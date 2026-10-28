@@ -190,58 +190,103 @@
           <!-- Animated Royal Aura -->
           <div class="royal-aura-disc"></div>
 
-          <!-- Master Doll Character Container -->
+          <!-- Articulated 3D Doll Character Container -->
           <div
             id="RoyalDollViewer-{{ section.id }}"
             class="royal-doll-character"
             data-doll-tracking="{{ section.settings.enable_doll_cursor_tracking | default: true }}"
             data-idle-float="{{ section.settings.enable_idle_float | default: true }}"
           >
-            <!-- Default Base Doll (Cream & Gold Master) -->
-            <img
-              id="RoyalDollBase-{{ section.id }}"
-              class="royal-doll-img active"
-              src="{{ section.settings.default_doll_image | default: 'royal-doll-cream.png' | asset_url }}"
-              alt="Royal Indian Fashion Doll"
-              width="848"
-              height="1264"
-              loading="eager"
-            >
+            <!-- Body Layer (Torso, Sherwani, Arms, Legs, Mojari) -->
+            <div id="RoyalDollBodyRig-{{ section.id }}" class="royal-doll-body-rig">
+              <img
+                id="RoyalDollBody-cream-{{ section.id }}"
+                class="royal-body-img active"
+                data-outfit-key="cream"
+                src="{{ 'royal-doll-cream-body.png' | asset_url }}"
+                alt="Imperial Ivory Sherwani Body"
+                width="848"
+                height="1264"
+                loading="eager"
+              >
+              <img
+                id="RoyalDollBody-red-{{ section.id }}"
+                class="royal-body-img"
+                data-outfit-key="red"
+                src="{{ 'royal-doll-red-body.png' | asset_url }}"
+                alt="Ruby Red Royal Sherwani Body"
+                width="848"
+                height="1264"
+                loading="lazy"
+              >
+              <img
+                id="RoyalDollBody-blue-{{ section.id }}"
+                class="royal-body-img"
+                data-outfit-key="blue"
+                src="{{ 'royal-doll-blue-body.png' | asset_url }}"
+                alt="Sapphire Blue Royal Sherwani Body"
+                width="848"
+                height="1264"
+                loading="lazy"
+              >
+              <img
+                id="RoyalDollBody-green-{{ section.id }}"
+                class="royal-body-img"
+                data-outfit-key="green"
+                src="{{ 'royal-doll-green-body.png' | asset_url }}"
+                alt="Emerald Green Heritage Sherwani Body"
+                width="848"
+                height="1264"
+                loading="lazy"
+              >
+            </div>
 
-            <!-- Preloaded Alternate Outfits for Instant, Seamless Crossfade -->
-            <img
-              id="RoyalDollOutfit-red-{{ section.id }}"
-              class="royal-doll-img"
-              data-outfit-key="red"
-              src="{{ 'royal-doll-red.png' | asset_url }}"
-              alt="Ruby Red Royal Court Sherwani"
-              width="848"
-              height="1264"
-              loading="lazy"
-            >
-            <img
-              id="RoyalDollOutfit-blue-{{ section.id }}"
-              class="royal-doll-img"
-              data-outfit-key="blue"
-              src="{{ 'royal-doll-blue.png' | asset_url }}"
-              alt="Sapphire Blue Royal Sherwani"
-              width="848"
-              height="1264"
-              loading="lazy"
-            >
-            <img
-              id="RoyalDollOutfit-green-{{ section.id }}"
-              class="royal-doll-img"
-              data-outfit-key="green"
-              src="{{ 'royal-doll-green.png' | asset_url }}"
-              alt="Emerald Green Heritage Sherwani"
-              width="848"
-              height="1264"
-              loading="lazy"
-            >
+            <!-- Head & Neck Layer (Pivots independently on the neck socket) -->
+            <div id="RoyalDollHeadRig-{{ section.id }}" class="royal-doll-head-rig">
+              <img
+                id="RoyalDollHead-cream-{{ section.id }}"
+                class="royal-head-img active"
+                data-outfit-key="cream"
+                src="{{ 'royal-doll-cream-head.png' | asset_url }}"
+                alt="Imperial Ivory Safa & Face"
+                width="848"
+                height="1264"
+                loading="eager"
+              >
+              <img
+                id="RoyalDollHead-red-{{ section.id }}"
+                class="royal-head-img"
+                data-outfit-key="red"
+                src="{{ 'royal-doll-red-head.png' | asset_url }}"
+                alt="Ruby Red Royal Safa & Face"
+                width="848"
+                height="1264"
+                loading="lazy"
+              >
+              <img
+                id="RoyalDollHead-blue-{{ section.id }}"
+                class="royal-head-img"
+                data-outfit-key="blue"
+                src="{{ 'royal-doll-blue-head.png' | asset_url }}"
+                alt="Sapphire Blue Royal Safa & Face"
+                width="848"
+                height="1264"
+                loading="lazy"
+              >
+              <img
+                id="RoyalDollHead-green-{{ section.id }}"
+                class="royal-head-img"
+                data-outfit-key="green"
+                src="{{ 'royal-doll-green-head.png' | asset_url }}"
+                alt="Emerald Green Heritage Safa & Face"
+                width="848"
+                height="1264"
+                loading="lazy"
+              >
+            </div>
 
-            <!-- Optional Custom Merchant Layer Overlays (Option B) -->
-            <div id="RoyalDollOverlays-{{ section.id }}" class="royal-doll-layer-stack" aria-hidden="true"></div>
+            <!-- Optional Custom Merchant Full-Body Image Layer -->
+            <div id="RoyalDollCustom-{{ section.id }}" class="royal-doll-custom-layer" aria-hidden="true"></div>
           </div>
 
           <!-- Current Outfit Title Tag -->
@@ -730,7 +775,7 @@
     transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  /* 3D Doll Character Container */
+  /* 3D Articulated Doll Rig */
   .royal-doll-character {
     position: relative;
     width: min(100%, 420px);
@@ -739,12 +784,38 @@
     align-items: flex-end;
     justify-content: center;
     z-index: 2;
-    transform-origin: center 85%;
+    perspective: 1100px;
     transform-style: preserve-3d;
-    will-change: transform;
     filter: drop-shadow(0 15px 25px rgba(43, 24, 16, 0.12));
+    pointer-events: none;
   }
 
+  /* Body Rig: Torso, Sherwani, Arms, Legs, Mojari (Pivots at feet/hips) */
+  .royal-doll-body-rig {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: center 88%;
+    transform-style: preserve-3d;
+    will-change: transform;
+    z-index: 2;
+  }
+
+  /* Head & Neck Rig: Sits in neck socket, pivots on neck collar base */
+  .royal-doll-head-rig {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 37.5%;
+    transform-style: preserve-3d;
+    will-change: transform;
+    z-index: 1;
+  }
+
+  .royal-body-img,
+  .royal-head-img,
   .royal-doll-img {
     position: absolute;
     bottom: 0;
@@ -763,6 +834,8 @@
     pointer-events: none;
   }
 
+  .royal-body-img.active,
+  .royal-head-img.active,
   .royal-doll-img.active {
     opacity: 1;
     visibility: visible;
@@ -1294,8 +1367,11 @@
       if (!sectionContainer) return;
 
       var dollViewer = document.getElementById('RoyalDollViewer-{{ section.id }}');
-      var baseDoll = document.getElementById('RoyalDollBase-{{ section.id }}');
-      var outfitImgs = sectionContainer.querySelectorAll('.royal-doll-img');
+      var headRig = document.getElementById('RoyalDollHeadRig-{{ section.id }}');
+      var bodyRig = document.getElementById('RoyalDollBodyRig-{{ section.id }}');
+      var bodyImgs = sectionContainer.querySelectorAll('.royal-body-img');
+      var headImgs = sectionContainer.querySelectorAll('.royal-head-img');
+      var customDollBox = document.getElementById('RoyalDollCustom-{{ section.id }}');
       var cards = sectionContainer.querySelectorAll('.royal-product-card');
       var categoryPills = sectionContainer.querySelectorAll('.royal-cat-pill');
       var cardsTrack = document.getElementById('RoyalCardsTrack-{{ section.id }}');
@@ -1354,38 +1430,43 @@
 
         // A) If merchant specified a custom uploaded doll image in block
         if (customOutfitUrl && customOutfitUrl.trim() !== '') {
-          // Check if dynamic custom image element exists
           var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
           if (!customImg) {
             customImg = document.createElement('img');
             customImg.id = 'RoyalCustomDoll-{{ section.id }}';
             customImg.className = 'royal-doll-img';
             customImg.alt = title;
-            dollViewer.appendChild(customImg);
+            if (customDollBox) customDollBox.appendChild(customImg);
           }
           customImg.src = customOutfitUrl;
-          outfitImgs.forEach(function(img) { img.classList.remove('active'); });
+          if (bodyRig) bodyRig.style.display = 'none';
+          if (headRig) headRig.style.display = 'none';
           customImg.classList.add('active');
           matched = true;
         }
 
         // B) Match against preloaded character variations (cream, red, blue, green)
         if (!matched) {
-          var targetImg = null;
-          outfitImgs.forEach(function(img) {
+          if (bodyRig) bodyRig.style.display = 'block';
+          if (headRig) headRig.style.display = 'block';
+          var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
+          if (customImg) customImg.classList.remove('active');
+
+          bodyImgs.forEach(function(img) {
             if (img.getAttribute('data-outfit-key') === outfitKey) {
-              targetImg = img;
+              img.classList.add('active');
+            } else {
+              img.classList.remove('active');
             }
           });
 
-          if (!targetImg && outfitKey === 'cream') {
-            targetImg = baseDoll;
-          }
-
-          if (targetImg) {
-            outfitImgs.forEach(function(img) { img.classList.remove('active'); });
-            targetImg.classList.add('active');
-          }
+          headImgs.forEach(function(img) {
+            if (img.getAttribute('data-outfit-key') === outfitKey) {
+              img.classList.add('active');
+            } else {
+              img.classList.remove('active');
+            }
+          });
         }
       }
 
@@ -1488,10 +1569,16 @@
       var ease = speedVal / 100;
       var particles = [];
 
-      // Doll 3D Orientation State
-      var dollRotY = 0;
-      var dollRotX = 0;
-      var dollTransX = 0;
+      // Body 3D Orientation State
+      var bodyRotY = 0;
+      var bodyRotX = 0;
+      var bodyTransX = 0;
+
+      // Head & Neck 3D Orientation State
+      var headRotY = 0;
+      var headRotX = 0;
+      var headRotZ = 0;
+      var headTransX = 0;
 
       // Sparkle Particle Class
       function Particle(x, y) {
@@ -1552,52 +1639,90 @@
       function animateStage(time) {
         if (prefersReducedMotion) return;
 
-        // --- A. 3D Doll Cursor Tracking (Doll Statue leans and looks towards mouse) ---
+        // --- A. 3D Doll Head, Neck & Body Cursor Tracking ---
         if (dollViewer && enableDollTracking) {
-          var targetDollRotY = 0;
-          var targetDollRotX = 0;
-          var targetDollTransX = 0;
+          var targetBodyRotY = 0;
+          var targetBodyRotX = 0;
+          var targetBodyTransX = 0;
+
+          var targetHeadRotY = 0;
+          var targetHeadRotX = 0;
+          var targetHeadRotZ = 0;
+          var targetHeadTransX = 0;
 
           if (isCursorInside) {
             var dollRect = dollViewer.getBoundingClientRect();
             var dollMidX = dollRect.left + dollRect.width / 2;
-            var dollMidY = dollRect.top + dollRect.height * 0.42;
+            var dollMidY = dollRect.top + dollRect.height * 0.38;
 
-            // Normalized displacement between cursor and doll center
             var relX = (currentClientX - dollMidX) / (window.innerWidth * 0.42);
             var relY = (currentClientY - dollMidY) / (window.innerHeight * 0.42);
 
-            relX = Math.max(-1.15, Math.min(1.15, relX));
-            relY = Math.max(-1.15, Math.min(1.15, relY));
+            relX = Math.max(-1.2, Math.min(1.2, relX));
+            relY = Math.max(-1.2, Math.min(1.2, relY));
 
-            // Cursor to left -> doll turns left (positive/negative rotation matching perspective)
-            // Cursor to right -> doll turns right
-            targetDollRotY = relX * 18;
-            targetDollRotX = -relY * 8;
-            targetDollTransX = relX * 14;
+            // HEAD & NECK: Active rotation following the cursor
+            // Moves smoothly to the side where the cursor is
+            targetHeadRotY = relX * 28;
+            targetHeadRotX = -relY * 12;
+            targetHeadRotZ = relX * 4.5;
+            targetHeadTransX = relX * 12;
+
+            // BODY: Grounded posture with subtle secondary lean
+            targetBodyRotY = relX * 7;
+            targetBodyRotX = -relY * 3.5;
+            targetBodyTransX = relX * 8;
           } else if (butterfly && (!isCursorInside || (time - lastMoveTime > 3000))) {
-            // When mouse is idle, doll follows the autonomous butterfly
+            // When mouse is idle, head and neck swivel to watch the autonomous butterfly!
             var dollLocalX = width * 0.5;
-            var diffX = (posX - dollLocalX) / (width * 0.5);
-            targetDollRotY = Math.max(-10, Math.min(10, diffX * 12));
-            targetDollTransX = targetDollRotY * 0.6;
+            var diffX = (posX - dollLocalX) / (width * 0.45);
+            var diffY = (posY - (height * 0.35)) / (height * 0.45);
+
+            diffX = Math.max(-1.1, Math.min(1.1, diffX));
+            diffY = Math.max(-1.1, Math.min(1.1, diffY));
+
+            targetHeadRotY = diffX * 22;
+            targetHeadRotX = -diffY * 10;
+            targetHeadRotZ = diffX * 3;
+            targetHeadTransX = diffX * 8;
+
+            targetBodyRotY = diffX * 5;
+            targetBodyTransX = diffX * 5;
           }
 
-          // Smooth lerp interpolation for silky motion
-          dollRotY += (targetDollRotY - dollRotY) * 0.08;
-          dollRotX += (targetDollRotX - dollRotX) * 0.08;
-          dollTransX += (targetDollTransX - dollTransX) * 0.08;
+          // Smooth lerp damping for fluid, organic motion
+          headRotY += (targetHeadRotY - headRotY) * 0.085;
+          headRotX += (targetHeadRotX - headRotX) * 0.085;
+          headRotZ += (targetHeadRotZ - headRotZ) * 0.085;
+          headTransX += (targetHeadTransX - headTransX) * 0.085;
+
+          bodyRotY += (targetBodyRotY - bodyRotY) * 0.07;
+          bodyRotX += (targetBodyRotX - bodyRotX) * 0.07;
+          bodyTransX += (targetBodyTransX - bodyTransX) * 0.07;
 
           var idleY = enableIdleFloat ? Math.sin(time * 0.0016) * 6 : 0;
 
-          dollViewer.style.transform =
-            'translate3d(' + dollTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
-            'rotateY(' + dollRotY.toFixed(2) + 'deg) ' +
-            'rotateX(' + dollRotX.toFixed(2) + 'deg)';
+          // Apply to Body Rig
+          if (bodyRig) {
+            bodyRig.style.transform =
+              'translate3d(' + bodyTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
+              'rotateY(' + bodyRotY.toFixed(2) + 'deg) ' +
+              'rotateX(' + bodyRotX.toFixed(2) + 'deg)';
+          }
 
+          // Apply to Head Rig (turns on neck joint!)
+          if (headRig) {
+            headRig.style.transform =
+              'translate3d(' + headTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
+              'rotateY(' + headRotY.toFixed(2) + 'deg) ' +
+              'rotateX(' + headRotX.toFixed(2) + 'deg) ' +
+              'rotateZ(' + headRotZ.toFixed(2) + 'deg)';
+          }
+
+          // Background Golden Aura Disc Counter-Parallax
           if (auraDisc) {
-            var auraX = -dollRotY * 1.5;
-            var auraY = -dollRotX * 1.2;
+            var auraX = -headRotY * 1.6;
+            var auraY = -headRotX * 1.2;
             auraDisc.style.transform = 'translate3d(calc(-50% + ' + auraX.toFixed(1) + 'px), ' + auraY.toFixed(1) + 'px, 0)';
           }
         }

@@ -26,6 +26,7 @@ html {
 }
 
 @media (min-width: 990px) {
+
   html:has(.page-wrapper),
   html:has(.page-wrapper) body {
     height: 100dvh;
@@ -152,7 +153,7 @@ p:empty {
 }
 
 :first-child:is(p, h1, h2, h3, h4, h5, h6),
-:first-child:empty + :where(p, h1, h2, h3, h4, h5, h6) {
+:first-child:empty+ :where(p, h1, h2, h3, h4, h5, h6) {
   margin-block-start: 0;
 }
 
@@ -173,6 +174,7 @@ p:empty {
  * take effect once an `@view-transition` opt-in is active, so they are inert without it.
  */
 @media (prefers-reduced-motion: no-preference) {
+
   /* Keep page interactive while view transitions are running */
   :root {
     view-transition-name: none;
@@ -262,7 +264,7 @@ p:empty {
   flex-direction: column;
 }
 
-.content-for-layout > .shopify-section:last-child {
+.content-for-layout>.shopify-section:last-child {
   flex-grow: 1;
 }
 
@@ -277,6 +279,7 @@ p:empty {
 }
 
 @media screen and (min-width: 750px) {
+
   .page-width-wide,
   .page-width-normal,
   .page-width-narrow,
@@ -312,19 +315,14 @@ p:empty {
    full-width background image even if the section content is constrained by the page width. Do not try
    to rewrite this to max-width: --page-width; margin: 0 auto;, it doesn't work. */
 .section {
-  --full-page-grid-central-column-width: min(
-    var(--page-width) - var(--page-margin) * 2,
-    calc(100% - var(--page-margin) * 2)
-  );
+  --full-page-grid-central-column-width: min(var(--page-width) - var(--page-margin) * 2,
+      calc(100% - var(--page-margin) * 2));
   --full-page-grid-margin: minmax(var(--page-margin), 1fr);
-  --full-page-grid-with-margins: var(--full-page-grid-margin) var(--full-page-grid-central-column-width)
-    var(--full-page-grid-margin);
+  --full-page-grid-with-margins: var(--full-page-grid-margin) var(--full-page-grid-central-column-width) var(--full-page-grid-margin);
 
   /* Utility variable gives the grid's first column width. Provides an offset width for components like carousels */
-  --util-page-margin-offset: max(
-    var(--page-margin),
-    calc((100% - min(var(--page-content-width), 100% - var(--page-margin) * 2)) / 2)
-  );
+  --util-page-margin-offset: max(var(--page-margin),
+      calc((100% - min(var(--page-content-width), 100% - var(--page-margin) * 2)) / 2));
 
   /* Offset for full-width sections to account for the page margin,
   used for Marquee — note that --util-page-margin-offset doesn't work here */
@@ -342,7 +340,7 @@ p:empty {
 }
 
 /* Place all direct children in the center column by default */
-.section > * {
+.section>* {
   grid-column: 2;
 }
 
@@ -364,23 +362,23 @@ p:empty {
 }
 
 /* For page-width sections, all content goes in the center column */
-.section--page-width > * {
+.section--page-width>* {
   grid-column: 2;
 }
 
 /* For full-width sections, content spans all columns */
-.section--full-width > * {
+.section--full-width>* {
   grid-column: 1 / -1;
 }
 
 @media screen and (max-width: 749px) {
-  .section--mobile-full-width > * {
+  .section--mobile-full-width>* {
     grid-column: 1 / -1;
   }
 }
 
 /* For full-width sections with margin, content still spans full width but with space on the sides */
-.section--full-width.section--full-width-margin > * {
+.section--full-width.section--full-width-margin>* {
   grid-column: 1 / -1;
 
   @media screen and (min-width: 750px) {
@@ -389,7 +387,7 @@ p:empty {
 }
 
 /* Some section content break out to full width of the page */
-.section > .force-full-width {
+.section>.force-full-width {
   grid-column: 1 / -1;
 }
 
@@ -424,6 +422,7 @@ p:empty {
 }
 
 @media screen and (max-width: 749px) {
+
   .hidden--mobile,
   .mobile\:hidden {
     /* stylelint-disable-next-line declaration-no-important */
@@ -432,6 +431,7 @@ p:empty {
 }
 
 @media screen and (min-width: 750px) {
+
   .hidden--desktop,
   .desktop\:hidden {
     /* stylelint-disable-next-line declaration-no-important */
@@ -489,11 +489,8 @@ p:empty {
 @media screen and (min-width: 1400px) {
   .grid {
     grid-template-columns:
-      1fr repeat(
-        var(--centered-column-number),
-        minmax(0, calc((var(--page-width) - var(--page-margin) * 2) / var(--centered-column-number)))
-      )
-      1fr;
+      1fr repeat(var(--centered-column-number),
+        minmax(0, calc((var(--page-width) - var(--page-margin) * 2) / var(--centered-column-number)))) 1fr;
   }
 }
 
@@ -565,7 +562,7 @@ p:empty {
   height: var(--icon-size-xs);
 }
 
-.svg-wrapper > svg {
+.svg-wrapper>svg {
   width: var(--icon-size-sm);
   height: var(--icon-size-sm);
 }
@@ -601,7 +598,7 @@ p:empty {
 /* Base text and heading styles */
 body,
 .paragraph:not(.button),
-.paragraph > *,
+.paragraph>*,
 .text-block.paragraph :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-paragraph--family);
   font-style: var(--font-paragraph--style);
@@ -615,6 +612,7 @@ body,
 
 /* Ensure inputs with type presets maintain minimum 16px on mobile to prevent iOS zoom */
 @media screen and (max-width: 1200px) {
+
   input.paragraph.paragraph,
   input.paragraph.paragraph:not([type]),
   textarea.paragraph.paragraph,
@@ -623,7 +621,7 @@ body,
   }
 }
 
-.paragraph > small {
+.paragraph>small {
   font-size: smaller;
 }
 
@@ -631,7 +629,7 @@ body,
 
 h1,
 .h1.h1,
-.text-block.h1 > *,
+.text-block.h1>*,
 .text-block.h1 :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-h1--family);
   font-style: var(--font-h1--style);
@@ -644,6 +642,7 @@ h1,
 }
 
 @media screen and (max-width: 1200px) {
+
   input.h1.h1,
   textarea.h1.h1,
   select.h1.h1 {
@@ -653,7 +652,7 @@ h1,
 
 h2,
 .h2.h2,
-.text-block.h2 > *,
+.text-block.h2>*,
 .text-block.h2 :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-h2--family);
   font-style: var(--font-h2--style);
@@ -666,6 +665,7 @@ h2,
 }
 
 @media screen and (max-width: 1200px) {
+
   input.h2.h2,
   textarea.h2.h2,
   select.h2.h2 {
@@ -676,7 +676,7 @@ h2,
 h3,
 .h3,
 .h3.h3,
-.text-block.h3 > *,
+.text-block.h3>*,
 .text-block.h3 :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-h3--family);
   font-style: var(--font-h3--style);
@@ -689,6 +689,7 @@ h3,
 }
 
 @media screen and (max-width: 1200px) {
+
   input.h3,
   textarea.h3,
   select.h3 {
@@ -698,7 +699,7 @@ h3,
 
 h4,
 .h4.h4,
-.text-block.h4 > *,
+.text-block.h4>*,
 .text-block.h4 :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-h4--family);
   font-style: var(--font-h4--style);
@@ -711,6 +712,7 @@ h4,
 }
 
 @media screen and (max-width: 1200px) {
+
   input.h4.h4,
   textarea.h4.h4,
   select.h4.h4 {
@@ -720,7 +722,7 @@ h4,
 
 h5,
 .h5.h5,
-.text-block.h5 > *,
+.text-block.h5>*,
 .text-block.h5 :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-h5--family);
   font-style: var(--font-h5--style);
@@ -733,6 +735,7 @@ h5,
 }
 
 @media screen and (max-width: 1200px) {
+
   input.h5.h5,
   textarea.h5.h5,
   select.h5.h5 {
@@ -742,7 +745,7 @@ h5,
 
 h6,
 .h6.h6,
-.text-block.h6 > *,
+.text-block.h6>*,
 .text-block.h6 :is(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-h6--family);
   font-style: var(--font-h6--style);
@@ -755,6 +758,7 @@ h6,
 }
 
 @media screen and (max-width: 1200px) {
+
   input.h6.h6,
   textarea.h6.h6,
   select.h6.h6 {
@@ -780,7 +784,7 @@ a {
     color var(--animation-speed) var(--animation-easing);
 }
 
-:is(h1, h2, h3, h4, h5, h6, p) > a:hover {
+:is(h1, h2, h3, h4, h5, h6, p)>a:hover {
   color: rgb(var(--color-rgb, var(--color-foreground-rgb)) / 0.7);
 }
 
@@ -1068,8 +1072,9 @@ summary:hover {
 }
 
 @media screen and (min-width: 750px) {
+
   .sticky-content--desktop,
-  .sticky-content--desktop.full-height--desktop > .group-block {
+  .sticky-content--desktop.full-height--desktop>.group-block {
     position: sticky;
     top: var(--sticky-header-offset, 0);
     z-index: var(--layer-flat);
@@ -1118,7 +1123,7 @@ summary:hover {
 
 /* Custom Typography style */
 .custom-typography,
-.custom-typography > * {
+.custom-typography>* {
   font-family: var(--font-family);
   font-weight: var(--font-weight);
   text-transform: var(--text-transform);
@@ -1144,12 +1149,12 @@ summary:hover {
 }
 
 .custom-font-size,
-.custom-font-size > * {
+.custom-font-size>* {
   font-size: var(--font-size);
 }
 
 .custom-font-weight,
-.custom-font-weight > * {
+.custom-font-weight>* {
   font-weight: var(--font-weight);
 }
 
@@ -1204,23 +1209,23 @@ summary:hover {
     flex-wrap: var(--flex-wrap-mobile);
     height: auto;
 
-    > .menu {
+    >.menu {
       flex: 1 1 min-content;
     }
 
-    > .text-block {
+    >.text-block {
       flex: 1 1 var(--max-width--display-tight);
     }
 
-    > .image-block {
+    >.image-block {
       flex: 1 1 var(--size-style-width-mobile-min);
     }
 
-    > .button {
+    >.button {
       flex: 0 0 fit-content;
     }
 
-    > .group-block--height-fill {
+    >.group-block--height-fill {
       height: calc(var(--section-min-height, auto) - var(--section-height-offset, 0px));
     }
   }
@@ -1291,7 +1296,7 @@ summary:hover {
   }
 
   :first-child:is(p, h1, h2, h3, h4, h5, h6),
-  :first-child:empty + :is(p, h1, h2, h3, h4, h5, h6) {
+  :first-child:empty+ :is(p, h1, h2, h3, h4, h5, h6) {
     margin-block-start: 0;
   }
 
@@ -1381,7 +1386,8 @@ input[type='radio'] {
   content: '';
   position: absolute;
   top: 50%;
-  left: 50%; /* stylelint-disable-line csstools/use-logical -- centring pair with a physical translate(-50%) */
+  left: 50%;
+  /* stylelint-disable-line csstools/use-logical -- centring pair with a physical translate(-50%) */
   transform: translate(-50%, -50%);
   width: calc(var(--checkbox-size) / 2);
   height: calc(var(--checkbox-size) / 2);
@@ -1430,7 +1436,8 @@ input[type='radio'] {
   content: '';
   position: absolute;
   top: 50%;
-  left: 50%; /* stylelint-disable-line csstools/use-logical -- centring pair with a physical translate(-50%) */
+  left: 50%;
+  /* stylelint-disable-line csstools/use-logical -- centring pair with a physical translate(-50%) */
   transform: translate(-50%, -50%);
   width: var(--checkbox-size);
   height: var(--checkbox-size);
@@ -1462,15 +1469,15 @@ input[type='radio'] {
 }
 
 /* Shared styles for radio buttons and checkboxes */
-:where(input[type='radio']) + label,
-:where(input[type='checkbox']) + label {
+:where(input[type='radio'])+label,
+:where(input[type='checkbox'])+label {
   display: inline;
   vertical-align: middle;
   cursor: pointer;
 }
 
-:where(input[type='radio']):disabled + label,
-:where(input[type='checkbox']):disabled + label {
+:where(input[type='radio']):disabled+label,
+:where(input[type='checkbox']):disabled+label {
   color: var(--input-disabled-text-color);
   cursor: not-allowed;
 }
@@ -1672,20 +1679,20 @@ input[type='radio'] {
 
 /* Slideshow Arrow Hover Animation - must stay in base.css for proper CSS cascade */
 
-slideshow-container[animate-arrows]:hover > slideshow-arrows .slideshow-control,
-slideshow-component:focus-within > slideshow-container[animate-arrows] > slideshow-arrows .slideshow-control {
+slideshow-container[animate-arrows]:hover>slideshow-arrows .slideshow-control,
+slideshow-component:focus-within>slideshow-container[animate-arrows]>slideshow-arrows .slideshow-control {
   animation: arrowsSlideIn var(--animation-speed) var(--animation-easing) forwards;
 }
 
 /* Clipped controls preserve accessible paging without intercepting touch taps. */
 @media (hover: none) and (pointer: coarse) {
-  .resource-list__carousel > [animate-arrows] > :where(slideshow-arrows) > .slideshow-control:not(:focus-visible) {
+  .resource-list__carousel>[animate-arrows]> :where(slideshow-arrows)>.slideshow-control:not(:focus-visible) {
     position: absolute;
     clip: rect(0 0 0 0);
     animation: none;
   }
 
-  .resource-list__carousel > [animate-arrows] > :where(slideshow-arrows) > .slideshow-control:focus-visible {
+  .resource-list__carousel>[animate-arrows]> :where(slideshow-arrows)>.slideshow-control:focus-visible {
     opacity: 1;
     animation: none;
   }
@@ -1720,11 +1727,10 @@ slideshow-component:focus-within > slideshow-container[animate-arrows] > slidesh
   display: none;
 }
 
-:where(.section-resource-list.section--full-width) product-card[data-product-transition] > .group-block,
-:where(.section-carousel.section--full-width) product-card[data-product-transition] > .group-block {
+:where(.section-resource-list.section--full-width) product-card[data-product-transition]>.group-block,
+:where(.section-carousel.section--full-width) product-card[data-product-transition]>.group-block {
   @media screen and (max-width: 749px) {
-    padding-inline: max(var(--padding-xs), var(--padding-inline-start))
-      max(var(--padding-xs), var(--padding-inline-end));
+    padding-inline: max(var(--padding-xs), var(--padding-inline-start)) max(var(--padding-xs), var(--padding-inline-end));
   }
 }
 
@@ -1749,15 +1755,15 @@ slideshow-component:focus-within > slideshow-container[animate-arrows] > slidesh
 }
 
 /* Flex behavior for width variants */
-.layout-panel-flex--row > .group-block--width-fit {
+.layout-panel-flex--row>.group-block--width-fit {
   flex: 0;
 }
 
-.layout-panel-flex--row > .group-block--width-fill {
+.layout-panel-flex--row>.group-block--width-fill {
   flex: 1;
 }
 
-.layout-panel-flex--row > .group-block--width-custom {
+.layout-panel-flex--row>.group-block--width-custom {
   flex-basis: var(--size-style-width);
 }
 
@@ -1772,15 +1778,15 @@ slideshow-component:focus-within > slideshow-container[animate-arrows] > slidesh
 }
 
 /* Flex behavior for height variants */
-.layout-panel-flex--column > .group-block--height-fit {
+.layout-panel-flex--column>.group-block--height-fit {
   flex: 0 1 auto;
 }
 
-.layout-panel-flex--column > .group-block--height-fill {
+.layout-panel-flex--column>.group-block--height-fill {
   flex: 1;
 }
 
-.layout-panel-flex--column > .group-block--height-custom {
+.layout-panel-flex--column>.group-block--height-custom {
   flex-basis: var(--size-style-height);
 }
 
@@ -1809,6 +1815,7 @@ slideshow-component:focus-within > slideshow-container[animate-arrows] > slidesh
 
 /* Prevent iOS zoom on input focus by ensuring minimum 16px font size on mobile */
 @media screen and (max-width: 1200px) {
+
   input,
   textarea,
   select,
@@ -1841,7 +1848,8 @@ slideshow-component:focus-within > slideshow-container[animate-arrows] > slidesh
 /* When the header is transparent, and when there is no header-section below it, offset the first main-section with
  * the height of the header
  */
-main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
+main>.shopify-section:first-child .section:not(.disable-section-top-offset) {
+
   &.spacing-style,
   .spacing-style {
     --section-top-offset: calc(var(--header-height) * var(--transparent-header-offset-boolean));

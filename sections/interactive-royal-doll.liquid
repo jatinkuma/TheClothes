@@ -1,12 +1,12 @@
 {% comment %}
   Interactive Royal Fashion Doll Section — "The Royal Attire"
   Faithful, production-ready recreation of the reference video:
-  - Living character with continuous organic 30fps animation (breathing, looking, blinking, head-turning)
-  - Interactive 3D cursor/pointer tracking driven by a 36-frame sequential character spritesheet + 3D CSS pitch & yaw
-  - Independent 3D butterfly with continuous flapping wings and starlight particle trail
+  - Hero stage with authentic Royal Statue (Rajasthani turban, sunglasses, kurta, dhoti, stole)
+  - 3D head and neck tracking that turns and tilts to follow the cursor across the screen
+  - Realistic independent continuous wing-flapping 3D butterfly with particle sparkle trail
   - "The Collection ↓" scroll pill revealing "Worn by royalty, made by hand"
   - Horizontal luxury card carousel (Safa, Odhni, Ghagra, Mojari, Sherwani)
-  - Full Shopify Theme Editor blocks for real product mapping and merchant custom configuration
+  - Seamless Shopify Theme Editor blocks for real product mapping and custom configuration
 {% endcomment %}
 
 <div
@@ -131,7 +131,7 @@
   {% endif %}
 
   <!-- =========================================================================
-       HERO STAGE: "The Royal Attire" with Living Interactive Character
+       HERO STAGE: "The Royal Attire" with 3D Head-Tracking Statue
        ========================================================================= -->
   <section class="royal-hero-screen" id="RoyalHero-{{ section.id }}">
     <!-- Top Navigation Bar matching video -->
@@ -175,7 +175,7 @@
       </div>
     </header>
 
-    <!-- Central 3D Interactive Living Character Podium -->
+    <!-- Central 3D Interactive Statue Podium -->
     <div class="royal-statue-center-stage">
       <div
         id="RoyalStatueViewer-{{ section.id }}"
@@ -186,40 +186,69 @@
         <!-- Ground Contact Shadow -->
         <div class="royal-floor-shadow" aria-hidden="true"></div>
 
-        <!-- 3D Articulated Living Rig: Continuous 60fps Spritesheet Canvas + Video + 3D CSS pitch & yaw -->
+        <!-- 3D Articulated Statue Rig: Smooth directional frame interpolation + 3D CSS pitch & yaw -->
         <div id="RoyalStatueInnerRig-{{ section.id }}" class="royal-statue-inner-rig">
           
-          <!-- Interactive Character Canvas (36-Frame Smooth Sequence from Reference Video) -->
-          <canvas
-            id="RoyalStatueCanvas-{{ section.id }}"
-            class="royal-character-canvas active"
-            width="320"
-            height="640"
-            data-spritesheet="{{ 'royal-owl-spritesheet.jpg' | asset_url }}"
-            data-spritesheet-png="{{ 'royal-owl-spritesheet.png' | asset_url }}"
-          ></canvas>
-
-          <!-- Native HTML5 Video Stream Fallback -->
-          <video
-            id="RoyalStatueVideo-{{ section.id }}"
-            class="royal-character-video"
-            src="{{ 'royal-owl-animation.mp4' | asset_url }}"
-            autoplay
-            loop
-            muted
-            playsinline
-            aria-hidden="true"
-          ></video>
-
-          <!-- Preload/Base High-Res Pose Image -->
+          <!-- Directional Statue Poses extracted directly from reference video -->
           <img
-            id="StatueAngle-center-{{ section.id }}"
-            class="royal-statue-pose fallback-base"
-            src="{{ 'royal-owl-statue-center.jpg' | asset_url }}"
-            alt="The Royal Attire Character"
+            id="StatueAngle-far-left-{{ section.id }}"
+            class="royal-statue-pose"
+            data-angle="far-left"
+            src="{{ 'royal-owl-statue-far-left.jpg' | asset_url }}"
+            alt="Royal Statue looking far left"
             width="420"
             height="830"
             loading="eager"
+          >
+          <img
+            id="StatueAngle-left-{{ section.id }}"
+            class="royal-statue-pose"
+            data-angle="left"
+            src="{{ 'royal-owl-statue-left.jpg' | asset_url }}"
+            alt="Royal Statue looking left"
+            width="420"
+            height="830"
+            loading="eager"
+          >
+          <img
+            id="StatueAngle-center-{{ section.id }}"
+            class="royal-statue-pose active"
+            data-angle="center"
+            src="{{ 'royal-owl-statue-center.jpg' | asset_url }}"
+            alt="Royal Statue looking forward"
+            width="420"
+            height="830"
+            loading="eager"
+          >
+          <img
+            id="StatueAngle-right-{{ section.id }}"
+            class="royal-statue-pose"
+            data-angle="right"
+            src="{{ 'royal-owl-statue-right.jpg' | asset_url }}"
+            alt="Royal Statue looking right"
+            width="420"
+            height="830"
+            loading="eager"
+          >
+          <img
+            id="StatueAngle-far-right-{{ section.id }}"
+            class="royal-statue-pose"
+            data-angle="far-right"
+            src="{{ 'royal-owl-statue-far-right.jpg' | asset_url }}"
+            alt="Royal Statue looking far right"
+            width="420"
+            height="830"
+            loading="eager"
+          >
+          <img
+            id="StatueAngle-blink-{{ section.id }}"
+            class="royal-statue-pose"
+            data-angle="blink"
+            src="{{ 'royal-owl-statue-blink.jpg' | asset_url }}"
+            alt="Royal Statue blinking"
+            width="420"
+            height="830"
+            loading="lazy"
           >
 
           <!-- Optional Merchant Custom Doll Upload Override -->
@@ -322,7 +351,7 @@
             {% comment %} Authentic default collection items extracted directly from video {% endcomment %}
 
             <!-- 01: Safa (Leheriya Silk) -->
-            <article class="royal-item-card active" data-card-index="1" data-piece-name="Safa">
+            <article class="royal-item-card active" data-card-index="1">
               <div class="item-card-visual">
                 <img src="{{ 'royal-card-safa.jpg' | asset_url }}" alt="Safa - Leheriya Silk" width="380" height="380" loading="lazy">
               </div>
@@ -339,7 +368,7 @@
             </article>
 
             <!-- 02: Odhni (Bandhani Tie-Dye) -->
-            <article class="royal-item-card" data-card-index="2" data-piece-name="Odhni">
+            <article class="royal-item-card" data-card-index="2">
               <div class="item-card-visual">
                 <img src="{{ 'royal-card-odhni.jpg' | asset_url }}" alt="Odhni - Bandhani Tie-Dye" width="380" height="380" loading="lazy">
               </div>
@@ -356,7 +385,7 @@
             </article>
 
             <!-- 03: Ghagra (Gota-Patti Zari) -->
-            <article class="royal-item-card" data-card-index="3" data-piece-name="Ghagra">
+            <article class="royal-item-card" data-card-index="3">
               <div class="item-card-visual">
                 <img src="{{ 'royal-card-ghagra.jpg' | asset_url }}" alt="Ghagra - Gota-Patti Zari" width="380" height="380" loading="lazy">
               </div>
@@ -373,7 +402,7 @@
             </article>
 
             <!-- 04: Mojari (Hand-Embroidered Leather) -->
-            <article class="royal-item-card" data-card-index="4" data-piece-name="Mojari">
+            <article class="royal-item-card" data-card-index="4">
               <div class="item-card-visual">
                 <img src="{{ 'royal-card-mojari.jpg' | asset_url }}" alt="Mojari - Hand-Embroidered Leather" width="380" height="380" loading="lazy">
               </div>
@@ -390,7 +419,7 @@
             </article>
 
             <!-- 05: Sherwani (Ivory Raw Silk) -->
-            <article class="royal-item-card" data-card-index="5" data-piece-name="Sherwani">
+            <article class="royal-item-card" data-card-index="5">
               <div class="item-card-visual">
                 <img src="{{ 'royal-card-sherwani.jpg' | asset_url }}" alt="Sherwani - Ivory Raw Silk" width="380" height="380" loading="lazy">
               </div>
@@ -594,7 +623,7 @@
     transform: scale(1.12);
   }
 
-  /* Center Stage Living Character */
+  /* Center Stage Statue */
   .royal-statue-center-stage {
     position: relative;
     flex: 1;
@@ -642,29 +671,6 @@
     z-index: 2;
   }
 
-  /* Canvas and Video Character Animators */
-  .royal-character-canvas,
-  .royal-character-video {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: calc(100% - 30px);
-    width: auto;
-    max-width: 100%;
-    object-fit: contain;
-    object-position: bottom center;
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 12px;
-    display: none;
-  }
-
-  .royal-character-canvas.active,
-  .royal-character-video.active {
-    display: block;
-  }
-
   .royal-statue-pose {
     position: absolute;
     bottom: 30px;
@@ -677,10 +683,10 @@
     object-position: bottom center;
     opacity: 0;
     visibility: hidden;
+    transition: opacity 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.22s;
     pointer-events: none;
     user-select: none;
     -webkit-user-drag: none;
-    z-index: 1;
   }
 
   .royal-statue-pose.active {
@@ -791,14 +797,12 @@
     box-shadow: 0 8px 26px rgba(43, 20, 8, 0.08);
     transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s;
     box-sizing: border-box;
-    cursor: pointer;
   }
 
   .royal-item-card:hover,
   .royal-item-card.active {
     transform: translateY(-4px);
     box-shadow: 0 16px 40px rgba(43, 20, 8, 0.14);
-    outline: 2px solid var(--royal-accent-gold);
   }
 
   .item-card-visual {
@@ -965,10 +969,6 @@
     .royal-butterfly-canvas {
       display: none !important;
     }
-    .royal-character-canvas,
-    .royal-character-video {
-      animation: none !important;
-    }
   }
 </style>
 
@@ -983,9 +983,7 @@
 
       var statueViewer = document.getElementById('RoyalStatueViewer-{{ section.id }}');
       var statueRig = document.getElementById('RoyalStatueInnerRig-{{ section.id }}');
-      var charCanvas = document.getElementById('RoyalStatueCanvas-{{ section.id }}');
-      var charVideo = document.getElementById('RoyalStatueVideo-{{ section.id }}');
-      var fallbackBase = statueRig ? statueRig.querySelector('.fallback-base') : null;
+      var poses = section.querySelectorAll('.royal-statue-pose');
       var butterfly = document.getElementById('RoyalButterfly-{{ section.id }}');
       var canvas = document.getElementById('RoyalButterflyCanvas-{{ section.id }}');
       var slider = document.getElementById('RoyalCardsSlider-{{ section.id }}');
@@ -998,63 +996,7 @@
       var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       /* ----------------------------------------------------
-         1. 36-Frame Authentic Character Animation Engine
-         ---------------------------------------------------- */
-      var COLS = 6;
-      var ROWS = 6;
-      var TOTAL_FRAMES = 36;
-      var FRAME_W = 160;
-      var FRAME_H = 320;
-
-      var spriteImg = new Image();
-      var isSpriteLoaded = false;
-      var spriteSrc = charCanvas ? (charCanvas.getAttribute('data-spritesheet') || '') : '';
-      
-      if (spriteSrc) {
-        spriteImg.onload = function() {
-          isSpriteLoaded = true;
-          if (charCanvas) charCanvas.classList.add('active');
-          if (fallbackBase) fallbackBase.style.display = 'none';
-        };
-        spriteImg.onerror = function() {
-          // If spritesheet fails, activate HTML5 video stream
-          if (charVideo) charVideo.classList.add('active');
-          if (fallbackBase) fallbackBase.style.display = 'none';
-        };
-        spriteImg.src = spriteSrc;
-      }
-
-      var currentFrameIndex = 18.0; // Center frame
-      var targetFrameIndex = 18.0;
-      var animLoopProgress = 0.0;
-      var isPointerActive = false;
-      var lastPointerMoveTime = performance.now();
-
-      function drawCharacterFrame(frameIdx) {
-        if (!charCanvas || !isSpriteLoaded) return;
-        var ctx = charCanvas.getContext('2d');
-        if (!ctx) return;
-
-        var safeIdx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.floor(frameIdx)));
-        var col = safeIdx % COLS;
-        var row = Math.floor(safeIdx / COLS);
-
-        ctx.clearRect(0, 0, charCanvas.width, charCanvas.height);
-        ctx.drawImage(
-          spriteImg,
-          col * FRAME_W,
-          row * FRAME_H,
-          FRAME_W,
-          FRAME_H,
-          0,
-          0,
-          charCanvas.width,
-          charCanvas.height
-        );
-      }
-
-      /* ----------------------------------------------------
-         2. 3D Butterfly Physics & Sparkle Particle Engine
+         1. 3D Butterfly Physics & Sparkle Particle Engine
          ---------------------------------------------------- */
       var width = section.offsetWidth;
       var height = section.offsetHeight;
@@ -1084,6 +1026,7 @@
       var currentClientX = window.innerWidth * 0.5;
       var currentClientY = window.innerHeight * 0.4;
       var isInside = false;
+      var lastMoveTime = performance.now();
       var speedSetting = butterfly ? (parseFloat(butterfly.getAttribute('data-speed')) || 8) : 8;
       var ease = speedSetting / 100;
       var particles = [];
@@ -1131,18 +1074,35 @@
         targetX = cx - rect.left;
         targetY = cy - rect.top;
         isInside = true;
-        isPointerActive = true;
-        lastPointerMoveTime = performance.now();
+        lastMoveTime = performance.now();
       }
 
       section.addEventListener('mousemove', handlePointer);
       section.addEventListener('mouseenter', handlePointer);
-      section.addEventListener('mouseleave', function() {
-        isInside = false;
-        isPointerActive = false;
-      });
+      section.addEventListener('mouseleave', function() { isInside = false; });
       section.addEventListener('touchmove', handlePointer, { passive: true });
       section.addEventListener('touchstart', handlePointer, { passive: true });
+
+      /* ----------------------------------------------------
+         2. Head Tracking & Blink State Management
+         ---------------------------------------------------- */
+      var currentPose = 'center';
+      var isBlinking = false;
+      var lastBlinkTime = 0;
+      var nextBlinkInterval = 3500;
+
+      function switchPose(poseName) {
+        if (currentPose === poseName) return;
+        currentPose = poseName;
+        poses.forEach(function(p) {
+          if (p.classList.contains('custom-override')) return;
+          if (p.getAttribute('data-angle') === poseName) {
+            p.classList.add('active');
+          } else {
+            p.classList.remove('active');
+          }
+        });
+      }
 
       var rigRotY = 0;
       var rigRotX = 0;
@@ -1155,13 +1115,12 @@
         if (prefersReducedMotion) return;
 
         // Autonomous Butterfly patrol when cursor is outside or idle
-        if (!isInside || (now - lastPointerMoveTime > 3500)) {
+        if (!isInside || (now - lastMoveTime > 4000)) {
           var t = now * 0.0014;
           var patrolCenterX = width * 0.5;
           var patrolCenterY = height * 0.28;
           targetX = patrolCenterX + Math.cos(t) * (width * 0.28);
           targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.16);
-          isPointerActive = false;
         }
 
         // Butterfly Movement Interpolation
@@ -1176,7 +1135,7 @@
           butterfly.style.transform = 'translate3d(' + posX.toFixed(1) + 'px, ' + posY.toFixed(1) + 'px, 0) rotate(' + tilt.toFixed(1) + 'deg)';
         }
 
-        // Sparkle Particles
+        // Particles
         if (canvas) {
           var ctx = canvas.getContext('2d');
           ctx.clearRect(0, 0, width, height);
@@ -1193,7 +1152,7 @@
           }
         }
 
-        // --- CHARACTER ANIMATION & TRACKING ---
+        // Statue 3D Head & Neck Tracking
         if (statueViewer && enableTracking) {
           var sRect = statueViewer.getBoundingClientRect();
           var statueMidX = sRect.left + sRect.width * 0.5;
@@ -1206,36 +1165,41 @@
           relX = Math.max(-1.2, Math.min(1.2, relX));
           relY = Math.max(-1.0, Math.min(1.0, relY));
 
-          // MODE A: Pointer active -> Character tracks cursor across 36 frame angles
-          if (isPointerActive) {
-            // Map relX [-1 to 1] to turn frame sequence
-            // Far Left: 5, Mid Left: 10, Center: 18, Mid Right: 24, Far Right: 30
-            var normalized = (relX + 1.2) / 2.4; // 0 to 1
-            targetFrameIndex = normalized * 35.0;
-            currentFrameIndex += (targetFrameIndex - currentFrameIndex) * 0.16;
-          } else {
-            // MODE B: Pointer idle -> Continuous living character animation loop!
-            // Cycles smoothly through authentic video sequence at 20fps
-            animLoopProgress += 0.32;
-            if (animLoopProgress >= TOTAL_FRAMES) {
-              animLoopProgress = 0;
-            }
-            currentFrameIndex = animLoopProgress;
+          // Blinking logic when looking forward
+          if (now - lastBlinkTime > nextBlinkInterval) {
+            isBlinking = true;
+            lastBlinkTime = now;
+            nextBlinkInterval = 3000 + Math.random() * 4000;
+            setTimeout(function() { isBlinking = false; }, 180);
           }
 
-          // Draw active frame on Canvas
-          drawCharacterFrame(currentFrameIndex);
+          if (isBlinking && Math.abs(relX) < 0.25) {
+            switchPose('blink');
+          } else {
+            // Select directional head angle based on cursor X
+            if (relX < -0.55) {
+              switchPose('far-left');
+            } else if (relX < -0.15) {
+              switchPose('left');
+            } else if (relX > 0.55) {
+              switchPose('far-right');
+            } else if (relX > 0.15) {
+              switchPose('right');
+            } else {
+              switchPose('center');
+            }
+          }
 
-          // Continuous micro 3D CSS pitch and yaw for depth
-          var targetRotY = isPointerActive ? (relX * 10) : (Math.sin(now * 0.0015) * 3);
-          var targetRotX = isPointerActive ? (-relY * 7) : (Math.cos(now * 0.002) * 2);
-          var targetTransX = isPointerActive ? (relX * 6) : 0;
+          // Continuous micro 3D CSS pitch and yaw for sub-pixel smoothness
+          var targetRotY = relX * 10;
+          var targetRotX = -relY * 7;
+          var targetTransX = relX * 6;
 
           rigRotY += (targetRotY - rigRotY) * 0.09;
           rigRotX += (targetRotX - rigRotX) * 0.09;
           rigTransX += (targetTransX - rigTransX) * 0.09;
 
-          var idleY = enableIdleFloat ? Math.sin(now * 0.0022) * 4 : 0;
+          var idleY = enableIdleFloat ? Math.sin(now * 0.0018) * 4 : 0;
 
           if (statueRig) {
             statueRig.style.transform =
@@ -1268,15 +1232,6 @@
         card.addEventListener('click', function() {
           cards.forEach(function(c) { c.classList.remove('active'); });
           card.classList.add('active');
-
-          // Subtle interactive nod / reaction from character when a piece is chosen
-          if (statueRig) {
-            statueRig.style.transition = 'transform 0.25s ease';
-            statueRig.style.transform = 'translate3d(0, -8px, 0) scale(1.02)';
-            setTimeout(function() {
-              statueRig.style.transition = '';
-            }, 300);
-          }
         });
       });
     }
@@ -1361,7 +1316,7 @@
     },
     {
       "type": "header",
-      "content": "Hero Stage & Character Animation"
+      "content": "Hero Stage & Character"
     },
     {
       "type": "color",
@@ -1373,7 +1328,7 @@
       "type": "image_picker",
       "id": "custom_doll_image",
       "label": "Custom Statue Image (Optional Override)",
-      "info": "Leave blank to use the authentic Royal Character animation from the reference video."
+      "info": "Leave blank to use the authentic Royal Owl Statue from the reference video."
     },
     {
       "type": "range",

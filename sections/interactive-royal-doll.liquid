@@ -193,7 +193,9 @@
           <!-- Master Doll Character Container -->
           <div
             id="RoyalDollViewer-{{ section.id }}"
-            class="royal-doll-character {% if section.settings.enable_idle_float %}royal-doll--idle{% endif %}"
+            class="royal-doll-character"
+            data-doll-tracking="{{ section.settings.enable_doll_cursor_tracking | default: true }}"
+            data-idle-float="{{ section.settings.enable_idle_float | default: true }}"
           >
             <!-- Default Base Doll (Cream & Gold Master) -->
             <img
@@ -710,6 +712,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
+    perspective: 1100px;
+    transform-style: preserve-3d;
   }
 
   .royal-aura-disc {
@@ -723,6 +727,7 @@
     background: radial-gradient(circle, rgba(255, 240, 190, 0.6) 0%, rgba(229, 155, 43, 0.18) 60%, transparent 80%);
     pointer-events: none;
     z-index: 1;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   /* 3D Doll Character Container */
@@ -734,21 +739,10 @@
     align-items: flex-end;
     justify-content: center;
     z-index: 2;
-    transform-origin: bottom center;
-  }
-
-  /* Gentle Royal Idle Movement */
-  .royal-doll--idle {
-    animation: royalDollIdle 5.5s ease-in-out infinite;
-  }
-
-  @keyframes royalDollIdle {
-    0%, 100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-9px) rotate(0.4deg);
-    }
+    transform-origin: center 85%;
+    transform-style: preserve-3d;
+    will-change: transform;
+    filter: drop-shadow(0 15px 25px rgba(43, 24, 16, 0.12));
   }
 
   .royal-doll-img {
@@ -1447,142 +1441,205 @@
       });
 
       /* ----------------------------------------------------
-         2. Interactive 3D Blue-Purple Butterfly Engine
+         2. Interactive 3D Cursor Tracking & Butterfly Engine
          ---------------------------------------------------- */
       var butterfly = document.getElementById('RoyalButterfly-{{ section.id }}');
       var canvas = document.getElementById('RoyalButterflyCanvas-{{ section.id }}');
+      var auraDisc = sectionContainer.querySelector('.royal-aura-disc');
+      var enableDollTracking = dollViewer && dollViewer.getAttribute('data-doll-tracking') !== 'false';
+      var enableIdleFloat = dollViewer && dollViewer.getAttribute('data-idle-float') !== 'false';
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (butterfly && canvas) {
-        var ctx = canvas.getContext('2d');
-        var animationFrameId = null;
-        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var animationFrameId = null;
+      var rect = sectionContainer.getBoundingClientRect();
+      var width = sectionContainer.offsetWidth;
+      var height = sectionContainer.offsetHeight;
 
-        // Position & Flight Physics State
-        var rect = sectionContainer.getBoundingClientRect();
-        var width = (canvas.width = sectionContainer.offsetWidth);
-        var height = (canvas.height = sectionContainer.offsetHeight);
+      if (canvas) {
+        canvas.width = width;
+        canvas.height = height;
+      }
 
-        // Resize Canvas on Window Resize
-        function handleResize() {
-          if (!sectionContainer) return;
-          width = canvas.width = sectionContainer.offsetWidth;
-          height = canvas.height = sectionContainer.offsetHeight;
+      function handleResize() {
+        if (!sectionContainer) return;
+        rect = sectionContainer.getBoundingClientRect();
+        width = sectionContainer.offsetWidth;
+        height = sectionContainer.offsetHeight;
+        if (canvas) {
+          canvas.width = width;
+          canvas.height = height;
         }
-        window.addEventListener('resize', handleResize);
+      }
+      window.addEventListener('resize', handleResize);
 
-        // Initial coordinates (start near top-left of section, as in reference video)
-        var posX = width * 0.18;
-        var posY = height * 0.15;
-        var targetX = posX;
-        var targetY = posY;
-        var currentAngle = 0;
-        var speedVal = parseFloat(butterfly.getAttribute('data-speed')) || 8;
-        var ease = speedVal / 100;
-        var isCursorInside = false;
-        var lastMoveTime = performance.now();
-        var particles = [];
+      // Mouse & Pointer Tracking State
+      var isCursorInside = false;
+      var lastMoveTime = performance.now();
+      var currentClientX = window.innerWidth * 0.5;
+      var currentClientY = window.innerHeight * 0.5;
 
-        // Sparkle Particle Class
-        function Particle(x, y) {
-          this.x = x + (Math.random() - 0.5) * 8;
-          this.y = y + (Math.random() - 0.5) * 8;
-          this.radius = Math.random() * 2.2 + 0.8;
-          this.alpha = 1;
-          this.decay = Math.random() * 0.025 + 0.015;
-          this.vx = (Math.random() - 0.5) * 0.8;
-          this.vy = Math.random() * 0.5 + 0.3; // gentle drift downwards
-          // Royal iridescent hues: Cyan, Violet, Gold
-          var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
-          this.color = hues[Math.floor(Math.random() * hues.length)];
+      // Butterfly Position & Flight State
+      var posX = width * 0.2;
+      var posY = height * 0.2;
+      var targetX = posX;
+      var targetY = posY;
+      var currentAngle = 0;
+      var speedVal = butterfly ? (parseFloat(butterfly.getAttribute('data-speed')) || 8) : 8;
+      var ease = speedVal / 100;
+      var particles = [];
+
+      // Doll 3D Orientation State
+      var dollRotY = 0;
+      var dollRotX = 0;
+      var dollTransX = 0;
+
+      // Sparkle Particle Class
+      function Particle(x, y) {
+        this.x = x + (Math.random() - 0.5) * 8;
+        this.y = y + (Math.random() - 0.5) * 8;
+        this.radius = Math.random() * 2.2 + 0.8;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.025 + 0.015;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = Math.random() * 0.5 + 0.3;
+        var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
+        this.color = hues[Math.floor(Math.random() * hues.length)];
+      }
+
+      Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= this.decay;
+      };
+
+      Particle.prototype.draw = function(c) {
+        c.save();
+        c.globalAlpha = Math.max(0, this.alpha);
+        c.fillStyle = this.color;
+        c.shadowColor = this.color;
+        c.shadowBlur = 6;
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      };
+
+      function updateTargetFromEvent(e) {
+        var clientX = e.clientX;
+        var clientY = e.clientY;
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
         }
+        currentClientX = clientX;
+        currentClientY = clientY;
+        rect = sectionContainer.getBoundingClientRect();
+        targetX = clientX - rect.left;
+        targetY = clientY - rect.top;
+        isCursorInside = true;
+        lastMoveTime = performance.now();
+      }
 
-        Particle.prototype.update = function() {
-          this.x += this.vx;
-          this.y += this.vy;
-          this.alpha -= this.decay;
-        };
+      sectionContainer.addEventListener('mousemove', updateTargetFromEvent);
+      sectionContainer.addEventListener('mouseenter', updateTargetFromEvent);
+      sectionContainer.addEventListener('mouseleave', function() {
+        isCursorInside = false;
+      });
+      sectionContainer.addEventListener('touchmove', updateTargetFromEvent, { passive: true });
+      sectionContainer.addEventListener('touchstart', updateTargetFromEvent, { passive: true });
 
-        Particle.prototype.draw = function(c) {
-          c.save();
-          c.globalAlpha = Math.max(0, this.alpha);
-          c.fillStyle = this.color;
-          c.shadowColor = this.color;
-          c.shadowBlur = 6;
-          c.beginPath();
-          c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          c.fill();
-          c.restore();
-        };
+      // Unified 60fps Animation Loop
+      function animateStage(time) {
+        if (prefersReducedMotion) return;
 
-        // Pointer Tracking (Mouse & Touch)
-        function updateTargetFromEvent(e) {
-          var clientX = e.clientX;
-          var clientY = e.clientY;
-          if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
+        // --- A. 3D Doll Cursor Tracking (Doll Statue leans and looks towards mouse) ---
+        if (dollViewer && enableDollTracking) {
+          var targetDollRotY = 0;
+          var targetDollRotX = 0;
+          var targetDollTransX = 0;
+
+          if (isCursorInside) {
+            var dollRect = dollViewer.getBoundingClientRect();
+            var dollMidX = dollRect.left + dollRect.width / 2;
+            var dollMidY = dollRect.top + dollRect.height * 0.42;
+
+            // Normalized displacement between cursor and doll center
+            var relX = (currentClientX - dollMidX) / (window.innerWidth * 0.42);
+            var relY = (currentClientY - dollMidY) / (window.innerHeight * 0.42);
+
+            relX = Math.max(-1.15, Math.min(1.15, relX));
+            relY = Math.max(-1.15, Math.min(1.15, relY));
+
+            // Cursor to left -> doll turns left (positive/negative rotation matching perspective)
+            // Cursor to right -> doll turns right
+            targetDollRotY = relX * 18;
+            targetDollRotX = -relY * 8;
+            targetDollTransX = relX * 14;
+          } else if (butterfly && (!isCursorInside || (time - lastMoveTime > 3000))) {
+            // When mouse is idle, doll follows the autonomous butterfly
+            var dollLocalX = width * 0.5;
+            var diffX = (posX - dollLocalX) / (width * 0.5);
+            targetDollRotY = Math.max(-10, Math.min(10, diffX * 12));
+            targetDollTransX = targetDollRotY * 0.6;
           }
-          rect = sectionContainer.getBoundingClientRect();
-          targetX = clientX - rect.left;
-          targetY = clientY - rect.top;
-          isCursorInside = true;
-          lastMoveTime = performance.now();
+
+          // Smooth lerp interpolation for silky motion
+          dollRotY += (targetDollRotY - dollRotY) * 0.08;
+          dollRotX += (targetDollRotX - dollRotX) * 0.08;
+          dollTransX += (targetDollTransX - dollTransX) * 0.08;
+
+          var idleY = enableIdleFloat ? Math.sin(time * 0.0016) * 6 : 0;
+
+          dollViewer.style.transform =
+            'translate3d(' + dollTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
+            'rotateY(' + dollRotY.toFixed(2) + 'deg) ' +
+            'rotateX(' + dollRotX.toFixed(2) + 'deg)';
+
+          if (auraDisc) {
+            var auraX = -dollRotY * 1.5;
+            var auraY = -dollRotX * 1.2;
+            auraDisc.style.transform = 'translate3d(calc(-50% + ' + auraX.toFixed(1) + 'px), ' + auraY.toFixed(1) + 'px, 0)';
+          }
         }
 
-        sectionContainer.addEventListener('mousemove', updateTargetFromEvent);
-        sectionContainer.addEventListener('mouseenter', updateTargetFromEvent);
-        sectionContainer.addEventListener('mouseleave', function() {
-          isCursorInside = false;
-        });
-        sectionContainer.addEventListener('touchmove', updateTargetFromEvent, { passive: true });
-        sectionContainer.addEventListener('touchstart', updateTargetFromEvent, { passive: true });
+        // --- B. Interactive 3D Butterfly Flight ---
+        if (butterfly && canvas) {
+          var ctx = canvas.getContext('2d');
 
-        // Continuous Flight & Flapping Animation Loop
-        function animateFlight(time) {
-          if (prefersReducedMotion) return;
-
-          // If mouse is idle or outside, autonomous royal curved patrol around doll
+          // If mouse is idle or outside, autonomous curved patrol around doll
           if (!isCursorInside || (time - lastMoveTime > 3500)) {
             var patrolCenterY = height * 0.32;
             var patrolCenterX = width * 0.5;
             var t = time * 0.0012;
-            // Elegant Infinity / Lissajous path
             targetX = patrolCenterX + Math.cos(t) * (width * 0.28);
             targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.18);
           }
 
-          // Calculate displacement to target
           var dx = targetX - posX;
           var dy = targetY - posY;
           var dist = Math.sqrt(dx * dx + dy * dy);
 
-          // Smooth interpolation towards target
           var vx = dx * ease;
           var vy = dy * ease;
           posX += vx;
           posY += vy;
 
-          // Natural organic sinusoidal drift while hovering
           var hoverX = Math.sin(time * 0.0035) * 10;
           var hoverY = Math.cos(time * 0.0042) * 8;
           var finalX = posX + hoverX;
           var finalY = posY + hoverY;
 
-          // Clamping strictly inside section boundary
           finalX = Math.max(30, Math.min(width - 70, finalX));
           finalY = Math.max(30, Math.min(height - 70, finalY));
 
-          // Calculate travel angle with smooth shortest-path angular interpolation
           if (dist > 2) {
             var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
             var angleDiff = (targetAngle - currentAngle + 540) % 360 - 180;
             currentAngle += angleDiff * 0.12;
           }
 
-          // Dynamic banking/tilt in 3D
           var tilt = Math.max(-25, Math.min(25, vx * 1.8));
 
-          // Modulate flapping frequency: rapid flap when darting, graceful flap when hovering
           if (dist > 40) {
             butterfly.classList.add('fast-flap');
             butterfly.classList.remove('hover-flap');
@@ -1591,18 +1648,15 @@
             butterfly.classList.add('hover-flap');
           }
 
-          // Apply 3D transform (centered on butterfly body)
           butterfly.style.transform =
             'translate3d(' + (finalX - 45) + 'px, ' + (finalY - 35) + 'px, 0px) ' +
             'rotate(' + currentAngle.toFixed(1) + 'deg) ' +
             'rotateY(' + tilt.toFixed(1) + 'deg)';
 
-          // Spawn sparkling particles behind butterfly
           if (Math.random() < 0.45 && particles.length < 50) {
             particles.push(new Particle(finalX, finalY));
           }
 
-          // Update & Draw Particle Canvas
           ctx.clearRect(0, 0, width, height);
           for (var i = particles.length - 1; i >= 0; i--) {
             particles[i].update();
@@ -1612,21 +1666,20 @@
               particles[i].draw(ctx);
             }
           }
-
-          animationFrameId = requestAnimationFrame(animateFlight);
         }
 
-        // Start 60fps loop
-        animationFrameId = requestAnimationFrame(animateFlight);
-
-        // Teardown logic on section unload
-        document.addEventListener('shopify:section:unload', function(e) {
-          if (e.detail && e.detail.sectionId === '{{ section.id }}') {
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            window.removeEventListener('resize', handleResize);
-          }
-        });
+        animationFrameId = requestAnimationFrame(animateStage);
       }
+
+      animationFrameId = requestAnimationFrame(animateStage);
+
+      // Teardown logic on section unload
+      document.addEventListener('shopify:section:unload', function(e) {
+        if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+          if (animationFrameId) cancelAnimationFrame(animationFrameId);
+          window.removeEventListener('resize', handleResize);
+        }
+      });
     }
 
     // Initialize on DOM load
@@ -1708,6 +1761,12 @@
       "type": "checkbox",
       "id": "enable_idle_float",
       "label": "Enable Gentle Idle Floating Animation",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_doll_cursor_tracking",
+      "label": "Enable Doll Cursor Movement (Follows mouse)",
       "default": true
     },
     {
@@ -1868,7 +1927,8 @@
         "bg_color": "#fbf2e1",
         "accent_color": "#c89332",
         "enable_butterfly": true,
-        "enable_idle_float": true
+        "enable_idle_float": true,
+        "enable_doll_cursor_tracking": true
       },
       "blocks": [
         {

@@ -38,7 +38,7 @@
       id="RoyalButterfly-{{ section.id }}"
       class="royal-butterfly-creature"
       aria-hidden="true"
-      data-speed="{{ section.settings.butterfly_speed | default: 0.08 }}"
+      data-speed="{{ section.settings.butterfly_speed | default: 8 }}"
     >
       <div class="butterfly-3d-rig">
         <!-- Left Wing -->
@@ -1476,7 +1476,8 @@
         var targetX = posX;
         var targetY = posY;
         var currentAngle = 0;
-        var ease = parseFloat(butterfly.getAttribute('data-speed')) || 0.08;
+        var speedVal = parseFloat(butterfly.getAttribute('data-speed')) || 8;
+        var ease = speedVal / 100;
         var isCursorInside = false;
         var lastMoveTime = performance.now();
         var particles = [];
@@ -1723,10 +1724,10 @@
       "type": "range",
       "id": "butterfly_speed",
       "label": "Butterfly Follow Speed",
-      "min": 0.03,
-      "max": 0.20,
-      "step": 0.01,
-      "default": 0.08
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 8
     },
     {
       "type": "header",

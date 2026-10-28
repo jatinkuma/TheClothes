@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
@@ -16,7 +17,6 @@
           "name": "t:names.heading",
           "settings": {
             "text": "<p>Browse our latest products</p>",
-            "text_color": "{{ settings.color_palette.background }}",
             "width": "fit-content",
             "max_width": "normal",
             "alignment": "left",
@@ -27,6 +27,7 @@
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "{{ settings.color_palette.background }}",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -48,6 +49,7 @@
             "custom_button_background": "rgba(0,0,0,0)",
             "custom_button_text": "{{ settings.color_palette.background }}",
             "custom_button_border": "{{ settings.color_palette.background }}",
+            "link_text_color": "",
             "width": "fit-content",
             "custom_width": 100,
             "width_mobile": "fit-content",
@@ -60,6 +62,7 @@
         "text_YLPk4p",
         "button_H9gpTf"
       ],
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
@@ -68,6 +71,7 @@
         "custom_mobile_media": false,
         "media_type_1_mobile": "image",
         "media_type_2_mobile": "image",
+        "link": "",
         "open_in_new_tab": false,
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -114,11 +118,13 @@
             "height": "fit",
             "custom_height": 100,
             "background_media": "none",
+            "background_color": "",
             "video_position": "cover",
             "background_image_position": "cover",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
+            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -136,10 +142,12 @@
                 "alignment": "left",
                 "type_preset": "h4",
                 "font": "var(--font-body--family)",
+                "font_size": "1rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
+                "text_color": "",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -157,6 +165,10 @@
                 "label": "View all",
                 "open_in_new_tab": false,
                 "style_class": "link",
+                "custom_button_background": "{{ settings.color_palette.foreground }}",
+                "custom_button_text": "{{ settings.color_palette.background }}",
+                "custom_button_border": "{{ settings.color_palette.background }}",
+                "link_text_color": "",
                 "width": "fit-content",
                 "custom_width": 100,
                 "width_mobile": "fit-content",
@@ -176,9 +188,11 @@
           "static": true,
           "settings": {
             "product_card_gap": 4,
+            "background_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
+            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -194,6 +208,7 @@
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
+                "border_color": "",
                 "border_radius": 0,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
@@ -216,6 +231,7 @@
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
+                "text_color": "",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -241,6 +257,7 @@
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
+                "text_color": "",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -256,6 +273,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "t:names.product_list",
       "settings": {
         "collection": "all",
@@ -276,10 +294,113 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "interactive_royal_doll_JwazkP": {
+      "type": "interactive-royal-doll",
+      "blocks": {
+        "product_item_kG8deN": {
+          "type": "product_item",
+          "settings": {
+            "product": "",
+            "category": "safa",
+            "outfit_palette": "cream",
+            "title_override": "Royal Safa Turban",
+            "subtitle": "Hand-Dyed Leheriya Silk with Brocade Kalangi",
+            "price_override": "₹ 14,500",
+            "description": "Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown."
+          }
+        },
+        "product_item_iCmzrB": {
+          "type": "product_item",
+          "settings": {
+            "product": "",
+            "category": "sherwani",
+            "outfit_palette": "cream",
+            "title_override": "Imperial Ivory Sherwani",
+            "subtitle": "Zari Embroidered Chanderi Silk",
+            "price_override": "₹ 48,000",
+            "description": "Inspired by the Jaipur Royal Court, featuring floral medallions and freshwater pearl buttons."
+          }
+        },
+        "product_item_w6wmgc": {
+          "type": "product_item",
+          "settings": {
+            "product": "",
+            "category": "sherwani",
+            "outfit_palette": "red",
+            "title_override": "Ruby Crimson Sherwani",
+            "subtitle": "Raw Silk with Antique Gold Zardozi",
+            "price_override": "₹ 56,000",
+            "description": "A stately crimson hue fit for royal processions, featuring architectural paisley arches."
+          }
+        },
+        "product_item_beLkhX": {
+          "type": "product_item",
+          "settings": {
+            "product": "",
+            "category": "sherwani",
+            "outfit_palette": "blue",
+            "title_override": "Sapphire Blue Jodhpuri",
+            "subtitle": "Royal Blue Brocade with Golden Motifs",
+            "price_override": "₹ 52,000",
+            "description": "Handwoven in the royal workshops of Mewar, combining celestial lapis blue silk with warm golden brocade."
+          }
+        },
+        "product_item_LmdyBr": {
+          "type": "product_item",
+          "settings": {
+            "product": "",
+            "category": "sherwani",
+            "outfit_palette": "green",
+            "title_override": "Emerald Heritage Sherwani",
+            "subtitle": "Deep Emerald Silk with Heritage Filigree",
+            "price_override": "₹ 54,000",
+            "description": "A rich royal emerald green silk ensemble featuring master needlework inspired by royal Mughal garden florals."
+          }
+        },
+        "product_item_LiMR97": {
+          "type": "product_item",
+          "settings": {
+            "product": "",
+            "category": "mojari",
+            "outfit_palette": "cream",
+            "title_override": "Royal Hand-Embroidered Mojari",
+            "subtitle": "Genuine Leather with Zari Vamp Embroidery",
+            "price_override": "₹ 9,500",
+            "description": "Curled at the toe, stitched without a single nail, intricately embroidered across the vamp."
+          }
+        }
+      },
+      "block_order": [
+        "product_item_kG8deN",
+        "product_item_iCmzrB",
+        "product_item_w6wmgc",
+        "product_item_beLkhX",
+        "product_item_LmdyBr",
+        "product_item_LiMR97"
+      ],
+      "name": "Royal Fashion Doll",
+      "settings": {
+        "subtitle": "The Royal Attire",
+        "heading": "Worn by royalty, made by hand",
+        "description": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal boy doll in handcrafted Indian heritage attire.",
+        "text_alignment": "center",
+        "doll_max_height": 560,
+        "enable_idle_float": true,
+        "enable_butterfly": true,
+        "butterfly_speed": 8,
+        "bg_color": "#fbf2e1",
+        "accent_color": "#c89332",
+        "text_color": "#2b1810",
+        "use_default_bg": true,
+        "padding_top": 60,
+        "padding_bottom": 80
+      }
     }
   },
   "order": [
     "hero_jVaWmY",
-    "product_list_fa6P9H"
+    "product_list_fa6P9H",
+    "interactive_royal_doll_JwazkP"
   ]
 }

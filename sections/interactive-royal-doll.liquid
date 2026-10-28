@@ -197,8 +197,29 @@
             data-doll-tracking="{{ section.settings.enable_doll_cursor_tracking | default: true }}"
             data-idle-float="{{ section.settings.enable_idle_float | default: true }}"
           >
+            <!-- Real 36-Frame Character Animation & 3D Interactive Scrubbing Canvas -->
+            <canvas
+              id="RoyalDollCanvas-{{ section.id }}"
+              class="royal-doll-canvas active"
+              width="160"
+              height="320"
+              aria-label="Interactive Royal Character"
+            ></canvas>
+
+            <!-- Video Fallback Player for Ultra-Smooth Continuous Motion -->
+            <video
+              id="RoyalDollVideo-{{ section.id }}"
+              class="royal-doll-video"
+              src="{{ 'royal-doll-animation.mp4' | asset_url }}"
+              autoplay
+              muted
+              loop
+              playsinline
+              aria-hidden="true"
+            ></video>
+
             <!-- Body Layer (Torso, Sherwani, Arms, Legs, Mojari) -->
-            <div id="RoyalDollBodyRig-{{ section.id }}" class="royal-doll-body-rig">
+            <div id="RoyalDollBodyRig-{{ section.id }}" class="royal-doll-body-rig" style="display: none;">
               <img
                 id="RoyalDollBody-cream-{{ section.id }}"
                 class="royal-body-img active"
@@ -814,6 +835,30 @@
     z-index: 1;
   }
 
+    /* Real 36-Frame Character Animation Canvas & Video Engine */
+  .royal-doll-canvas,
+  .royal-doll-video {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+    z-index: 2;
+    display: none;
+    will-change: transform;
+    filter: drop-shadow(0 15px 25px rgba(43, 24, 16, 0.14));
+  }
+
+  .royal-doll-canvas.active,
+  .royal-doll-video.active {
+    display: block;
+  }
+
   .royal-body-img,
   .royal-head-img,
   .royal-doll-img {
@@ -1367,8 +1412,25 @@
       if (!sectionContainer) return;
 
       var dollViewer = document.getElementById('RoyalDollViewer-{{ section.id }}');
+      var dollCanvas = document.getElementById('RoyalDollCanvas-{{ section.id }}');
+      var dollVideo = document.getElementById('RoyalDollVideo-{{ section.id }}');
       var headRig = document.getElementById('RoyalDollHeadRig-{{ section.id }}');
       var bodyRig = document.getElementById('RoyalDollBodyRig-{{ section.id }}');
+
+      // Authentic 36-Frame Character Animation Spritesheet Engine
+      var spritesheetImg = new Image();
+      var isSpritesheetLoaded = false;
+      var currentDollFrame = -1;
+      spritesheetImg.onload = function() {
+        isSpritesheetLoaded = true;
+        if (dollCanvas) {
+          dollCanvas.width = 160;
+          dollCanvas.height = 320;
+          var ctxInit = dollCanvas.getContext('2d');
+          ctxInit.drawImage(spritesheetImg, 0, 0, 160, 320, 0, 0, 160, 320);
+        }
+      };
+      spritesheetImg.src = "{{ 'royal-doll-spritesheet.png' | asset_url }}";
       var bodyImgs = sectionContainer.querySelectorAll('.royal-body-img');
       var headImgs = sectionContainer.querySelectorAll('.royal-head-img');
       var customDollBox = document.getElementById('RoyalDollCustom-{{ section.id }}');
@@ -1447,26 +1509,42 @@
 
         // B) Match against preloaded character variations (cream, red, blue, green)
         if (!matched) {
-          if (bodyRig) bodyRig.style.display = 'block';
-          if (headRig) headRig.style.display = 'block';
           var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
           if (customImg) customImg.classList.remove('active');
 
-          bodyImgs.forEach(function(img) {
-            if (img.getAttribute('data-outfit-key') === outfitKey) {
-              img.classList.add('active');
-            } else {
-              img.classList.remove('active');
+          if (outfitKey === 'cream') {
+            // Restore authentic 36-frame character animation canvas
+            if (dollCanvas) {
+              dollCanvas.style.display = 'block';
+              dollCanvas.classList.add('active');
             }
-          });
+            if (bodyRig) bodyRig.style.display = 'none';
+            if (headRig) headRig.style.display = 'none';
+          } else {
+            // Switch to color variation outfit layer with active 3D neck/head tracking
+            if (dollCanvas) {
+              dollCanvas.style.display = 'none';
+              dollCanvas.classList.remove('active');
+            }
+            if (bodyRig) bodyRig.style.display = 'block';
+            if (headRig) headRig.style.display = 'block';
 
-          headImgs.forEach(function(img) {
-            if (img.getAttribute('data-outfit-key') === outfitKey) {
-              img.classList.add('active');
-            } else {
-              img.classList.remove('active');
-            }
-          });
+            bodyImgs.forEach(function(img) {
+              if (img.getAttribute('data-outfit-key') === outfitKey) {
+                img.classList.add('active');
+              } else {
+                img.classList.remove('active');
+              }
+            });
+
+            headImgs.forEach(function(img) {
+              if (img.getAttribute('data-outfit-key') === outfitKey) {
+                img.classList.add('active');
+              } else {
+                img.classList.remove('active');
+              }
+            });
+          }
         }
       }
 
@@ -1717,6 +1795,63 @@
               'rotateY(' + headRotY.toFixed(2) + 'deg) ' +
               'rotateX(' + headRotX.toFixed(2) + 'deg) ' +
               'rotateZ(' + headRotZ.toFixed(2) + 'deg)';
+          }
+
+          // Authentic 36-Frame Character Animation & Multi-Angle Gaze
+          if (dollCanvas && isSpritesheetLoaded && dollCanvas.classList.contains('active')) {
+            var ctxDoll = dollCanvas.getContext('2d');
+            var targetFrame = 0;
+
+            if (isCursorInside) {
+              // Map cursor X offset to character keyframe gaze angles from reference video
+              if (relX < -0.55) {
+                targetFrame = 35; // far left profile
+              } else if (relX < -0.28) {
+                targetFrame = 24; // medium left turn
+              } else if (relX < -0.08) {
+                targetFrame = 19; // subtle left glance
+              } else if (relX > 0.55) {
+                targetFrame = 15; // far right profile
+              } else if (relX > 0.28) {
+                targetFrame = 13; // medium right turn
+              } else if (relX > 0.08) {
+                targetFrame = 11; // subtle right glance
+              } else {
+                // Front-facing natural breathing cycles (frames 0-6)
+                targetFrame = Math.floor((time * 0.004) % 6);
+              }
+            } else if (butterfly && (time - lastMoveTime > 3000)) {
+              // Idle: character gaze tracks the autonomous butterfly flight
+              var diffX = (posX - (width * 0.5)) / (width * 0.45);
+              if (diffX < -0.4) {
+                targetFrame = 35;
+              } else if (diffX < -0.15) {
+                targetFrame = 24;
+              } else if (diffX > 0.4) {
+                targetFrame = 15;
+              } else if (diffX > 0.15) {
+                targetFrame = 13;
+              } else {
+                targetFrame = Math.floor((time * 0.012) % 36);
+              }
+            } else {
+              // Continuous living idle motion loop through all 36 frames (~14 FPS)
+              targetFrame = Math.floor((time * 0.014) % 36);
+            }
+
+            if (currentDollFrame !== targetFrame) {
+              currentDollFrame = targetFrame;
+              var r = Math.floor(currentDollFrame / 6);
+              var c = currentDollFrame % 6;
+              ctxDoll.clearRect(0, 0, 160, 320);
+              ctxDoll.drawImage(spritesheetImg, c * 160, r * 320, 160, 320, 0, 0, 160, 320);
+            }
+
+            // Apply physical 3D perspective lean and floating bob to canvas
+            dollCanvas.style.transform =
+              'translateX(-50%) translate3d(' + headTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
+              'rotateY(' + (headRotY * 0.65).toFixed(2) + 'deg) ' +
+              'rotateX(' + (headRotX * 0.65).toFixed(2) + 'deg)';
           }
 
           // Background Golden Aura Disc Counter-Parallax

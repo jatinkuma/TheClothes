@@ -1,0 +1,1943 @@
+{% comment %}
+  Interactive Royal Fashion Doll Section
+  Production-ready 3D character doll showcase with interactive product-to-outfit mapping,
+  continuous 3D butterfly flight animation, and royal palace ambiance.
+{% endcomment %}
+
+<div
+  id="RoyalDoll-{{ section.id }}"
+  class="royal-doll-section royal-doll--{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  style="
+    --royal-bg-color: {{ section.settings.bg_color | default: '#fdf6e9' }};
+    --royal-accent-gold: {{ section.settings.accent_color | default: '#c89332' }};
+    --royal-gold-light: {{ section.settings.gold_light | default: '#f3dfb2' }};
+    --royal-text-primary: {{ section.settings.text_color | default: '#2b1810' }};
+    --royal-padding-top: {{ section.settings.padding_top | default: 60 }}px;
+    --royal-padding-bottom: {{ section.settings.padding_bottom | default: 80 }}px;
+    --royal-doll-height: {{ section.settings.doll_max_height | default: 560 }}px;
+    {% if section.settings.bg_image != blank %}
+      --royal-bg-image: url('{{ section.settings.bg_image | image_url: width: 2400 }}');
+    {% elsif section.settings.use_default_bg %}
+      --royal-bg-image: url('{{ "palace-background.jpg" | asset_url }}');
+    {% else %}
+      --royal-bg-image: none;
+    {% endif %}
+  "
+>
+  <!-- Background Palace Texture / Gradient Overlay -->
+  <div class="royal-palace-backdrop" aria-hidden="true">
+    <div class="royal-arch-glow"></div>
+  </div>
+
+  <!-- Interactive 3D Cursor Butterfly & Sparkle Trail Canvas -->
+  {% if section.settings.enable_butterfly %}
+    <canvas id="RoyalButterflyCanvas-{{ section.id }}" class="royal-butterfly-canvas" aria-hidden="true"></canvas>
+
+    <div
+      id="RoyalButterfly-{{ section.id }}"
+      class="royal-butterfly-creature"
+      aria-hidden="true"
+      data-speed="{{ section.settings.butterfly_speed | default: 0.08 }}"
+    >
+      <div class="butterfly-3d-rig">
+        <!-- Left Wing -->
+        <div class="butterfly-wing wing-left">
+          <svg viewBox="0 0 70 80" width="70" height="80">
+            <defs>
+              <linearGradient id="bfWingL-{{ section.id }}" x1="0%" y1="30%" x2="100%" y2="70%">
+                <stop offset="0%" stop-color="#140742" />
+                <stop offset="25%" stop-color="#4a148c" />
+                <stop offset="55%" stop-color="#2979ff" />
+                <stop offset="85%" stop-color="#00e5ff" />
+                <stop offset="100%" stop-color="#80d8ff" />
+              </linearGradient>
+              <radialGradient id="bfGlowL-{{ section.id }}" cx="60%" cy="45%" r="50%">
+                <stop offset="0%" stop-color="#69f0ae" stop-opacity="0.75" />
+                <stop offset="60%" stop-color="#00e5ff" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="#2979ff" stop-opacity="0" />
+              </radialGradient>
+              <filter id="bfShadowL-{{ section.id }}" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00e5ff" flood-opacity="0.6"/>
+              </filter>
+            </defs>
+            <path d="M 68 36 C 60 18, 42 2, 18 2 C 8 2, 2 10, 4 20 C 6 30, 22 42, 38 46 C 54 50, 64 45, 68 36 Z"
+                  fill="url(#bfWingL-{{ section.id }})" filter="url(#bfShadowL-{{ section.id }})" stroke="#0d47a1" stroke-width="0.8" />
+            <path d="M 68 36 C 60 18, 42 2, 18 2 C 8 2, 2 10, 4 20 C 6 30, 22 42, 38 46 C 54 50, 64 45, 68 36 Z"
+                  fill="url(#bfGlowL-{{ section.id }})" />
+            <path d="M 66 38 C 58 44, 46 48, 30 52 C 16 56, 12 66, 20 74 C 28 82, 48 78, 58 64 C 64 54, 66 44, 66 38 Z"
+                  fill="url(#bfWingL-{{ section.id }})" stroke="#1a237e" stroke-width="0.8" />
+            <g stroke="rgba(255,255,255,0.6)" stroke-width="0.65" fill="none">
+              <path d="M 66 36 Q 40 24 16 12" />
+              <path d="M 66 36 Q 36 32 10 24" />
+              <path d="M 66 36 Q 42 40 24 38" />
+              <path d="M 65 42 Q 46 56 26 68" />
+              <path d="M 65 42 Q 52 64 42 74" />
+            </g>
+            <circle cx="10" cy="14" r="1.3" fill="#ffffff" />
+            <circle cx="6" cy="22" r="1" fill="#ffffff" />
+            <circle cx="18" cy="72" r="1.2" fill="#ffffff" />
+          </svg>
+        </div>
+
+        <!-- Center Body -->
+        <div class="butterfly-body">
+          <svg viewBox="0 0 16 80" width="16" height="80">
+            <defs>
+              <linearGradient id="bfBodyGrad-{{ section.id }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4a148c" />
+                <stop offset="50%" stop-color="#1a237e" />
+                <stop offset="100%" stop-color="#00e5ff" />
+              </linearGradient>
+            </defs>
+            <path d="M 7 24 Q 4 12 1 6 Q 0 4 2 4 Q 4 4 5 10 Q 6 18 7 24" fill="#311b92" />
+            <path d="M 9 24 Q 12 12 15 6 Q 16 4 14 4 Q 12 4 11 10 Q 10 18 9 24" fill="#311b92" />
+            <circle cx="2" cy="4" r="1.5" fill="#00e5ff" />
+            <circle cx="14" cy="4" r="1.5" fill="#00e5ff" />
+            <circle cx="8" cy="26" r="3.5" fill="#1a237e" />
+            <circle cx="6.5" cy="25" r="0.9" fill="#69f0ae" />
+            <circle cx="9.5" cy="25" r="0.9" fill="#69f0ae" />
+            <ellipse cx="8" cy="35" rx="3.8" ry="6" fill="url(#bfBodyGrad-{{ section.id }})" />
+            <path d="M 5 40 Q 4 54 7 66 Q 8 68 9 66 Q 12 54 11 40 Z" fill="url(#bfBodyGrad-{{ section.id }})" />
+            <ellipse cx="8" cy="34" rx="1.8" ry="2.8" fill="#00e5ff" opacity="0.95" />
+          </svg>
+        </div>
+
+        <!-- Right Wing -->
+        <div class="butterfly-wing wing-right">
+          <svg viewBox="0 0 70 80" width="70" height="80">
+            <defs>
+              <linearGradient id="bfWingR-{{ section.id }}" x1="100%" y1="30%" x2="0%" y2="70%">
+                <stop offset="0%" stop-color="#140742" />
+                <stop offset="25%" stop-color="#4a148c" />
+                <stop offset="55%" stop-color="#2979ff" />
+                <stop offset="85%" stop-color="#00e5ff" />
+                <stop offset="100%" stop-color="#80d8ff" />
+              </linearGradient>
+              <radialGradient id="bfGlowR-{{ section.id }}" cx="40%" cy="45%" r="50%">
+                <stop offset="0%" stop-color="#69f0ae" stop-opacity="0.75" />
+                <stop offset="60%" stop-color="#00e5ff" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="#2979ff" stop-opacity="0" />
+              </radialGradient>
+              <filter id="bfShadowR-{{ section.id }}" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00e5ff" flood-opacity="0.6"/>
+              </filter>
+            </defs>
+            <path d="M 2 36 C 10 18, 28 2, 52 2 C 62 2, 68 10, 66 20 C 64 30, 48 42, 32 46 C 16 50, 6 45, 2 36 Z"
+                  fill="url(#bfWingR-{{ section.id }})" filter="url(#bfShadowR-{{ section.id }})" stroke="#0d47a1" stroke-width="0.8" />
+            <path d="M 2 36 C 10 18, 28 2, 52 2 C 62 2, 68 10, 66 20 C 64 30, 48 42, 32 46 C 16 50, 6 45, 2 36 Z"
+                  fill="url(#bfGlowR-{{ section.id }})" />
+            <path d="M 4 38 C 12 44, 24 48, 40 52 C 54 56, 58 66, 50 74 C 42 82, 22 78, 12 64 C 6 54, 4 44, 4 38 Z"
+                  fill="url(#bfWingR-{{ section.id }})" stroke="#1a237e" stroke-width="0.8" />
+            <g stroke="rgba(255,255,255,0.6)" stroke-width="0.65" fill="none">
+              <path d="M 4 36 Q 30 24 54 12" />
+              <path d="M 4 36 Q 34 32 60 24" />
+              <path d="M 4 36 Q 28 40 46 38" />
+              <path d="M 5 42 Q 24 56 44 68" />
+              <path d="M 5 42 Q 18 64 28 74" />
+            </g>
+            <circle cx="60" cy="14" r="1.3" fill="#ffffff" />
+            <circle cx="64" cy="22" r="1" fill="#ffffff" />
+            <circle cx="52" cy="72" r="1.2" fill="#ffffff" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="royal-container">
+    <!-- Section Header / Brand Title -->
+    <header class="royal-header text-{{ section.settings.text_alignment | default: 'center' }}">
+      {% if section.settings.subtitle != blank %}
+        <div class="royal-subtitle">
+          <span class="royal-sub-ornament">✦</span>
+          <span>{{ section.settings.subtitle | escape }}</span>
+          <span class="royal-sub-ornament">✦</span>
+        </div>
+      {% endif %}
+
+      {% if section.settings.heading != blank %}
+        <h2 class="royal-title">{{ section.settings.heading | escape }}</h2>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <p class="royal-desc">{{ section.settings.description | escape }}</p>
+      {% endif %}
+    </header>
+
+    <!-- Main Showcase Layout: Doll Center Stage with Category Nav & Details Panel -->
+    <div class="royal-showcase-stage">
+      
+      <!-- Category Filter Pills (Desktop & Tablet) -->
+      <nav class="royal-category-nav" aria-label="Attire Categories">
+        <button type="button" class="royal-cat-pill active" data-category="all">
+          <span class="pill-dot"></span> All Pieces
+        </button>
+        <button type="button" class="royal-cat-pill" data-category="safa">
+          <span class="pill-dot"></span> Safa / Turbans
+        </button>
+        <button type="button" class="royal-cat-pill" data-category="sherwani">
+          <span class="pill-dot"></span> Sherwanis
+        </button>
+        <button type="button" class="royal-cat-pill" data-category="mojari">
+          <span class="pill-dot"></span> Mojari
+        </button>
+      </nav>
+
+      <!-- Center Stage: 3D Royal Doll Canvas & Frame -->
+      <div class="royal-doll-podium">
+        <div class="royal-jharokha-frame">
+          <!-- Animated Royal Aura -->
+          <div class="royal-aura-disc"></div>
+
+          <!-- Master Doll Character Container -->
+          <div
+            id="RoyalDollViewer-{{ section.id }}"
+            class="royal-doll-character {% if section.settings.enable_idle_float %}royal-doll--idle{% endif %}"
+          >
+            <!-- Default Base Doll (Cream & Gold Master) -->
+            <img
+              id="RoyalDollBase-{{ section.id }}"
+              class="royal-doll-img active"
+              src="{{ section.settings.default_doll_image | default: 'royal-doll-cream.png' | asset_url }}"
+              alt="Royal Indian Fashion Doll"
+              width="848"
+              height="1264"
+              loading="eager"
+            >
+
+            <!-- Preloaded Alternate Outfits for Instant, Seamless Crossfade -->
+            <img
+              id="RoyalDollOutfit-red-{{ section.id }}"
+              class="royal-doll-img"
+              data-outfit-key="red"
+              src="{{ 'royal-doll-red.png' | asset_url }}"
+              alt="Ruby Red Royal Court Sherwani"
+              width="848"
+              height="1264"
+              loading="lazy"
+            >
+            <img
+              id="RoyalDollOutfit-blue-{{ section.id }}"
+              class="royal-doll-img"
+              data-outfit-key="blue"
+              src="{{ 'royal-doll-blue.png' | asset_url }}"
+              alt="Sapphire Blue Royal Sherwani"
+              width="848"
+              height="1264"
+              loading="lazy"
+            >
+            <img
+              id="RoyalDollOutfit-green-{{ section.id }}"
+              class="royal-doll-img"
+              data-outfit-key="green"
+              src="{{ 'royal-doll-green.png' | asset_url }}"
+              alt="Emerald Green Heritage Sherwani"
+              width="848"
+              height="1264"
+              loading="lazy"
+            >
+
+            <!-- Optional Custom Merchant Layer Overlays (Option B) -->
+            <div id="RoyalDollOverlays-{{ section.id }}" class="royal-doll-layer-stack" aria-hidden="true"></div>
+          </div>
+
+          <!-- Current Outfit Title Tag -->
+          <div class="royal-outfit-badge">
+            <span class="badge-icon">👑</span>
+            <span id="RoyalActiveOutfitName-{{ section.id }}" class="badge-text">Imperial Ivory & Zari Sherwani</span>
+          </div>
+        </div>
+
+        <!-- Live Selected Product Information Panel -->
+        <aside class="royal-selected-info" id="RoyalSelectedInfo-{{ section.id }}">
+          <div class="selected-info-inner">
+            <span class="selected-piece-number" id="RoyalSelectedNumber-{{ section.id }}">01</span>
+            <div class="selected-category-tag" id="RoyalSelectedCategory-{{ section.id }}">Sherwani Collection</div>
+            <h3 class="selected-product-title" id="RoyalSelectedTitle-{{ section.id }}">Imperial Ivory & Zari Sherwani</h3>
+            <div class="selected-product-subtitle" id="RoyalSelectedSubtitle-{{ section.id }}">Hand-Woven Chanderi Silk with 24k Gold Zari Threading</div>
+            <div class="selected-product-price" id="RoyalSelectedPrice-{{ section.id }}">₹ 48,000</div>
+            <p class="selected-product-story" id="RoyalSelectedStory-{{ section.id }}">
+              Inspired by the grandeur of the Jaipur Court, crafted with delicate floral jaal embroidery and finished with heritage pearl buttons.
+            </p>
+
+            <div class="selected-action-row">
+              <a
+                id="RoyalSelectedCTA-{{ section.id }}"
+                href="#the-collection"
+                class="royal-cta-btn royal-cta--primary"
+              >
+                <span>Enquire / Add to Wardrobe</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Multiple Selectable Product Cards (Horizontal Carousel / Row) -->
+      <section class="royal-collection-strip" aria-label="Royal Collection Items">
+        <div class="royal-strip-heading">
+          <div class="strip-header-left">
+            <span class="strip-sub">THE WARDROBE</span>
+            <h3 class="strip-title">Click any creation to drape the doll</h3>
+          </div>
+          <div class="royal-carousel-arrows" aria-hidden="true">
+            <button type="button" class="royal-nav-arrow arrow-prev" aria-label="Previous products">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="royal-nav-arrow arrow-next" aria-label="Next products">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="royal-cards-track" id="RoyalCardsTrack-{{ section.id }}">
+          
+          {% comment %}
+            Render merchant blocks if added; otherwise render pristine default royal items
+          {% endcomment %}
+          {% if section.blocks.size > 0 %}
+            {% for block in section.blocks %}
+              {%- liquid
+                assign p = block.settings.product
+                assign title = block.settings.title_override | default: p.title
+                assign price = p.price | money
+                if block.settings.price_override != blank
+                  assign price = block.settings.price_override
+                endif
+
+                assign card_image = block.settings.custom_product_image
+                if card_image == blank and p.featured_image != blank
+                  assign card_image = p.featured_image
+                endif
+
+                assign outfit_img = block.settings.doll_outfit_image
+                assign outfit_url = ''
+                if outfit_img != blank
+                  assign outfit_url = outfit_img | image_url: width: 1200
+                endif
+              -%}
+
+              <article
+                class="royal-product-card {% if forloop.first %}selected{% endif %}"
+                data-block-id="{{ block.id }}"
+                data-category="{{ block.settings.category | default: 'sherwani' }}"
+                data-outfit-url="{{ outfit_url }}"
+                data-outfit-key="{{ block.settings.outfit_palette | default: 'cream' }}"
+                data-title="{{ title | escape }}"
+                data-subtitle="{{ block.settings.subtitle | escape }}"
+                data-price="{{ price | escape }}"
+                data-story="{{ block.settings.description | default: p.description | strip_html | truncate: 180 | escape }}"
+                data-product-url="{{ p.url | default: '#' }}"
+                data-product-id="{{ p.selected_or_first_available_variant.id }}"
+                tabindex="0"
+                role="button"
+                aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                {{ block.shopify_attributes }}
+              >
+                <div class="card-image-box">
+                  {% if card_image != blank %}
+                    <img
+                      src="{{ card_image | image_url: width: 450 }}"
+                      alt="{{ title | escape }}"
+                      loading="lazy"
+                      width="320"
+                      height="320"
+                    >
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'card-placeholder-svg' }}
+                  {% endif %}
+
+                  <span class="card-try-on-pill">
+                    <span class="sparkle-icon">✨</span> Try On
+                  </span>
+                </div>
+
+                <div class="card-meta">
+                  <div class="card-index">0{{ forloop.index }}</div>
+                  <h4 class="card-title">{{ title | escape }}</h4>
+                  <div class="card-sub">{{ block.settings.subtitle | escape }}</div>
+                  <div class="card-price">{{ price }}</div>
+                </div>
+
+                <div class="card-active-glow" aria-hidden="true"></div>
+              </article>
+            {% endfor %}
+
+          {% else %}
+            {% comment %} Demo fallback items matching reference video {% endcomment %}
+            
+            <!-- Item 1: Safa / Turban -->
+            <article
+              class="royal-product-card"
+              data-category="safa"
+              data-outfit-key="cream"
+              data-title="Royal Safa Turban"
+              data-subtitle="Hand-Dyed Leheriya Silk with Brocade Kalangi"
+              data-price="₹ 14,500"
+              data-story="Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown and finished with antique gold kalangi brooch."
+              data-product-url="#"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div class="card-image-box">
+                <img src="{{ 'royal-product-safa.jpg' | asset_url }}" alt="Royal Safa Turban" width="320" height="320" loading="lazy">
+                <span class="card-try-on-pill"><span class="sparkle-icon">✨</span> Try On</span>
+              </div>
+              <div class="card-meta">
+                <div class="card-index">01</div>
+                <h4 class="card-title">Royal Safa</h4>
+                <div class="card-sub">Leheriya Silk</div>
+                <div class="card-price">₹ 14,500</div>
+              </div>
+              <div class="card-active-glow"></div>
+            </article>
+
+            <!-- Item 2: Imperial Ivory Sherwani (Active) -->
+            <article
+              class="royal-product-card selected"
+              data-category="sherwani"
+              data-outfit-key="cream"
+              data-title="Imperial Ivory & Zari Sherwani"
+              data-subtitle="Handcrafted Silk with 24k Gold Threading"
+              data-price="₹ 48,000"
+              data-story="Inspired by the Jaipur Royal Court, intricately embellished with floral paisley medallions and pure freshwater pearl buttons."
+              data-product-url="#"
+              tabindex="0"
+              role="button"
+              aria-pressed="true"
+            >
+              <div class="card-image-box">
+                <img src="{{ 'royal-product-sherwani-cream.jpg' | asset_url }}" alt="Imperial Ivory Sherwani" width="320" height="320" loading="lazy">
+                <span class="card-try-on-pill"><span class="sparkle-icon">✨</span> Try On</span>
+              </div>
+              <div class="card-meta">
+                <div class="card-index">02</div>
+                <h4 class="card-title">Imperial Ivory</h4>
+                <div class="card-sub">Zari Embroidered Silk</div>
+                <div class="card-price">₹ 48,000</div>
+              </div>
+              <div class="card-active-glow"></div>
+            </article>
+
+            <!-- Item 3: Ruby Crimson Sherwani -->
+            <article
+              class="royal-product-card"
+              data-category="sherwani"
+              data-outfit-key="red"
+              data-title="Ruby Royal Crimson Sherwani"
+              data-subtitle="Pure Raw Silk with Antique Gold Zardozi"
+              data-price="₹ 56,000"
+              data-story="A stately crimson hue fit for royal processions, featuring architectural paisley arches and gold zari borders."
+              data-product-url="#"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div class="card-image-box">
+                <img src="{{ 'royal-product-sherwani-red.jpg' | asset_url }}" alt="Ruby Royal Crimson Sherwani" width="320" height="320" loading="lazy">
+                <span class="card-try-on-pill"><span class="sparkle-icon">✨</span> Try On</span>
+              </div>
+              <div class="card-meta">
+                <div class="card-index">03</div>
+                <h4 class="card-title">Ruby Crimson</h4>
+                <div class="card-sub">Raw Silk & Zardozi</div>
+                <div class="card-price">₹ 56,000</div>
+              </div>
+              <div class="card-active-glow"></div>
+            </article>
+
+            <!-- Item 4: Sapphire Blue Royal Sherwani -->
+            <article
+              class="royal-product-card"
+              data-category="sherwani"
+              data-outfit-key="blue"
+              data-title="Sapphire Blue Jodhpuri Attire"
+              data-subtitle="Royal Blue Brocade with Golden Floral Motifs"
+              data-price="₹ 52,000"
+              data-story="Handwoven in the royal workshops of Mewar, combining celestial lapis blue silk with warm golden brocade accents."
+              data-product-url="#"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div class="card-image-box">
+                <img src="{{ 'royal-product-sherwani-blue.jpg' | asset_url }}" alt="Sapphire Blue Sherwani" width="320" height="320" loading="lazy">
+                <span class="card-try-on-pill"><span class="sparkle-icon">✨</span> Try On</span>
+              </div>
+              <div class="card-meta">
+                <div class="card-index">04</div>
+                <h4 class="card-title">Sapphire Jodhpuri</h4>
+                <div class="card-sub">Royal Blue Brocade</div>
+                <div class="card-price">₹ 52,000</div>
+              </div>
+              <div class="card-active-glow"></div>
+            </article>
+
+            <!-- Item 5: Emerald Green Heritage Sherwani -->
+            <article
+              class="royal-product-card"
+              data-category="sherwani"
+              data-outfit-key="green"
+              data-title="Emerald Heritage Court Sherwani"
+              data-subtitle="Deep Emerald Silk with Heritage Gold Filigree"
+              data-price="₹ 54,000"
+              data-story="A rich royal emerald green silk ensemble featuring master needlework inspired by royal Mughal garden florals."
+              data-product-url="#"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div class="card-image-box">
+                <img src="{{ 'royal-product-sherwani-green.jpg' | asset_url }}" alt="Emerald Heritage Sherwani" width="320" height="320" loading="lazy">
+                <span class="card-try-on-pill"><span class="sparkle-icon">✨</span> Try On</span>
+              </div>
+              <div class="card-meta">
+                <div class="card-index">05</div>
+                <h4 class="card-title">Emerald Heritage</h4>
+                <div class="card-sub">Deep Emerald Silk</div>
+                <div class="card-price">₹ 54,000</div>
+              </div>
+              <div class="card-active-glow"></div>
+            </article>
+
+            <!-- Item 6: Handcrafted Mojari Footwear -->
+            <article
+              class="royal-product-card"
+              data-category="mojari"
+              data-outfit-key="cream"
+              data-title="Royal Hand-Embroidered Mojari"
+              data-subtitle="Genuine Calf Leather with Zari Vamp Embroidery"
+              data-price="₹ 9,500"
+              data-story="Curled at the toe, stitched without a single nail, intricately embroidered across the vamp in coloured zari threads."
+              data-product-url="#"
+              tabindex="0"
+              role="button"
+              aria-pressed="false"
+            >
+              <div class="card-image-box">
+                <img src="{{ 'royal-product-mojari.jpg' | asset_url }}" alt="Royal Mojari Footwear" width="320" height="320" loading="lazy">
+                <span class="card-try-on-pill"><span class="sparkle-icon">✨</span> Try On</span>
+              </div>
+              <div class="card-meta">
+                <div class="card-index">06</div>
+                <h4 class="card-title">Royal Mojari</h4>
+                <div class="card-sub">Curled Toe Leather</div>
+                <div class="card-price">₹ 9,500</div>
+              </div>
+              <div class="card-active-glow"></div>
+            </article>
+
+          {% endif %}
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ==========================================================================
+     Scoped Styles for Interactive Royal Fashion Doll Section
+     ========================================================================== */
+  #RoyalDoll-{{ section.id }} {
+    position: relative;
+    width: 100%;
+    min-height: 850px;
+    background-color: var(--royal-bg-color);
+    background-image: var(--royal-bg-image);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    padding-top: var(--royal-padding-top);
+    padding-bottom: var(--royal-padding-bottom);
+    color: var(--royal-text-primary);
+    overflow: hidden;
+    font-family: inherit;
+    box-sizing: border-box;
+    cursor: default;
+  }
+
+  #RoyalDoll-{{ section.id }} *,
+  #RoyalDoll-{{ section.id }} *::before,
+  #RoyalDoll-{{ section.id }} *::after {
+    box-sizing: border-box;
+  }
+
+  /* Backdrop & Jharokha Arch Glow */
+  .royal-palace-backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .royal-arch-glow {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1000px, 95vw);
+    height: 700px;
+    background: radial-gradient(circle at 50% 40%, rgba(255, 230, 160, 0.45) 0%, rgba(229, 155, 43, 0.15) 50%, transparent 75%);
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+  }
+
+  /* Container */
+  .royal-container {
+    position: relative;
+    z-index: 5;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .royal-header {
+    margin-bottom: 32px;
+  }
+
+  .royal-header.text-center { text-align: center; }
+  .royal-header.text-left { text-align: left; }
+  .royal-header.text-right { text-align: right; }
+
+  .royal-subtitle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--royal-accent-gold);
+    margin-bottom: 8px;
+  }
+
+  .royal-sub-ornament {
+    font-size: 0.75rem;
+    color: var(--royal-accent-gold);
+  }
+
+  .royal-title {
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--royal-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .royal-desc {
+    font-size: 1.05rem;
+    max-width: 640px;
+    margin: 0 auto;
+    opacity: 0.82;
+    line-height: 1.55;
+  }
+
+  /* Category Filter Pills */
+  .royal-category-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 6;
+  }
+
+  .royal-cat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(200, 147, 50, 0.28);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--royal-text-primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .royal-cat-pill:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--royal-accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(200, 147, 50, 0.15);
+  }
+
+  .royal-cat-pill.active {
+    background: var(--royal-accent-gold);
+    color: #ffffff;
+    border-color: var(--royal-accent-gold);
+    box-shadow: 0 4px 15px rgba(200, 147, 50, 0.35);
+  }
+
+  .royal-cat-pill .pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+  }
+
+  /* Center Stage: Doll Podium */
+  .royal-doll-podium {
+    display: grid;
+    grid-template-columns: 1fr minmax(320px, 460px) 1fr;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 44px;
+    position: relative;
+  }
+
+  .royal-jharokha-frame {
+    grid-column: 2;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .royal-aura-disc {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(420px, 90vw);
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 240, 190, 0.6) 0%, rgba(229, 155, 43, 0.18) 60%, transparent 80%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 3D Doll Character Container */
+  .royal-doll-character {
+    position: relative;
+    width: min(100%, 420px);
+    height: var(--royal-doll-height);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 2;
+    transform-origin: bottom center;
+  }
+
+  /* Gentle Royal Idle Movement */
+  .royal-doll--idle {
+    animation: royalDollIdle 5.5s ease-in-out infinite;
+  }
+
+  @keyframes royalDollIdle {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-9px) rotate(0.4deg);
+    }
+  }
+
+  .royal-doll-img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+
+  .royal-doll-img.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Outfit Badge */
+  .royal-outfit-badge {
+    position: relative;
+    z-index: 3;
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(200, 147, 50, 0.35);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 14px rgba(43, 24, 16, 0.08);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--royal-text-primary);
+    transition: transform 0.3s ease;
+  }
+
+  /* Selected Product Information Panel */
+  .royal-selected-info {
+    grid-column: 3;
+    padding-left: 20px;
+    position: relative;
+    z-index: 5;
+  }
+
+  .selected-info-inner {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(200, 147, 50, 0.25);
+    border-radius: 18px;
+    padding: 28px 24px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 30px rgba(43, 24, 16, 0.06);
+    max-width: 380px;
+    transition: all 0.3s ease;
+  }
+
+  .selected-piece-number {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--royal-accent-gold);
+    letter-spacing: 0.1em;
+  }
+
+  .selected-category-tag {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(43, 24, 16, 0.6);
+    margin: 4px 0 8px;
+  }
+
+  .selected-product-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--royal-text-primary);
+    line-height: 1.25;
+    margin: 0 0 8px;
+  }
+
+  .selected-product-subtitle {
+    font-size: 0.88rem;
+    color: var(--royal-accent-gold);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .selected-product-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--royal-text-primary);
+    margin-bottom: 14px;
+  }
+
+  .selected-product-story {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: rgba(43, 24, 16, 0.8);
+    margin-bottom: 22px;
+  }
+
+  .royal-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 22px;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .royal-cta--primary {
+    background: var(--royal-text-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(43, 24, 16, 0.2);
+  }
+
+  .royal-cta--primary:hover {
+    background: var(--royal-accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(200, 147, 50, 0.35);
+  }
+
+  /* Collection Strip / Horizontal Track */
+  .royal-collection-strip {
+    position: relative;
+    z-index: 6;
+  }
+
+  .royal-strip-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 18px;
+  }
+
+  .strip-sub {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--royal-accent-gold);
+    text-transform: uppercase;
+  }
+
+  .strip-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--royal-text-primary);
+    margin: 4px 0 0;
+  }
+
+  .royal-carousel-arrows {
+    display: flex;
+    gap: 8px;
+  }
+
+  .royal-nav-arrow {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(200, 147, 50, 0.3);
+    color: var(--royal-text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .royal-nav-arrow:hover {
+    background: var(--royal-accent-gold);
+    color: #ffffff;
+    border-color: var(--royal-accent-gold);
+  }
+
+  /* Product Cards Track */
+  .royal-cards-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 4px 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--royal-accent-gold) transparent;
+  }
+
+  .royal-cards-track::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .royal-cards-track::-webkit-scrollbar-thumb {
+    background: var(--royal-accent-gold);
+    border-radius: 4px;
+  }
+
+  /* Individual Product Card */
+  .royal-product-card {
+    position: relative;
+    flex: 0 0 250px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1.5px solid rgba(200, 147, 50, 0.2);
+    border-radius: 16px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(43, 24, 16, 0.05);
+    outline: none;
+  }
+
+  .royal-product-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--royal-accent-gold);
+    box-shadow: 0 8px 25px rgba(200, 147, 50, 0.18);
+    background: #ffffff;
+  }
+
+  .royal-product-card.selected {
+    border-color: var(--royal-accent-gold);
+    border-width: 2px;
+    background: #ffffff;
+    box-shadow: 0 8px 28px rgba(200, 147, 50, 0.28);
+    transform: translateY(-6px);
+  }
+
+  .card-image-box {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f7efe4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .card-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .royal-product-card:hover .card-image-box img {
+    transform: scale(1.05);
+  }
+
+  .card-try-on-pill {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(43, 24, 16, 0.85);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+  }
+
+  .royal-product-card.selected .card-try-on-pill {
+    background: var(--royal-accent-gold);
+    color: #ffffff;
+  }
+
+  .card-meta {
+    padding: 2px 4px;
+  }
+
+  .card-index {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--royal-accent-gold);
+    letter-spacing: 0.1em;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--royal-text-primary);
+    margin: 2px 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-sub {
+    font-size: 0.8rem;
+    color: rgba(43, 24, 16, 0.65);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+  }
+
+  .card-price {
+    font-size: 1.08rem;
+    font-weight: 800;
+    color: var(--royal-text-primary);
+  }
+
+  /* Active Card Golden Glow Ring */
+  .card-active-glow {
+    position: absolute;
+    inset: -2px;
+    border-radius: 17px;
+    pointer-events: none;
+    opacity: 0;
+    border: 2px solid var(--royal-accent-gold);
+    box-shadow: 0 0 16px rgba(200, 147, 50, 0.5);
+    transition: opacity 0.3s ease;
+  }
+
+  .royal-product-card.selected .card-active-glow {
+    opacity: 1;
+  }
+
+  /* ==========================================================================
+     3D Animated Butterfly with Continuous Independent Flapping
+     ========================================================================== */
+  .royal-butterfly-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .royal-butterfly-creature {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90px;
+    height: 70px;
+    pointer-events: none;
+    z-index: 15;
+    transform: translate3d(-200px, -200px, 0);
+    will-change: transform;
+    transition: opacity 0.3s ease;
+  }
+
+  .butterfly-3d-rig {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    perspective: 700px;
+    transform-style: preserve-3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .butterfly-body {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 60px;
+    z-index: 4;
+  }
+
+  .butterfly-body svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.7));
+  }
+
+  /* Left Wing */
+  .butterfly-wing.wing-left {
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    margin-right: -4px;
+    margin-top: -30px;
+    width: 58px;
+    height: 64px;
+    transform-origin: right 45%;
+    transform-style: preserve-3d;
+    animation: flapLeftWing 0.16s ease-in-out infinite alternate;
+    z-index: 2;
+  }
+
+  /* Right Wing */
+  .butterfly-wing.wing-right {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -30px;
+    width: 58px;
+    height: 64px;
+    transform-origin: left 45%;
+    transform-style: preserve-3d;
+    animation: flapRightWing 0.16s ease-in-out infinite alternate;
+    z-index: 2;
+  }
+
+  .butterfly-wing svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Continuous 3D Wing Flapping Between Open and Folded */
+  @keyframes flapLeftWing {
+    0% {
+      transform: rotateY(0deg) rotateZ(0deg);
+    }
+    50% {
+      transform: rotateY(52deg) rotateZ(-6deg);
+    }
+    100% {
+      transform: rotateY(78deg) rotateZ(-12deg);
+    }
+  }
+
+  @keyframes flapRightWing {
+    0% {
+      transform: rotateY(0deg) rotateZ(0deg);
+    }
+    50% {
+      transform: rotateY(-52deg) rotateZ(6deg);
+    }
+    100% {
+      transform: rotateY(-78deg) rotateZ(12deg);
+    }
+  }
+
+  /* Rapid Flap State when accelerating */
+  .royal-butterfly-creature.fast-flap .wing-left {
+    animation-duration: 0.11s;
+  }
+  .royal-butterfly-creature.fast-flap .wing-right {
+    animation-duration: 0.11s;
+  }
+
+  /* Hover gentle flutter */
+  .royal-butterfly-creature.hover-flap .wing-left {
+    animation-duration: 0.22s;
+  }
+  .royal-butterfly-creature.hover-flap .wing-right {
+    animation-duration: 0.22s;
+  }
+
+  /* ==========================================================================
+     Responsive Breakpoints
+     ========================================================================== */
+  @media (max-width: 1024px) {
+    .royal-doll-podium {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 20px;
+    }
+    .royal-jharokha-frame {
+      grid-column: 1;
+    }
+    .royal-selected-info {
+      grid-column: 1;
+      width: 100%;
+      max-width: 460px;
+      padding-left: 0;
+    }
+    .selected-info-inner {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    #RoyalDoll-{{ section.id }} {
+      --royal-doll-height: 440px;
+      padding-top: 40px;
+      padding-bottom: 50px;
+    }
+
+    .royal-title {
+      font-size: 1.85rem;
+    }
+
+    .royal-cat-pill {
+      font-size: 0.8rem;
+      padding: 6px 14px;
+    }
+
+    .royal-product-card {
+      flex: 0 0 210px;
+      padding: 10px;
+    }
+
+    .card-image-box {
+      height: 180px;
+    }
+
+    /* Keep butterfly visible on mobile */
+    .royal-butterfly-creature {
+      transform: scale(0.85);
+    }
+  }
+
+  /* Reduced Motion Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .royal-doll--idle {
+      animation: none !important;
+    }
+    .butterfly-wing {
+      animation: none !important;
+      transform: rotateY(20deg) !important;
+    }
+    .royal-butterfly-creature {
+      display: none !important;
+    }
+    .royal-butterfly-canvas {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    /**
+     * Royal Fashion Doll Interactive Controller
+     * Handles product card selection, outfit crossfades, and 3D butterfly flight physics.
+     */
+    function initRoyalDollSection() {
+      var sectionContainer = document.getElementById('RoyalDoll-{{ section.id }}');
+      if (!sectionContainer) return;
+
+      var dollViewer = document.getElementById('RoyalDollViewer-{{ section.id }}');
+      var baseDoll = document.getElementById('RoyalDollBase-{{ section.id }}');
+      var outfitImgs = sectionContainer.querySelectorAll('.royal-doll-img');
+      var cards = sectionContainer.querySelectorAll('.royal-product-card');
+      var categoryPills = sectionContainer.querySelectorAll('.royal-cat-pill');
+      var cardsTrack = document.getElementById('RoyalCardsTrack-{{ section.id }}');
+      var prevBtn = sectionContainer.querySelector('.arrow-prev');
+      var nextBtn = sectionContainer.querySelector('.arrow-next');
+
+      // Live Details elements
+      var titleEl = document.getElementById('RoyalSelectedTitle-{{ section.id }}');
+      var subtitleEl = document.getElementById('RoyalSelectedSubtitle-{{ section.id }}');
+      var priceEl = document.getElementById('RoyalSelectedPrice-{{ section.id }}');
+      var storyEl = document.getElementById('RoyalSelectedStory-{{ section.id }}');
+      var categoryEl = document.getElementById('RoyalSelectedCategory-{{ section.id }}');
+      var numberEl = document.getElementById('RoyalSelectedNumber-{{ section.id }}');
+      var ctaEl = document.getElementById('RoyalSelectedCTA-{{ section.id }}');
+      var outfitBadgeEl = document.getElementById('RoyalActiveOutfitName-{{ section.id }}');
+
+      /* ----------------------------------------------------
+         1. Outfit Selection & Crossfade Logic
+         ---------------------------------------------------- */
+      function selectCard(card) {
+        if (!card) return;
+
+        // Visual Card State
+        cards.forEach(function(c) {
+          c.classList.remove('selected');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        card.classList.add('selected');
+        card.setAttribute('aria-pressed', 'true');
+
+        // Extract metadata
+        var outfitKey = card.getAttribute('data-outfit-key') || 'cream';
+        var customOutfitUrl = card.getAttribute('data-outfit-url');
+        var title = card.getAttribute('data-title');
+        var subtitle = card.getAttribute('data-subtitle');
+        var price = card.getAttribute('data-price');
+        var story = card.getAttribute('data-story');
+        var category = card.getAttribute('data-category');
+        var productUrl = card.getAttribute('data-product-url');
+        var cardIndex = card.querySelector('.card-index') ? card.querySelector('.card-index').textContent : '01';
+
+        // Update Info Panel
+        if (titleEl && title) titleEl.textContent = title;
+        if (subtitleEl && subtitle) subtitleEl.textContent = subtitle;
+        if (priceEl && price) priceEl.textContent = price;
+        if (storyEl && story) storyEl.textContent = story;
+        if (categoryEl && category) categoryEl.textContent = category.toUpperCase() + ' CREATION';
+        if (numberEl && cardIndex) numberEl.textContent = cardIndex;
+        if (outfitBadgeEl && title) outfitBadgeEl.textContent = title;
+        if (ctaEl && productUrl) {
+          ctaEl.setAttribute('href', productUrl !== '#' ? productUrl : '#');
+        }
+
+        // Crossfade Doll Appearance
+        var matched = false;
+
+        // A) If merchant specified a custom uploaded doll image in block
+        if (customOutfitUrl && customOutfitUrl.trim() !== '') {
+          // Check if dynamic custom image element exists
+          var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
+          if (!customImg) {
+            customImg = document.createElement('img');
+            customImg.id = 'RoyalCustomDoll-{{ section.id }}';
+            customImg.className = 'royal-doll-img';
+            customImg.alt = title;
+            dollViewer.appendChild(customImg);
+          }
+          customImg.src = customOutfitUrl;
+          outfitImgs.forEach(function(img) { img.classList.remove('active'); });
+          customImg.classList.add('active');
+          matched = true;
+        }
+
+        // B) Match against preloaded character variations (cream, red, blue, green)
+        if (!matched) {
+          var targetImg = null;
+          outfitImgs.forEach(function(img) {
+            if (img.getAttribute('data-outfit-key') === outfitKey) {
+              targetImg = img;
+            }
+          });
+
+          if (!targetImg && outfitKey === 'cream') {
+            targetImg = baseDoll;
+          }
+
+          if (targetImg) {
+            outfitImgs.forEach(function(img) { img.classList.remove('active'); });
+            targetImg.classList.add('active');
+          }
+        }
+      }
+
+      // Card Click & Keyboard Listeners
+      cards.forEach(function(card) {
+        card.addEventListener('click', function() {
+          selectCard(card);
+        });
+        card.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectCard(card);
+          }
+        });
+      });
+
+      // Carousel Horizontal Arrow Navigation
+      if (prevBtn && cardsTrack) {
+        prevBtn.addEventListener('click', function() {
+          cardsTrack.scrollBy({ left: -280, behavior: 'smooth' });
+        });
+      }
+      if (nextBtn && cardsTrack) {
+        nextBtn.addEventListener('click', function() {
+          cardsTrack.scrollBy({ left: 280, behavior: 'smooth' });
+        });
+      }
+
+      // Category Pill Filtering
+      categoryPills.forEach(function(pill) {
+        pill.addEventListener('click', function() {
+          categoryPills.forEach(function(p) { p.classList.remove('active'); });
+          pill.classList.add('active');
+
+          var selectedCat = pill.getAttribute('data-category');
+          var firstVisible = null;
+
+          cards.forEach(function(card) {
+            var cardCat = card.getAttribute('data-category');
+            if (selectedCat === 'all' || cardCat === selectedCat) {
+              card.style.display = 'block';
+              if (!firstVisible) firstVisible = card;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          // Automatically select the first piece in this category
+          if (firstVisible) {
+            selectCard(firstVisible);
+          }
+        });
+      });
+
+      /* ----------------------------------------------------
+         2. Interactive 3D Blue-Purple Butterfly Engine
+         ---------------------------------------------------- */
+      var butterfly = document.getElementById('RoyalButterfly-{{ section.id }}');
+      var canvas = document.getElementById('RoyalButterflyCanvas-{{ section.id }}');
+
+      if (butterfly && canvas) {
+        var ctx = canvas.getContext('2d');
+        var animationFrameId = null;
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Position & Flight Physics State
+        var rect = sectionContainer.getBoundingClientRect();
+        var width = (canvas.width = sectionContainer.offsetWidth);
+        var height = (canvas.height = sectionContainer.offsetHeight);
+
+        // Resize Canvas on Window Resize
+        function handleResize() {
+          if (!sectionContainer) return;
+          width = canvas.width = sectionContainer.offsetWidth;
+          height = canvas.height = sectionContainer.offsetHeight;
+        }
+        window.addEventListener('resize', handleResize);
+
+        // Initial coordinates (start near top-left of section, as in reference video)
+        var posX = width * 0.18;
+        var posY = height * 0.15;
+        var targetX = posX;
+        var targetY = posY;
+        var currentAngle = 0;
+        var ease = parseFloat(butterfly.getAttribute('data-speed')) || 0.08;
+        var isCursorInside = false;
+        var lastMoveTime = performance.now();
+        var particles = [];
+
+        // Sparkle Particle Class
+        function Particle(x, y) {
+          this.x = x + (Math.random() - 0.5) * 8;
+          this.y = y + (Math.random() - 0.5) * 8;
+          this.radius = Math.random() * 2.2 + 0.8;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.025 + 0.015;
+          this.vx = (Math.random() - 0.5) * 0.8;
+          this.vy = Math.random() * 0.5 + 0.3; // gentle drift downwards
+          // Royal iridescent hues: Cyan, Violet, Gold
+          var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
+          this.color = hues[Math.floor(Math.random() * hues.length)];
+        }
+
+        Particle.prototype.update = function() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+        };
+
+        Particle.prototype.draw = function(c) {
+          c.save();
+          c.globalAlpha = Math.max(0, this.alpha);
+          c.fillStyle = this.color;
+          c.shadowColor = this.color;
+          c.shadowBlur = 6;
+          c.beginPath();
+          c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          c.fill();
+          c.restore();
+        };
+
+        // Pointer Tracking (Mouse & Touch)
+        function updateTargetFromEvent(e) {
+          var clientX = e.clientX;
+          var clientY = e.clientY;
+          if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+          }
+          rect = sectionContainer.getBoundingClientRect();
+          targetX = clientX - rect.left;
+          targetY = clientY - rect.top;
+          isCursorInside = true;
+          lastMoveTime = performance.now();
+        }
+
+        sectionContainer.addEventListener('mousemove', updateTargetFromEvent);
+        sectionContainer.addEventListener('mouseenter', updateTargetFromEvent);
+        sectionContainer.addEventListener('mouseleave', function() {
+          isCursorInside = false;
+        });
+        sectionContainer.addEventListener('touchmove', updateTargetFromEvent, { passive: true });
+        sectionContainer.addEventListener('touchstart', updateTargetFromEvent, { passive: true });
+
+        // Continuous Flight & Flapping Animation Loop
+        function animateFlight(time) {
+          if (prefersReducedMotion) return;
+
+          // If mouse is idle or outside, autonomous royal curved patrol around doll
+          if (!isCursorInside || (time - lastMoveTime > 3500)) {
+            var patrolCenterY = height * 0.32;
+            var patrolCenterX = width * 0.5;
+            var t = time * 0.0012;
+            // Elegant Infinity / Lissajous path
+            targetX = patrolCenterX + Math.cos(t) * (width * 0.28);
+            targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.18);
+          }
+
+          // Calculate displacement to target
+          var dx = targetX - posX;
+          var dy = targetY - posY;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Smooth interpolation towards target
+          var vx = dx * ease;
+          var vy = dy * ease;
+          posX += vx;
+          posY += vy;
+
+          // Natural organic sinusoidal drift while hovering
+          var hoverX = Math.sin(time * 0.0035) * 10;
+          var hoverY = Math.cos(time * 0.0042) * 8;
+          var finalX = posX + hoverX;
+          var finalY = posY + hoverY;
+
+          // Clamping strictly inside section boundary
+          finalX = Math.max(30, Math.min(width - 70, finalX));
+          finalY = Math.max(30, Math.min(height - 70, finalY));
+
+          // Calculate travel angle with smooth shortest-path angular interpolation
+          if (dist > 2) {
+            var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+            var angleDiff = (targetAngle - currentAngle + 540) % 360 - 180;
+            currentAngle += angleDiff * 0.12;
+          }
+
+          // Dynamic banking/tilt in 3D
+          var tilt = Math.max(-25, Math.min(25, vx * 1.8));
+
+          // Modulate flapping frequency: rapid flap when darting, graceful flap when hovering
+          if (dist > 40) {
+            butterfly.classList.add('fast-flap');
+            butterfly.classList.remove('hover-flap');
+          } else {
+            butterfly.classList.remove('fast-flap');
+            butterfly.classList.add('hover-flap');
+          }
+
+          // Apply 3D transform (centered on butterfly body)
+          butterfly.style.transform =
+            'translate3d(' + (finalX - 45) + 'px, ' + (finalY - 35) + 'px, 0px) ' +
+            'rotate(' + currentAngle.toFixed(1) + 'deg) ' +
+            'rotateY(' + tilt.toFixed(1) + 'deg)';
+
+          // Spawn sparkling particles behind butterfly
+          if (Math.random() < 0.45 && particles.length < 50) {
+            particles.push(new Particle(finalX, finalY));
+          }
+
+          // Update & Draw Particle Canvas
+          ctx.clearRect(0, 0, width, height);
+          for (var i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            if (particles[i].alpha <= 0) {
+              particles.splice(i, 1);
+            } else {
+              particles[i].draw(ctx);
+            }
+          }
+
+          animationFrameId = requestAnimationFrame(animateFlight);
+        }
+
+        // Start 60fps loop
+        animationFrameId = requestAnimationFrame(animateFlight);
+
+        // Teardown logic on section unload
+        document.addEventListener('shopify:section:unload', function(e) {
+          if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('resize', handleResize);
+          }
+        });
+      }
+    }
+
+    // Initialize on DOM load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRoyalDollSection);
+    } else {
+      initRoyalDollSection();
+    }
+
+    // Re-initialize when Shopify Theme Editor re-renders the section
+    document.addEventListener('shopify:section:load', function(e) {
+      if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+        initRoyalDollSection();
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Royal Fashion Doll",
+  "tag": "section",
+  "class": "interactive-royal-doll-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Story & Header"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "The Royal Attire"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main Heading",
+      "default": "Worn by royalty, made by hand"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal boy doll in handcrafted Indian heritage attire."
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Doll Character Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "default_doll_image",
+      "label": "Master Base Doll Image (Transparent PNG)",
+      "info": "Leave blank to use the built-in stylized 3D Indian boy doll."
+    },
+    {
+      "type": "range",
+      "id": "doll_max_height",
+      "label": "Doll Display Height",
+      "min": 400,
+      "max": 750,
+      "step": 10,
+      "unit": "px",
+      "default": 560
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_idle_float",
+      "label": "Enable Gentle Idle Floating Animation",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Interactive 3D Butterfly"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_butterfly",
+      "label": "Enable Blue-Purple 3D Butterfly",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "butterfly_speed",
+      "label": "Butterfly Follow Speed",
+      "min": 0.03,
+      "max": 0.20,
+      "step": 0.01,
+      "default": 0.08
+    },
+    {
+      "type": "header",
+      "content": "Background & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#fbf2e1"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Royal Gold Accent Color",
+      "default": "#c89332"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Primary Text Color",
+      "default": "#2b1810"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Custom Palace Background Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_default_bg",
+      "label": "Use Built-in Royal Palace Ambiance Backdrop",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Section Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding",
+      "min": 20,
+      "max": 140,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding",
+      "min": 20,
+      "max": 140,
+      "step": 5,
+      "unit": "px",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_item",
+      "name": "Showcase Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Shopify Product"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Attire Category",
+          "options": [
+            { "value": "safa", "label": "Safa / Turban" },
+            { "value": "sherwani", "label": "Sherwani / Kurta" },
+            { "value": "mojari", "label": "Mojari / Footwear" },
+            { "value": "accessory", "label": "Accessory / Jewelry" }
+          ],
+          "default": "sherwani"
+        },
+        {
+          "type": "select",
+          "id": "outfit_palette",
+          "label": "Built-in Doll Outfit Palette",
+          "options": [
+            { "value": "cream", "label": "Imperial Ivory & Gold" },
+            { "value": "red", "label": "Ruby Crimson Red" },
+            { "value": "blue", "label": "Sapphire Blue Jodhpuri" },
+            { "value": "green", "label": "Emerald Heritage Green" }
+          ],
+          "default": "cream",
+          "info": "Changes the 3D doll attire to this variation when the product is clicked."
+        },
+        {
+          "type": "image_picker",
+          "id": "doll_outfit_image",
+          "label": "Custom Mapped Doll Outfit Image (Transparent PNG)",
+          "info": "Overrides the built-in palette with your own custom full-body doll or outfit layer."
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_product_image",
+          "label": "Custom Card Image",
+          "info": "Optional: Overrides the product's default featured image."
+        },
+        {
+          "type": "text",
+          "id": "title_override",
+          "label": "Title Override"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Material / Atelier Subtitle",
+          "default": "Handcrafted Silk & Zari"
+        },
+        {
+          "type": "text",
+          "id": "price_override",
+          "label": "Price Override (e.g. ₹ 48,000)"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Craftsmanship Story"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Royal Fashion Doll",
+      "category": "Custom Interactive",
+      "settings": {
+        "subtitle": "The Royal Attire",
+        "heading": "Worn by royalty, made by hand",
+        "bg_color": "#fbf2e1",
+        "accent_color": "#c89332",
+        "enable_butterfly": true,
+        "enable_idle_float": true
+      },
+      "blocks": [
+        {
+          "type": "product_item",
+          "settings": {
+            "title_override": "Royal Safa Turban",
+            "category": "safa",
+            "outfit_palette": "cream",
+            "subtitle": "Hand-Dyed Leheriya Silk with Brocade Kalangi",
+            "price_override": "₹ 14,500",
+            "description": "Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown."
+          }
+        },
+        {
+          "type": "product_item",
+          "settings": {
+            "title_override": "Imperial Ivory Sherwani",
+            "category": "sherwani",
+            "outfit_palette": "cream",
+            "subtitle": "Zari Embroidered Chanderi Silk",
+            "price_override": "₹ 48,000",
+            "description": "Inspired by the Jaipur Royal Court, featuring floral medallions and freshwater pearl buttons."
+          }
+        },
+        {
+          "type": "product_item",
+          "settings": {
+            "title_override": "Ruby Crimson Sherwani",
+            "category": "sherwani",
+            "outfit_palette": "red",
+            "subtitle": "Raw Silk with Antique Gold Zardozi",
+            "price_override": "₹ 56,000",
+            "description": "A stately crimson hue fit for royal processions, featuring architectural paisley arches."
+          }
+        },
+        {
+          "type": "product_item",
+          "settings": {
+            "title_override": "Sapphire Blue Jodhpuri",
+            "category": "sherwani",
+            "outfit_palette": "blue",
+            "subtitle": "Royal Blue Brocade with Golden Motifs",
+            "price_override": "₹ 52,000",
+            "description": "Handwoven in the royal workshops of Mewar, combining celestial lapis blue silk with warm golden brocade."
+          }
+        },
+        {
+          "type": "product_item",
+          "settings": {
+            "title_override": "Emerald Heritage Sherwani",
+            "category": "sherwani",
+            "outfit_palette": "green",
+            "subtitle": "Deep Emerald Silk with Heritage Filigree",
+            "price_override": "₹ 54,000",
+            "description": "A rich royal emerald green silk ensemble featuring master needlework inspired by royal Mughal garden florals."
+          }
+        },
+        {
+          "type": "product_item",
+          "settings": {
+            "title_override": "Royal Hand-Embroidered Mojari",
+            "category": "mojari",
+            "outfit_palette": "cream",
+            "subtitle": "Genuine Leather with Zari Vamp Embroidery",
+            "price_override": "₹ 9,500",
+            "description": "Curled at the toe, stitched without a single nail, intricately embroidered across the vamp."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

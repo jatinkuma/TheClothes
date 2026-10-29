@@ -349,7 +349,7 @@
         "product_item_LmdyBr": {
           "type": "product_item",
           "settings": {
-            "product": "",
+            "product": "mustard-festive-sherwani",
             "category": "sherwani",
             "outfit_palette": "green",
             "title_override": "Emerald Heritage Sherwani",
@@ -361,7 +361,7 @@
         "product_item_LiMR97": {
           "type": "product_item",
           "settings": {
-            "product": "",
+            "product": "royal-blue-sherwani",
             "category": "mojari",
             "outfit_palette": "cream",
             "title_override": "Royal Hand-Embroidered Mojari",

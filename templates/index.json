@@ -325,7 +325,7 @@
         "product_item_w6wmgc": {
           "type": "product_item",
           "settings": {
-            "product": "",
+            "product": "cream-floral-sherwani",
             "category": "sherwani",
             "outfit_palette": "red",
             "title_override": "Ruby Crimson Sherwani",
@@ -337,7 +337,7 @@
         "product_item_beLkhX": {
           "type": "product_item",
           "settings": {
-            "product": "",
+            "product": "emerald-green-sherwani",
             "category": "sherwani",
             "outfit_palette": "blue",
             "title_override": "Sapphire Blue Jodhpuri",

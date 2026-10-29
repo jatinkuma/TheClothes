@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Royal Attire — Haute Atelier</title>
+  
+  <style>
+    /* ==========================================================================
+       1. GLOBAL RESET & LUXURY TYPOGRAPHY
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-mustard: #E2A522;
+      --bg-mustard-deep: #C78C13;
+      --gold-primary: #FFD700;
+      --gold-deep: #C99723;
+      --ruby-red: #8B1E1E;
+      --ruby-dark: #660E0E;
+      --dark-espresso: #24160A;
+      --cream-pure: #FAF5EA;
+      --card-bg: rgba(255, 255, 255, 0.45);
+      --card-border: rgba(255, 255, 255, 0.65);
+      --shadow-luxury: 0 20px 50px rgba(36, 22, 10, 0.18);
+    }
+
+    body {
+      background-color: var(--bg-mustard);
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(255, 235, 170, 0.35) 0%, transparent 60%),
+        radial-gradient(circle at 85% 85%, rgba(199, 140, 19, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 15% 90%, rgba(139, 30, 30, 0.12) 0%, transparent 50%);
+      color: var(--dark-espresso);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Georgia", serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      cursor: default;
+      position: relative;
+      padding-bottom: 70px;
+    }
+
+    /* Subtle luxury damask background texture overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       2. ANTIGRAVITY BUTTERFLY CURSOR ENGINE
+       ========================================================================== */
+    #butterfly-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 52px;
+      height: 52px;
+      pointer-events: none;
+      z-index: 999999;
+      transform: translate(-100px, -100px);
+      will-change: transform;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Ambient aura glow behind the butterfly */
+    .butterfly-aura {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--cursor-glow, rgba(0, 240, 255, 0.65)) 0%, transparent 70%);
+      pointer-events: none;
+      transition: background 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Wing Flutter Layer */
+    .butterfly-rig {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 500px;
+      position: relative;
+      filter: drop-shadow(0 0 10px var(--cursor-glow, rgba(0, 240, 255, 0.8)));
+      transition: filter 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .wing {
+      width: 22px;
+      height: 32px;
+      display: block;
+      will-change: transform;
+    }
+
+    .wing-left {
+      transform-origin: 100% 50%;
+      animation: wingFlutterLeft 0.14s infinite alternate ease-in-out;
+    }
+
+    .wing-right {
+      transform-origin: 0% 50%;
+      animation: wingFlutterRight 0.14s infinite alternate ease-in-out;
+    }
+
+    @keyframes wingFlutterLeft {
+      0% { transform: rotateY(0deg) scaleX(1); }
+      100% { transform: rotateY(72deg) scaleX(0.45); }
+    }
+
+    @keyframes wingFlutterRight {
+      0% { transform: rotateY(0deg) scaleX(1); }
+      100% { transform: rotateY(-72deg) scaleX(0.45); }
+    }
+
+    .wing-svg-path {
+      fill: var(--cursor-color, #00F0FF);
+      transition: fill 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .butterfly-torso {
+      width: 4px;
+      height: 20px;
+      background: #110B06;
+      border-radius: 4px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .butterfly-antennae {
+      position: absolute;
+      top: -5px;
+      left: -3px;
+      width: 10px;
+      height: 6px;
+      border-top: 1.5px solid #110B06;
+      border-radius: 5px 5px 0 0;
+    }
+
+    /* ==========================================================================
+       3. HEADER & HERO BANNER
+       ========================================================================== */
+    .showcase-header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 30px 24px 10px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .crown-svg {
+      width: 32px;
+      height: 32px;
+      fill: var(--ruby-red);
+      filter: drop-shadow(0 2px 4px rgba(139, 30, 30, 0.25));
+    }
+
+    .brand-title {
+      font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dark-espresso);
+    }
+
+    .header-badge {
+      background: rgba(36, 22, 10, 0.08);
+      border: 1px solid rgba(36, 22, 10, 0.12);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dark-espresso);
+    }
+
+    .hero-text-block {
+      text-align: center;
+      max-width: 680px;
+      margin: 10px auto 25px;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-subtitle {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      color: var(--ruby-red);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-main-title {
+      font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--dark-espresso);
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .hero-caption {
+      font-size: 1.02rem;
+      line-height: 1.55;
+      color: rgba(36, 22, 10, 0.85);
+    }
+
+    /* ==========================================================================
+       4. REAL-PERSON SIMULATION CHARACTER ENGINE
+       ========================================================================== */
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1100px;
+      margin: 0 auto;
+      z-index: 10;
+    }
+
+    /* Imperial Pedestal Cushion Shadow */
+    .pedestal-base {
+      position: absolute;
+      bottom: 25px;
+      width: 380px;
+      height: 75px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(36, 22, 10, 0.32) 0%, rgba(36, 22, 10, 0) 72%);
+      pointer-events: none;
+      filter: blur(4px);
+    }
+
+    /* Organic Multi-Second Idle Breathing Animation */
+    .breathing-rig {
+      position: relative;
+      width: 320px;
+      height: 420px;
+      animation: naturalBreathing 4.5s ease-in-out infinite;
+      transform-origin: 50% 92%;
+      will-change: transform;
+    }
+
+    @keyframes naturalBreathing {
+      0%, 100% {
+        transform: translateY(0px) scale(1, 1);
+      }
+      50% {
+        transform: translateY(-9px) scale(1.025, 1.035);
+      }
+    }
+
+    /* Dynamic Head/Neck Mouse-Tracking Pivot Layer */
+    .head-tilt-pivot {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 45%;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.08s ease-out;
+    }
+
+    /* Central Character Layers Container */
+    .character-canvas-stack {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .character-svg-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Overlay Equipment Layers */
+    .equipment-layer {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    /* Layer: Safa (Turban) - drops in from top */
+    #layer-safa {
+      transform: translateY(-24px) scale(0.94);
+    }
+    #layer-safa.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Layer: Achkan (Royal Jacket) - expands over chest */
+    #layer-achkan {
+      transform: scale(0.92);
+    }
+    #layer-achkan.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Layer: Mojari (Shoes) - slides up to talons */
+    #layer-mojari {
+      transform: translateY(20px) scale(0.94);
+    }
+    #layer-mojari.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ==========================================================================
+       5. PRODUCT SELECTION & LIVE OUTFIT EQUIPMENT SYSTEM
+       ========================================================================== */
+    .wardrobe-section {
+      width: 100%;
+      max-width: 1060px;
+      margin: 15px auto 0;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .wardrobe-controls-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .wardrobe-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wardrobe-title {
+      font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--dark-espresso);
+    }
+
+    .wardrobe-hint {
+      font-size: 0.85rem;
+      color: rgba(36, 22, 10, 0.75);
+    }
+
+    /* Dedicated "Clear Look" Reset Button */
+    .btn-clear-look {
+      background: rgba(36, 22, 10, 0.08);
+      border: 1px solid rgba(36, 22, 10, 0.22);
+      color: var(--dark-espresso);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 9px 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+
+    .btn-clear-look:hover {
+      background: var(--ruby-red);
+      color: #FFF;
+      border-color: var(--ruby-red);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(139, 30, 30, 0.28);
+    }
+
+    .btn-clear-look svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    /* Horizontal Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* Product Card Trigger */
+    .product-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid var(--card-border);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow-luxury);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      background: rgba(255, 255, 255, 0.65);
+      border-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 24px 50px rgba(36, 22, 10, 0.22);
+    }
+
+    /* Active Equipped Card Styling */
+    .product-card.equipped {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: var(--ruby-red);
+      box-shadow: 0 16px 40px rgba(139, 30, 30, 0.2);
+    }
+
+    .card-thumb-frame {
+      width: 100%;
+      height: 125px;
+      border-radius: 12px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(240, 225, 195, 0.5) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .card-thumb-svg {
+      width: 95px;
+      height: 95px;
+      transition: transform 0.35s ease;
+    }
+
+    .product-card:hover .card-thumb-svg {
+      transform: scale(1.08);
+    }
+
+    .card-header-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .card-category {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--ruby-red);
+    }
+
+    .card-status-pill {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: rgba(36, 22, 10, 0.06);
+      color: rgba(36, 22, 10, 0.6);
+      transition: all 0.25s ease;
+    }
+
+    .product-card.equipped .card-status-pill {
+      background: var(--ruby-red);
+      color: #FFF;
+    }
+
+    .card-title {
+      font-family: "Didot", "Bodoni MT", "Cinzel", "Georgia", serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark-espresso);
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: rgba(36, 22, 10, 0.78);
+      margin-bottom: 14px;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid rgba(36, 22, 10, 0.08);
+    }
+
+    .card-price {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--dark-espresso);
+    }
+
+    .card-action-cue {
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--ruby-red);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Toast notification */
+    #look-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: var(--dark-espresso);
+      color: #FFF;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--gold-primary);
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #look-toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 860px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+      .stage-wrapper {
+        height: 420px;
+      }
+      .hero-main-title {
+        font-size: 2.1rem;
+      }
+      .showcase-header {
+        padding: 20px 16px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. CUSTOM ANTIGRAVITY BUTTERFLY CURSOR
+       ======================================================================== -->
+  <div id="butterfly-cursor" aria-hidden="true">
+    <div class="butterfly-aura"></div>
+    <div class="butterfly-rig">
+      <!-- Left Wing -->
+      <svg class="wing wing-left" viewBox="0 0 50 70">
+        <path class="wing-svg-path" d="M48,56 C38,44 14,24 6,5 C-1,-3 -2,9 5,23 C9,31 22,46 48,60 Z" />
+        <path class="wing-svg-path" opacity="0.8" d="M48,56 C38,54 20,48 12,38 C4,28 -2,38 6,48 C14,58 30,66 48,58 Z" />
+      </svg>
+      <!-- Central Body & Antennae -->
+      <div class="butterfly-torso">
+        <div class="butterfly-antennae"></div>
+      </div>
+      <!-- Right Wing -->
+      <svg class="wing wing-right" viewBox="0 0 50 70">
+        <path class="wing-svg-path" d="M2,56 C12,44 36,24 44,5 C51,-3 52,9 45,23 C41,31 28,46 2,60 Z" />
+        <path class="wing-svg-path" opacity="0.8" d="M2,56 C12,54 30,48 38,38 C46,28 52,38 44,48 C36,58 20,66 2,58 Z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       2. LUXURY HEADER
+       ======================================================================== -->
+  <header class="showcase-header">
+    <div class="brand-group">
+      <svg class="crown-svg" viewBox="0 0 24 24">
+        <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+      </svg>
+      <span class="brand-title">The Royal Attire</span>
+    </div>
+    <div class="header-badge">Rajasthani Court Regalia</div>
+  </header>
+
+  <!-- Hero Headings -->
+  <div class="hero-text-block">
+    <span class="hero-subtitle">Bespoke Living Mascot</span>
+    <h1 class="hero-main-title">Worn by Royalty, Made by Hand</h1>
+    <p class="hero-caption">Select any royal piece below to drape our living owl avatar. Watch him follow the floating butterfly cursor in real-time.</p>
+  </div>
+
+  <!-- ========================================================================
+       3. REAL-PERSON SIMULATION CHARACTER ENGINE (CENTRAL STAGE)
+       ======================================================================== -->
+  <div class="stage-wrapper" id="character-stage">
+    
+    <!-- Imperial Pedestal Shadow -->
+    <div class="pedestal-base"></div>
+
+    <!-- Multi-second Idle Breathing Container -->
+    <div class="breathing-rig" id="breathing-rig">
+      
+      <!-- Mouse-Tracking Head / Body Rotation Pivot Layer -->
+      <div class="head-tilt-pivot" id="head-tilt-pivot">
+        
+        <div class="character-canvas-stack">
+          
+          <!-- BASE LAYER: Royal Owl Character with Sunglasses & Perch -->
+          <svg class="character-svg-layer" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="grad-cushion" cx="50%" cy="40%" r="50%">
+                <stop offset="0%" stop-color="#A52626"/>
+                <stop offset="70%" stop-color="#6F1212"/>
+                <stop offset="100%" stop-color="#3D0606"/>
+              </radialGradient>
+              <linearGradient id="grad-gold-trim" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ECC669"/>
+                <stop offset="50%" stop-color="#FFE79A"/>
+                <stop offset="100%" stop-color="#C5962B"/>
+              </linearGradient>
+              <radialGradient id="grad-body" cx="50%" cy="50%" r="55%">
+                <stop offset="0%" stop-color="#7B502C"/>
+                <stop offset="60%" stop-color="#553419"/>
+                <stop offset="100%" stop-color="#351F0D"/>
+              </radialGradient>
+              <radialGradient id="grad-breast" cx="50%" cy="45%" r="45%">
+                <stop offset="0%" stop-color="#FAF1DE"/>
+                <stop offset="65%" stop-color="#E7D2AF"/>
+                <stop offset="100%" stop-color="#CBB186"/>
+              </radialGradient>
+              <linearGradient id="grad-shades" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2D2D2D"/>
+                <stop offset="40%" stop-color="#141414"/>
+                <stop offset="100%" stop-color="#050505"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 1. Imperial Velvet Perch Cushion -->
+            <ellipse cx="160" cy="385" rx="120" ry="25" fill="url(#grad-cushion)" />
+            <path d="M40,385 Q160,402 280,385 Q260,398 160,398 Q60,398 40,385 Z" fill="url(#grad-gold-trim)"/>
+            <!-- Golden Tassels -->
+            <circle cx="45" cy="388" r="4" fill="#FFE79A" />
+            <circle cx="275" cy="388" r="4" fill="#FFE79A" />
+            <circle cx="160" cy="396" r="4" fill="#FFE79A" />
+
+            <!-- 2. Golden Talons -->
+            <g fill="#DCA32B" stroke="#9E6B08" stroke-width="1.5">
+              <path d="M125,372 C120,380 115,385 110,387 M128,372 C128,382 126,388 123,390 M134,372 C138,381 140,386 142,388"/>
+              <path d="M186,372 C182,381 180,386 178,388 M192,372 C192,382 194,388 197,390 M195,372 C200,380 205,385 210,387"/>
+            </g>
+
+            <!-- 3. Owl Torso & Tail Feathers -->
+            <path d="M110,210 Q85,270 95,360 Q160,378 225,360 Q235,270 210,210 Z" fill="url(#grad-body)" />
+            
+            <!-- Folded Royal Wings -->
+            <path d="M96,218 C78,255 72,310 88,355 C98,340 106,310 110,270 Z" fill="#42250F" stroke="#2D1708" stroke-width="1.2"/>
+            <path d="M224,218 C242,255 248,310 232,355 C222,340 214,310 210,270 Z" fill="#42250F" stroke="#2D1708" stroke-width="1.2"/>
+
+            <!-- Breast Feathers -->
+            <path d="M120,215 Q160,205 200,215 Q212,280 198,345 Q160,362 122,345 Q108,280 120,215 Z" fill="url(#grad-breast)" />
+            <!-- Subtle Feather Texture Chevron Marks -->
+            <g stroke="#9F7E50" stroke-width="1.8" fill="none" opacity="0.6">
+              <path d="M148,245 L160,252 L172,245 M144,268 L160,277 L176,268 M140,292 L160,303 L180,292 M145,316 L160,326 L175,316" />
+            </g>
+
+            <!-- 4. Owl Head & Feathery Cheeks -->
+            <path d="M102,155 C92,110 115,75 160,75 C205,75 228,110 218,155 C226,175 215,200 195,212 C175,220 145,220 125,212 C105,200 94,175 102,155 Z" fill="url(#grad-body)" />
+            
+            <!-- Ear Tufts (Plumage Horns) -->
+            <path d="M112,85 L88,48 C96,62 108,68 122,76 Z" fill="#3D210B" />
+            <path d="M208,85 L232,48 C224,62 212,68 198,76 Z" fill="#3D210B" />
+
+            <!-- Golden Curved Beak -->
+            <path d="M154,152 Q160,148 166,152 L160,172 Z" fill="#F0B533" stroke="#A9730D" stroke-width="1.2" />
+
+            <!-- 5. Stylish Royal Sunglasses (High-End Frame) -->
+            <g id="royal-sunglasses" filter="drop-shadow(0 4px 6px rgba(0,0,0,0.45))">
+              <!-- Golden Bridge & Frame -->
+              <path d="M148,135 Q160,131 172,135" stroke="url(#grad-gold-trim)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+              <rect x="110" y="122" width="40" height="28" rx="8" fill="url(#grad-shades)" stroke="url(#grad-gold-trim)" stroke-width="2.5" />
+              <rect x="170" y="122" width="40" height="28" rx="8" fill="url(#grad-shades)" stroke="url(#grad-gold-trim)" stroke-width="2.5" />
+              <!-- Glass Sheen Glare Reflection -->
+              <path d="M114,126 L134,126 L118,146 L114,146 Z" fill="rgba(255, 255, 255, 0.32)" />
+              <path d="M174,126 L194,126 L178,146 L174,146 Z" fill="rgba(255, 255, 255, 0.32)" />
+            </g>
+          </svg>
+
+          <!-- ================================================================
+               OVERLAY LAYER 1: SAFA (TURBAN)
+               ================================================================ -->
+          <svg class="character-svg-layer equipment-layer" id="layer-safa" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="grad-safa-silk" x1="0%" y1="0%" x2="100%" y2="80%">
+                <stop offset="0%" stop-color="#C21E2C"/>
+                <stop offset="40%" stop-color="#8F101A"/>
+                <stop offset="70%" stop-color="#E53935"/>
+                <stop offset="100%" stop-color="#67050D"/>
+              </linearGradient>
+              <linearGradient id="grad-zari" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#D4AF37"/>
+                <stop offset="50%" stop-color="#FFF2A8"/>
+                <stop offset="100%" stop-color="#AA8010"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Turban Wraps -->
+            <g id="safa-turban-mesh" filter="drop-shadow(0 6px 12px rgba(80, 5, 10, 0.45))">
+              <!-- Foundation Swathe -->
+              <path d="M96,108 C88,68 116,34 160,32 C204,34 232,68 224,108 C216,120 104,120 96,108 Z" fill="url(#grad-safa-silk)" />
+              
+              <!-- Spiraling Pleats & Zari Bands -->
+              <path d="M92,102 Q158,68 226,98 C220,114 100,114 92,102 Z" fill="#8F101A" stroke="url(#grad-zari)" stroke-width="2.5" />
+              <path d="M98,82 Q160,50 222,80 C215,92 105,92 98,82 Z" fill="url(#grad-safa-silk)" stroke="url(#grad-zari)" stroke-width="2" />
+              <path d="M108,62 Q160,38 212,62" fill="none" stroke="url(#grad-zari)" stroke-width="2.2" />
+
+              <!-- Side Hanging Shamla Pleats (Left drape) -->
+              <path d="M88,102 C80,122 84,152 86,172 C92,168 96,135 98,110 Z" fill="#A71520" stroke="url(#grad-zari)" stroke-width="1.5" />
+
+              <!-- Royal Kalgi (Brooch + Plume) -->
+              <path d="M160,42 Q156,12 150,0 Q164,10 160,42 Z" fill="#FFF8E7" stroke="#D4AF37" stroke-width="1.5" />
+              <circle cx="160" cy="48" r="8" fill="url(#grad-zari)" />
+              <circle cx="160" cy="48" r="5" fill="#00E5FF" stroke="#FFF" stroke-width="1" />
+              <!-- Dropping Pearl Tear -->
+              <circle cx="160" cy="60" r="3" fill="#FFF" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.4))" />
+            </g>
+          </svg>
+
+          <!-- ================================================================
+               OVERLAY LAYER 2: ACHKAN (JACKET)
+               ================================================================ -->
+          <svg class="character-svg-layer equipment-layer" id="layer-achkan" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="grad-achkan-brocade" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FAF5EC"/>
+                <stop offset="60%" stop-color="#EADBBA"/>
+                <stop offset="100%" stop-color="#D2BC95"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Royal Embroidered Achkan Outer Coat -->
+            <g id="achkan-coat" filter="drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25))">
+              <!-- Main Coat Silhouette -->
+              <path d="M102,205 C96,250 94,310 102,368 Q160,382 218,368 C226,310 224,250 218,205 Q160,195 102,205 Z" 
+                    fill="url(#grad-achkan-brocade)" stroke="#C39A4D" stroke-width="2.5" />
+
+              <!-- Mandarin Collar -->
+              <path d="M125,206 Q160,196 195,206 L195,218 Q160,208 125,218 Z" fill="#B88A34" stroke="#FFF" stroke-width="1.2" />
+
+              <!-- Central Placket with Gold Zardozi Embroidery -->
+              <rect x="154" y="218" width="12" height="152" fill="#B88A34" stroke="#D4AF37" stroke-width="1.5" />
+              
+              <!-- Royal Gemstone Buttons -->
+              <g fill="#A71520" stroke="#FFF" stroke-width="1">
+                <circle cx="160" cy="232" r="3" />
+                <circle cx="160" cy="254" r="3" />
+                <circle cx="160" cy="276" r="3" />
+                <circle cx="160" cy="298" r="3" />
+                <circle cx="160" cy="320" r="3" />
+                <circle cx="160" cy="342" r="3" />
+              </g>
+
+              <!-- Imperial Freshwater Pearl Mala (Necklace) -->
+              <path d="M130,220 Q160,285 190,220" fill="none" stroke="#FFF" stroke-width="4.5" stroke-dasharray="1 7" stroke-linecap="round" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.3))" />
+              <circle cx="160" cy="278" r="6" fill="#137547" stroke="#FFD700" stroke-width="1.8" />
+            </g>
+          </svg>
+
+          <!-- ================================================================
+               OVERLAY LAYER 3: MOJARI (SHOES)
+               ================================================================ -->
+          <svg class="character-svg-layer equipment-layer" id="layer-mojari" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="grad-mojari-velvet" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#9C1724"/>
+                <stop offset="60%" stop-color="#720E18"/>
+                <stop offset="100%" stop-color="#4E080F"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Pair of Royal Mojari Slippers on Talons -->
+            <g id="mojari-shoes" filter="drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45))">
+              <!-- Left Mojari with Curled Toe -->
+              <path d="M106,375 C116,368 138,368 145,378 C144,388 128,394 114,394 C104,394 92,390 90,384 C88,378 94,374 98,374 C102,374 102,380 98,382 Z" 
+                    fill="url(#grad-mojari-velvet)" stroke="#E5C158" stroke-width="2" />
+              <!-- Golden Vamp Needlework -->
+              <path d="M112,376 Q126,380 138,376 M115,382 Q126,386 135,382" fill="none" stroke="#FFD700" stroke-width="1.4" />
+
+              <!-- Right Mojari with Curled Toe -->
+              <path d="M214,375 C204,368 182,368 175,378 C176,388 192,394 206,394 C216,394 228,390 230,384 C232,378 226,374 222,374 C218,374 218,380 222,382 Z" 
+                    fill="url(#grad-mojari-velvet)" stroke="#E5C158" stroke-width="2" />
+              <!-- Golden Vamp Needlework -->
+              <path d="M208,376 Q194,380 182,376 M205,382 Q194,386 185,382" fill="none" stroke="#FFD700" stroke-width="1.4" />
+            </g>
+          </svg>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       4. PRODUCT SELECTION & LIVE OUTFIT EQUIPMENT SYSTEM
+       ======================================================================== -->
+  <section class="wardrobe-section">
+    <div class="wardrobe-controls-head">
+      <div class="wardrobe-title-wrap">
+        <h2 class="wardrobe-title">Select Attire</h2>
+        <span class="wardrobe-hint">Click cards to toggle live garment overlays</span>
+      </div>
+      
+      <!-- Dedicated "Clear Look" Reset Button -->
+      <button type="button" class="btn-clear-look" id="btn-clear-look" title="Reset all equipped garments">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+        <span>Clear Look</span>
+      </button>
+    </div>
+
+    <!-- Horizontal Product Showcase Grid -->
+    <div class="product-grid">
+      
+      <!-- Card 1: Safa (Turban) -->
+      <div class="product-card" id="card-safa" data-target="layer-safa" data-name="Safa (Royal Turban)">
+        <div class="card-thumb-frame">
+          <!-- Thumbnail Graphic for Safa -->
+          <svg class="card-thumb-svg" viewBox="0 0 100 100">
+            <path d="M20,65 C15,35 35,15 50,14 C65,15 85,35 80,65 Q50,75 20,65 Z" fill="#9C1724" stroke="#D4AF37" stroke-width="3"/>
+            <path d="M18,60 Q50,38 82,58" fill="none" stroke="#FFD700" stroke-width="2.5" />
+            <circle cx="50" cy="24" r="5" fill="#FFD700" />
+            <circle cx="50" cy="24" r="3" fill="#00F0FF" />
+          </svg>
+        </div>
+        <div class="card-header-line">
+          <span class="card-category">Headwear</span>
+          <span class="card-status-pill" id="pill-safa">Equip</span>
+        </div>
+        <h3 class="card-title">Safa</h3>
+        <p class="card-desc">Hand-wound Rajasthani Leheriya silk turban adorned with a turquoise kalgi plume and ruby brocade band.</p>
+        <div class="card-footer">
+          <span class="card-price">Rs. 14,500</span>
+          <span class="card-action-cue">Toggle Outfit &rarr;</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Achkan (Jacket) -->
+      <div class="product-card" id="card-achkan" data-target="layer-achkan" data-name="Achkan (Ceremonial Coat)">
+        <div class="card-thumb-frame">
+          <!-- Thumbnail Graphic for Achkan -->
+          <svg class="card-thumb-svg" viewBox="0 0 100 100">
+            <path d="M25,28 L38,20 L62,20 L75,28 L72,85 Q50,92 28,85 Z" fill="#EADBBA" stroke="#B88A34" stroke-width="3"/>
+            <rect x="46" y="24" width="8" height="62" fill="#B88A34" />
+            <circle cx="50" cy="34" r="2.5" fill="#9C1724" />
+            <circle cx="50" cy="46" r="2.5" fill="#9C1724" />
+            <circle cx="50" cy="58" r="2.5" fill="#9C1724" />
+            <circle cx="50" cy="70" r="2.5" fill="#9C1724" />
+          </svg>
+        </div>
+        <div class="card-header-line">
+          <span class="card-category">Royal Regalia</span>
+          <span class="card-status-pill" id="pill-achkan">Equip</span>
+        </div>
+        <h3 class="card-title">Achkan</h3>
+        <p class="card-desc">Ceremonial ivory raw silk jacket featuring zardozi wirework, heirloom ruby buttons, and emerald mala necklace.</p>
+        <div class="card-footer">
+          <span class="card-price">Rs. 56,000</span>
+          <span class="card-action-cue">Toggle Outfit &rarr;</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Mojari (Shoes) -->
+      <div class="product-card" id="card-mojari" data-target="layer-mojari" data-name="Mojari (Curled Toe Shoes)">
+        <div class="card-thumb-frame">
+          <!-- Thumbnail Graphic for Mojari -->
+          <svg class="card-thumb-svg" viewBox="0 0 100 100">
+            <path d="M15,55 C22,46 45,46 50,56 C48,68 32,74 18,74 C8,74 2,68 2,64 C2,58 8,56 12,56 C16,56 16,62 12,64 Z" fill="#720E18" stroke="#D4AF37" stroke-width="2.5"/>
+            <path d="M85,55 C78,46 55,46 50,56 C52,68 68,74 82,74 C92,74 98,68 98,64 C98,58 92,56 88,56 C84,56 84,62 88,64 Z" fill="#720E18" stroke="#D4AF37" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="card-header-line">
+          <span class="card-category">Footwear</span>
+          <span class="card-status-pill" id="pill-mojari">Equip</span>
+        </div>
+        <h3 class="card-title">Mojari</h3>
+        <p class="card-desc">Master artisan hand-turned velvet slippers with distinctive pointed curl toes and spun brass cord embroidery.</p>
+        <div class="card-footer">
+          <span class="card-price">Rs. 9,500</span>
+          <span class="card-action-cue">Toggle Outfit &rarr;</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Look Status Notification Toast -->
+  <div id="look-toast" role="status" aria-live="polite"></div>
+
+  <!-- ========================================================================
+       5. VANILLA JAVASCRIPT MECHANICS ENGINE
+       ======================================================================== -->
+  <script>
+    (function() {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         1. CUSTOM ANTIGRAVITY BUTTERFLY CURSOR ENGINE
+         - Linear interpolation (lerp factor 0.15) for smooth trailing drag
+         - Color cycling every 2.5 seconds (Cyan, Magenta, Gold, Neon Green)
+         ---------------------------------------------------------------------- */
+      const butterflyCursor = document.getElementById('butterfly-cursor');
+      
+      let mouseX = window.innerWidth / 2;
+      let mouseY = window.innerHeight / 2;
+      let curX = mouseX;
+      let curY = mouseY;
+      const LERP_FACTOR = 0.15; // Strictly 0.15 easing factor
+
+      // Track cursor position
+      window.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+
+      // Butterfly color cycle profiles
+      const colorProfiles = [
+        { name: 'Cyan', color: '#00F0FF', glow: 'rgba(0, 240, 255, 0.75)' },
+        { name: 'Magenta', color: '#FF007F', glow: 'rgba(255, 0, 127, 0.75)' },
+        { name: 'Gold', color: '#FFD700', glow: 'rgba(255, 215, 0, 0.75)' },
+        { name: 'Neon Green', color: '#39FF14', glow: 'rgba(57, 255, 20, 0.75)' }
+      ];
+      let activeColorIdx = 0;
+
+      function applyButterflyColor(profile) {
+        document.documentElement.style.setProperty('--cursor-color', profile.color);
+        document.documentElement.style.setProperty('--cursor-glow', profile.glow);
+      }
+      // Initialize starting color
+      applyButterflyColor(colorProfiles[0]);
+
+      // Automated 2.5s Color Profile Cycle Timer
+      setInterval(function() {
+        activeColorIdx = (activeColorIdx + 1) % colorProfiles.length;
+        applyButterflyColor(colorProfiles[activeColorIdx]);
+      }, 2500);
+
+      // RAF Engine for Antigravity Cursor Movement
+      function renderButterfly(time) {
+        // Linear Interpolation: cur += (target - cur) * 0.15
+        curX += (mouseX - curX) * LERP_FACTOR;
+        curY += (mouseY - curY) * LERP_FACTOR;
+
+        // Antigravity floating wobble
+        const floatY = Math.sin(time * 0.004) * 8;
+        const floatX = Math.cos(time * 0.003) * 5;
+
+        // Center on cursor with slight offset
+        const renderX = curX + floatX - 26;
+        const renderY = curY + floatY - 26;
+
+        butterflyCursor.style.transform = `translate3d(${renderX.toFixed(2)}px, ${renderY.toFixed(2)}px, 0)`;
+
+        requestAnimationFrame(renderButterfly);
+      }
+      requestAnimationFrame(renderButterfly);
+
+
+      /* ----------------------------------------------------------------------
+         2. REAL-PERSON SIMULATION CHARACTER ENGINE
+         - Calculates distance between cursor and center of character
+         - Dynamically applies rotateX & rotateY to make avatar follow butterfly
+         ---------------------------------------------------------------------- */
+      const stageEl = document.getElementById('character-stage');
+      const headTiltPivot = document.getElementById('head-tilt-pivot');
+      
+      let targetRotY = 0;
+      let targetRotX = 0;
+      let curRotY = 0;
+      let curRotX = 0;
+
+      window.addEventListener('mousemove', function(e) {
+        if (!stageEl || !headTiltPivot) return;
+
+        const rect = stageEl.getBoundingClientRect();
+        const charCenterX = rect.left + rect.width / 2;
+        const charCenterY = rect.top + rect.height * 0.42;
+
+        // Distance deltas
+        const deltaX = e.clientX - charCenterX;
+        const deltaY = e.clientY - charCenterY;
+
+        // Compute angle limits (-22deg to +22deg yaw, -12deg to +12deg pitch)
+        const maxRangeX = window.innerWidth * 0.55;
+        const maxRangeY = window.innerHeight * 0.55;
+
+        const normX = Math.max(-1, Math.min(1, deltaX / maxRangeX));
+        const normY = Math.max(-1, Math.min(1, deltaY / maxRangeY));
+
+        targetRotY = normX * 22;   // Look left / right
+        targetRotX = -normY * 12;  // Look up / down
+      });
+
+      window.addEventListener('mouseleave', function() {
+        targetRotY = 0;
+        targetRotX = 0;
+      });
+
+      // Smooth Character Orientation Interpolation Loop
+      function updateCharacterGaze() {
+        curRotY += (targetRotY - curRotY) * 0.09;
+        curRotX += (targetRotX - curRotX) * 0.09;
+
+        // Add subtle tiltZ derived from yaw for natural animal head cocking
+        const tiltZ = curRotY * 0.16;
+
+        if (headTiltPivot) {
+          headTiltPivot.style.transform = 
+            `rotateY(${curRotY.toFixed(2)}deg) ` +
+            `rotateX(${curRotX.toFixed(2)}deg) ` +
+            `rotateZ(${tiltZ.toFixed(2)}deg)`;
+        }
+
+        requestAnimationFrame(updateCharacterGaze);
+      }
+      requestAnimationFrame(updateCharacterGaze);
+
+
+      /* ----------------------------------------------------------------------
+         3. PRODUCT SELECTION & LIVE OUTFIT EQUIPMENT SYSTEM
+         - Each item card toggles its matching overlay on the character
+         - Synced with the breathing rig (overlays sit inside the breathing-rig)
+         - "Clear Look" button resets all garments to hidden states
+         ---------------------------------------------------------------------- */
+      const productCards = document.querySelectorAll('.product-card');
+      const clearLookBtn = document.getElementById('btn-clear-look');
+      const toastEl = document.getElementById('look-toast');
+      let toastTimer = null;
+
+      function showToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.add('visible');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() {
+          toastEl.classList.remove('visible');
+        }, 2200);
+      }
+
+      // Toggle individual garment
+      productCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+          const targetId = card.getAttribute('data-target');
+          const itemName = card.getAttribute('data-name');
+          const overlayEl = document.getElementById(targetId);
+          const pillEl = card.querySelector('.card-status-pill');
+
+          if (!overlayEl) return;
+
+          const isCurrentlyActive = overlayEl.classList.contains('active');
+
+          if (isCurrentlyActive) {
+            // Un-equip
+            overlayEl.classList.remove('active');
+            card.classList.remove('equipped');
+            if (pillEl) pillEl.textContent = 'Equip';
+            showToast('Removed ' + itemName);
+          } else {
+            // Equip
+            overlayEl.classList.add('active');
+            card.classList.add('equipped');
+            if (pillEl) pillEl.textContent = 'Equipped';
+            showToast('Equipped ' + itemName + ' onto Royal Mascot');
+          }
+        });
+      });
+
+      // Clear Look Reset Action
+      if (clearLookBtn) {
+        clearLookBtn.addEventListener('click', function() {
+          const allOverlays = document.querySelectorAll('.equipment-layer');
+          let removedCount = 0;
+
+          allOverlays.forEach(function(overlay) {
+            if (overlay.classList.contains('active')) {
+              overlay.classList.remove('active');
+              removedCount++;
+            }
+          });
+
+          productCards.forEach(function(card) {
+            card.classList.remove('equipped');
+            const pillEl = card.querySelector('.card-status-pill');
+            if (pillEl) pillEl.textContent = 'Equip';
+          });
+
+          if (removedCount > 0) {
+            showToast('Look Cleared — Restored Base Avatar');
+          } else {
+            showToast('Avatar is already in neutral base form');
+          }
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>

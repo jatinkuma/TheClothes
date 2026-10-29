@@ -837,10 +837,10 @@
   /* 3D Articulated Doll Rig */
   .royal-doll-character {
     position: relative;
-    width: min(100%, 420px);
+    width: min(100%, 380px);
     height: var(--royal-doll-height);
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     z-index: 2;
     perspective: 1100px;
@@ -864,12 +864,15 @@
     display: block;
   }
 
-  /* Body Rig: Torso, Sherwani, Arms, Legs, Mojari (Remains mostly stationary) */
+  /* Body Rig: Torso, Sherwani, Arms, Legs, Mojari (Stationary) */
   .royal-doll-body-rig {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transform-origin: center bottom;
     transform-style: preserve-3d;
     will-change: transform;
@@ -877,13 +880,16 @@
     pointer-events: none;
   }
 
-  /* Head & Neck Rig: Sits in neck socket, pivots naturally on neck collar base */
+  /* Head & Neck Rig: Sits in neck socket, pivots naturally on collar socket (row 174 / 415 = 41.9%) */
   .royal-doll-head-rig {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    transform-origin: 50% 42% 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: 50% 41.9% 0;
     transform-style: preserve-3d;
     will-change: transform;
     z-index: 2;
@@ -895,17 +901,18 @@
   .royal-head-angle,
   .royal-doll-img {
     position: absolute;
-    bottom: 0;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     height: 100%;
+    max-height: 100%;
     width: auto;
     max-width: 100%;
     object-fit: contain;
-    object-position: bottom center;
+    object-position: center center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s;
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s;
     user-select: none;
     -webkit-user-drag: none;
     pointer-events: none;
@@ -939,12 +946,12 @@
     transition: transform 0.3s ease;
   }
 
-  /* Selected Product Information Panel */
+  /* Selected Product Information Panel (Layered above butterfly) */
   .royal-selected-info {
     grid-column: 3;
     padding-left: 20px;
     position: relative;
-    z-index: 5;
+    z-index: 25;
   }
 
   .selected-info-inner {
@@ -1031,10 +1038,10 @@
     box-shadow: 0 6px 20px rgba(200, 147, 50, 0.35);
   }
 
-  /* Collection Strip / Horizontal Track */
+  /* Collection Strip / Horizontal Track (Layered above butterfly) */
   .royal-collection-strip {
     position: relative;
-    z-index: 6;
+    z-index: 30;
   }
 
   .royal-strip-heading {
@@ -1107,6 +1114,7 @@
   /* Individual Product Card */
   .royal-product-card {
     position: relative;
+    z-index: 31;
     flex: 0 0 250px;
     background: rgba(255, 255, 255, 0.8);
     border: 1.5px solid rgba(200, 147, 50, 0.2);
@@ -1252,7 +1260,7 @@
     width: 90px;
     height: 70px;
     pointer-events: none;
-    z-index: 15;
+    z-index: 12;
     transform: translate3d(-200px, -200px, 0);
     will-change: transform;
     transition: opacity 0.3s ease;
@@ -1473,12 +1481,13 @@
       function initThreeRig() {
         if (typeof THREE === 'undefined' || !threeContainer || isThreeReady) return;
         try {
-          var cWidth = threeContainer.clientWidth || (dollViewer ? dollViewer.offsetWidth : 400) || 400;
+          var cWidth = threeContainer.clientWidth || (dollViewer ? dollViewer.offsetWidth : 380) || 380;
           var cHeight = threeContainer.clientHeight || (dollViewer ? dollViewer.offsetHeight : 560) || 560;
 
           threeScene = new THREE.Scene();
-          threeCamera = new THREE.PerspectiveCamera(32, cWidth / cHeight, 0.1, 100);
-          threeCamera.position.set(0, 0.15, 4.8);
+          // Camera placed with generous headroom so head is never clipped
+          threeCamera = new THREE.PerspectiveCamera(30, cWidth / cHeight, 0.1, 100);
+          threeCamera.position.set(0, 0.05, 4.2);
 
           threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
           threeRenderer.setSize(cWidth, cHeight);
@@ -1487,18 +1496,18 @@
           threeContainer.appendChild(threeRenderer.domElement);
 
           // Warm Palace Lighting
-          var tAmb = new THREE.AmbientLight(0xfff7e6, 1.3);
+          var tAmb = new THREE.AmbientLight(0xfff7e6, 1.35);
           threeScene.add(tAmb);
 
-          var tKey = new THREE.DirectionalLight(0xffeedd, 1.4);
+          var tKey = new THREE.DirectionalLight(0xffeedd, 1.3);
           tKey.position.set(2.5, 4, 3.5);
           threeScene.add(tKey);
 
-          var tRim = new THREE.DirectionalLight(0x00e5ff, 0.6);
+          var tRim = new THREE.DirectionalLight(0x00e5ff, 0.5);
           tRim.position.set(-3, 2, -2);
           threeScene.add(tRim);
 
-          // Texture Maps for authentic furry character in Rajasthani attire
+          // Texture Maps for authentic mascot character in Rajasthani attire
           var tLoader = new THREE.TextureLoader();
           outfitTextureMap = {
             cream: tLoader.load("{{ 'royal-doll-cream-body.png' | asset_url }}"),
@@ -1509,29 +1518,34 @@
           var tHead = tLoader.load("{{ 'royal-doll-head-center.png' | asset_url }}");
 
           // Anatomical Skeleton Bones (Root -> Spine -> Neck -> Head)
+          // Character is 2.0 units tall, centered at y = 0.0 (from y = -1.0 to y = +1.0)
+          // In the 210x415 texture, the collar socket is at row 174 (41.93% from top = 1.1614 units from bottom)
+          var charH = 2.0;
+          var collarYFromBottom = (415 - 174) / 415 * charH; // 1.1614 units
+
           rootBone = new THREE.Bone();
           rootBone.name = "root";
-          rootBone.position.set(0, -1.05, 0);
+          rootBone.position.set(0, -1.0, 0);
 
           spineBone = new THREE.Bone();
           spineBone.name = "spine";
-          spineBone.position.set(0, 0.8, 0); // Torso / Sherwani anchor
+          spineBone.position.set(0, 0, 0); // Torso / Sherwani anchor at character base
           rootBone.add(spineBone);
 
           neckBone = new THREE.Bone();
           neckBone.name = "neck";
-          neckBone.position.set(0, 0.58, 0); // Exact collar pivot joint
+          neckBone.position.set(0, collarYFromBottom, 0); // Anatomical collar pivot joint
           spineBone.add(neckBone);
 
           headBone = new THREE.Bone();
           headBone.name = "head";
-          headBone.position.set(0, 0.22, 0); // Head & Safa center
+          headBone.position.set(0, 0, 0); // Coincident with neck pivot
           neckBone.add(headBone);
 
           threeScene.add(rootBone);
 
           // Torso / Sherwani 3D Curved Mesh (Attached to spineBone - stationary!)
-          var torsoGeo = new THREE.CylinderGeometry(0.55, 0.65, 1.45, 32, 1, true, -Math.PI * 0.45, Math.PI * 0.9);
+          var torsoGeo = new THREE.CylinderGeometry(0.55, 0.65, charH, 32, 1, true, -Math.PI * 0.44, Math.PI * 0.88);
           torsoMat = new THREE.MeshStandardMaterial({
             map: outfitTextureMap.cream,
             transparent: true,
@@ -1540,11 +1554,11 @@
             side: THREE.DoubleSide
           });
           var torsoMesh = new THREE.Mesh(torsoGeo, torsoMat);
-          torsoMesh.position.set(0, -0.45, 0);
+          torsoMesh.position.set(0, charH / 2, 0); // Centered at y = 1.0 on spineBone (world y = 0.0)
           spineBone.add(torsoMesh);
 
           // Head, Safa, Kalgi & Sunglasses 3D Curved Mesh (Attached to headBone!)
-          var headGeo = new THREE.CylinderGeometry(0.52, 0.52, 0.95, 32, 1, true, -Math.PI * 0.45, Math.PI * 0.9);
+          var headGeo = new THREE.CylinderGeometry(0.55, 0.55, charH, 32, 1, true, -Math.PI * 0.44, Math.PI * 0.88);
           headMat = new THREE.MeshStandardMaterial({
             map: tHead,
             transparent: true,
@@ -1553,7 +1567,8 @@
             side: THREE.DoubleSide
           });
           var headMesh = new THREE.Mesh(headGeo, headMat);
-          headMesh.position.set(0, 0.22, 0);
+          // Offset relative to headBone so head center matches torso center with zero gap!
+          headMesh.position.set(0, (charH / 2) - collarYFromBottom, 0);
           headBone.add(headMesh);
 
           // Optional External GLB Model Support
@@ -1662,7 +1677,7 @@
       function selectCard(card) {
         if (!card) return;
 
-        // Visual Card State
+        // Visual Card Selection State
         cards.forEach(function(c) {
           c.classList.remove('selected');
           c.setAttribute('aria-pressed', 'false');
@@ -1671,34 +1686,33 @@
         card.setAttribute('aria-pressed', 'true');
 
         // Extract metadata
-        var outfitKey = card.getAttribute('data-outfit-key') || 'cream';
+        var outfitKey = (card.getAttribute('data-outfit-key') || 'cream').toLowerCase().trim();
         var customOutfitUrl = card.getAttribute('data-outfit-url');
-        var title = card.getAttribute('data-title');
-        var subtitle = card.getAttribute('data-subtitle');
-        var price = card.getAttribute('data-price');
-        var story = card.getAttribute('data-story');
-        var category = card.getAttribute('data-category');
-        var productUrl = card.getAttribute('data-product-url');
-        var cardIndex = card.querySelector('.card-index') ? card.querySelector('.card-index').textContent : '01';
+        var title = card.getAttribute('data-title') || '';
+        var subtitle = card.getAttribute('data-subtitle') || '';
+        var price = card.getAttribute('data-price') || '';
+        var story = card.getAttribute('data-story') || '';
+        var category = card.getAttribute('data-category') || 'Royal';
+        var productUrl = card.getAttribute('data-product-url') || '#';
+        var cardIndex = card.querySelector('.card-index') ? card.querySelector('.card-index').textContent.trim() : '01';
 
-        // Update Info Panel
-        if (titleEl && title) titleEl.textContent = title;
-        if (subtitleEl && subtitle) subtitleEl.textContent = subtitle;
-        if (priceEl && price) priceEl.textContent = price;
-        if (storyEl && story) storyEl.textContent = story;
-        if (categoryEl && category) categoryEl.textContent = category.toUpperCase() + ' CREATION';
-        if (numberEl && cardIndex) numberEl.textContent = cardIndex;
-        if (outfitBadgeEl && title) outfitBadgeEl.textContent = title;
-        if (ctaEl && productUrl) {
-          ctaEl.setAttribute('href', productUrl !== '#' ? productUrl : '#');
+        // 1. Synchronously update Product Details Card (Title, Price, Subtitle, Story, Category, Number, CTA)
+        if (titleEl) titleEl.textContent = title;
+        if (subtitleEl) subtitleEl.textContent = subtitle;
+        if (priceEl) priceEl.textContent = price;
+        if (storyEl) storyEl.textContent = story;
+        if (categoryEl) categoryEl.textContent = category.toUpperCase() + ' CREATION';
+        if (numberEl) numberEl.textContent = cardIndex;
+        if (outfitBadgeEl) outfitBadgeEl.textContent = title;
+        if (ctaEl) {
+          ctaEl.setAttribute('href', productUrl && productUrl !== '#' ? productUrl : '#the-collection');
         }
 
-        // Crossfade Doll Appearance
-        var matched = false;
+        // 2. Synchronously update Character Attire
+        var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
 
-        // A) If merchant specified a custom uploaded doll image in block
         if (customOutfitUrl && customOutfitUrl.trim() !== '') {
-          var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
+          // Merchant custom uploaded character attire
           if (!customImg) {
             customImg = document.createElement('img');
             customImg.id = 'RoyalCustomDoll-{{ section.id }}';
@@ -1707,26 +1721,29 @@
             if (customDollBox) customDollBox.appendChild(customImg);
           }
           customImg.src = customOutfitUrl;
+          customImg.classList.add('active');
           if (isThreeReady && threeContainer) threeContainer.style.display = 'none';
           if (bodyRig) bodyRig.style.display = 'none';
           if (headRig) headRig.style.display = 'none';
-          customImg.classList.add('active');
-          matched = true;
-        }
+        } else {
+          // Built-in Royal Outfit Palette (cream, red, blue, green)
+          if (customImg) customImg.classList.remove('active');
 
-        // B) Match against preloaded character variations (cream, red, blue, green)
-        if (!matched) {
-          // Update Three.js 3D sherwani garment material
-          if (isThreeReady && torsoMat && outfitTextureMap && outfitTextureMap[outfitKey]) {
-            torsoMat.map = outfitTextureMap[outfitKey];
-            torsoMat.needsUpdate = true;
+          if (!outfitTextureMap[outfitKey]) {
+            console.warn('Outfit palette "' + outfitKey + '" not found in texture maps, defaulting to cream.');
+            outfitKey = 'cream';
           }
 
-          if (isThreeReady && threeContainer) threeContainer.style.display = 'block';
-          if (bodyRig) bodyRig.style.display = isThreeReady ? 'none' : 'block';
-          if (headRig) headRig.style.display = isThreeReady ? 'none' : 'block';
-          var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
-          if (customImg) customImg.classList.remove('active');
+          // A) Update Three.js 3D WebGL material
+          if (isThreeReady && torsoMat && outfitTextureMap[outfitKey]) {
+            torsoMat.map = outfitTextureMap[outfitKey];
+            torsoMat.needsUpdate = true;
+            if (threeContainer) threeContainer.style.display = 'block';
+          }
+
+          // B) Update 2D fallback layers
+          if (bodyRig) bodyRig.style.display = isThreeReady ? 'none' : 'flex';
+          if (headRig) headRig.style.display = isThreeReady ? 'none' : 'flex';
 
           bodyImgs.forEach(function(img) {
             if (img.getAttribute('data-outfit-key') === outfitKey) {
@@ -1736,27 +1753,11 @@
             }
           });
 
-          if (outfitKey === 'cream') {
-            headAngles.forEach(function(img) {
-              img.style.display = 'block';
-            });
-            headImgs.forEach(function(img) {
-              img.classList.remove('active');
-            });
-            setHeadAngleView('center');
-          } else {
-            headAngles.forEach(function(img) {
-              img.style.display = 'none';
-              img.classList.remove('active');
-            });
-            headImgs.forEach(function(img) {
-              if (img.getAttribute('data-outfit-key') === outfitKey) {
-                img.classList.add('active');
-              } else {
-                img.classList.remove('active');
-              }
-            });
-          }
+          // Keep head active and seamless across all outfit changes
+          headAngles.forEach(function(img) {
+            img.style.display = 'block';
+          });
+          if (headCenter) headCenter.classList.add('active');
         }
       }
 
@@ -1908,6 +1909,10 @@
         c.restore();
       };
 
+      var stageContainer = sectionContainer.querySelector('.royal-showcase-stage') || sectionContainer;
+      var cardsSection = sectionContainer.querySelector('.royal-collection-strip');
+      var isHoveringCards = false;
+
       function updateTargetFromEvent(e) {
         var clientX = e.clientX;
         var clientY = e.clientY;
@@ -1918,8 +1923,25 @@
         currentClientX = clientX;
         currentClientY = clientY;
         rect = sectionContainer.getBoundingClientRect();
-        targetX = clientX - rect.left;
-        targetY = clientY - rect.top;
+
+        var rawX = clientX - rect.left;
+        var rawY = clientY - rect.top;
+
+        // Check if cursor is over product cards or below the upper interactive stage
+        var cardsRect = cardsSection ? cardsSection.getBoundingClientRect() : null;
+        if (cardsRect && clientY >= cardsRect.top - 15) {
+          isHoveringCards = true;
+        } else {
+          isHoveringCards = false;
+        }
+
+        // Strictly confine butterfly target to the upper interactive stage
+        var stageHeight = stageContainer.offsetHeight || (height * 0.65);
+        var maxButterflyY = Math.max(120, stageHeight - 40);
+
+        targetX = Math.max(40, Math.min(width - 80, rawX));
+        targetY = Math.max(30, Math.min(maxButterflyY, rawY));
+
         isCursorInside = true;
         lastMoveTime = performance.now();
       }
@@ -2060,13 +2082,14 @@
         if (butterfly && canvas) {
           var ctx = canvas.getContext('2d');
 
-          // If mouse is idle or outside, autonomous curved patrol around doll
-          if (!isCursorInside || (time - lastMoveTime > 3500)) {
-            var patrolCenterY = height * 0.32;
+          // If mouse is idle, outside, or hovering over product cards,
+          // maintain autonomous curved patrol gracefully around the doll podium in the upper stage
+          if (!isCursorInside || isHoveringCards || (time - lastMoveTime > 3500)) {
             var patrolCenterX = width * 0.5;
+            var patrolCenterY = height * 0.28;
             var t = time * 0.0012;
-            targetX = patrolCenterX + Math.cos(t) * (width * 0.28);
-            targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.18);
+            targetX = patrolCenterX + Math.cos(t) * (width * 0.25);
+            targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.12);
           }
 
           var dx = targetX - posX;
@@ -2078,13 +2101,16 @@
           posX += vx;
           posY += vy;
 
-          var hoverX = Math.sin(time * 0.0035) * 10;
-          var hoverY = Math.cos(time * 0.0042) * 8;
+          var hoverX = Math.sin(time * 0.0035) * 8;
+          var hoverY = Math.cos(time * 0.0042) * 6;
           var finalX = posX + hoverX;
           var finalY = posY + hoverY;
 
+          // Strictly clamp within interactive stage bounds (never enters product cards)
+          var stageHeight = stageContainer.offsetHeight || (height * 0.65);
+          var maxFlightY = Math.max(100, stageHeight - 30);
           finalX = Math.max(30, Math.min(width - 70, finalX));
-          finalY = Math.max(30, Math.min(height - 70, finalY));
+          finalY = Math.max(25, Math.min(maxFlightY, finalY));
 
           if (dist > 2) {
             var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;

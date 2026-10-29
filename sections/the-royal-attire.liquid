@@ -1,0 +1,1594 @@
+{% comment %}
+  THE ROYAL ATTIRE - Luxury Interactive 3D Mascot Showcase & Atelier
+  Created as an independent, fully-featured Shopify section.
+{% endcomment %}
+
+<div id="the-royal-attire-{{ section.id }}" class="the-royal-attire-wrapper" style="--tra-bg: {{ section.settings.bg_color | default: '#EA9B1B' }};">
+  
+  <!-- Canvas for AI Magical Sparkles / Starburst -->
+  <canvas id="tra-magic-canvas-{{ section.id }}" class="tra-magic-canvas"></canvas>
+
+  <!-- Antigravity Color-Changing Butterfly Cursor -->
+  {% if section.settings.enable_butterfly %}
+  <div id="tra-butterfly-cursor-{{ section.id }}" class="tra-butterfly" aria-hidden="true">
+    <div class="tra-butterfly-glow"></div>
+    <div class="tra-butterfly-wings">
+      <div class="tra-wing tra-wing-left">
+        <svg viewBox="0 0 50 60">
+          <path d="M48,50 C40,40 20,20 10,2 C3,-4 -2,8 4,20 C8,28 20,40 45,55 Z" class="wing-fill wing-upper"/>
+          <path d="M48,50 C38,48 20,42 12,32 C4,22 -2,32 5,42 C12,52 28,60 48,52 Z" class="wing-fill wing-lower"/>
+        </svg>
+      </div>
+      <div class="tra-butterfly-body">
+        <div class="tra-bf-antennae"></div>
+        <div class="tra-bf-torso"></div>
+      </div>
+      <div class="tra-wing tra-wing-right">
+        <svg viewBox="0 0 50 60">
+          <path d="M2,50 C10,40 30,20 40,2 C47,-4 52,8 46,20 C42,28 30,40 5,55 Z" class="wing-fill wing-upper"/>
+          <path d="M2,50 C12,48 30,42 38,32 C46,22 52,32 45,42 C38,52 22,60 2,52 Z" class="wing-fill wing-lower"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- 1. HEADER & NAVIGATION -->
+  <header class="tra-header">
+    <div class="tra-header-left">
+      <div class="tra-crown-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+        </svg>
+      </div>
+      <h1 class="tra-brand-title">{{ section.settings.brand_title | default: 'The Royal Attire' }}</h1>
+    </div>
+
+    <nav class="tra-nav">
+      <a href="#the-collection-{{ section.id }}" class="tra-nav-link">Collection</a>
+      <a href="#the-mascot-{{ section.id }}" class="tra-nav-link">Atelier</a>
+      <a href="#the-stylist-{{ section.id }}" class="tra-nav-link">The Stylist</a>
+      <a href="#heritage-{{ section.id }}" class="tra-nav-link">Heritage</a>
+    </nav>
+
+    <div class="tra-social-links">
+      <a href="https://instagram.com" target="_blank" rel="noopener" class="tra-social-icon" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="https://pinterest.com" target="_blank" rel="noopener" class="tra-social-icon" aria-label="Pinterest">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.291 1.199-.332 1.365-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener" class="tra-social-icon" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </a>
+      <a href="https://wa.me/" target="_blank" rel="noopener" class="tra-social-icon" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. HERO SHOWCASE WITH LIVING OWL AVATAR -->
+  <section id="the-mascot-{{ section.id }}" class="tra-hero-section">
+    <div class="tra-hero-header">
+      <span class="tra-badge">{{ section.settings.subtitle | default: 'THE COLLECTION' }}</span>
+      <h2 class="tra-main-heading">{{ section.settings.heading | default: 'Worn by royalty, made by hand' }}</h2>
+      <p class="tra-hero-sub">{{ section.settings.description | default: 'Explore handcrafted heritage regalia. Click any item or swatch below to drape our royal owl in authentic Rajasthani silk.' }}</p>
+    </div>
+
+    <!-- Central Stage: 3D Animated Living Owl Mascot -->
+    <div class="tra-stage-container">
+      <div class="tra-pedestal-glow"></div>
+      
+      <!-- Interactive Mascot Rig -->
+      <div id="tra-mascot-rig-{{ section.id }}" class="tra-mascot-rig" data-palette="cream">
+        
+        <!-- Stationary Torso & Lower Body with Idle Breathing Scale -->
+        <div class="tra-avatar-body-wrap">
+          <img id="tra-avatar-body-{{ section.id }}" class="tra-avatar-layer tra-avatar-body" 
+               src="{{ 'royal-doll-cream-body.png' | asset_url }}" 
+               alt="Royal Owl Torso & Regalia" 
+               loading="eager" />
+        </div>
+
+        <!-- Rotating & Tilting Head & Neck (Pivoted cleanly at the collar line 41.9%) -->
+        <div id="tra-avatar-head-pivot-{{ section.id }}" class="tra-avatar-head-pivot">
+          <img id="tra-avatar-head-{{ section.id }}" class="tra-avatar-layer tra-avatar-head" 
+               src="{{ 'royal-doll-cream-head.png' | asset_url }}" 
+               alt="Royal Owl Safa & Head" 
+               loading="eager" />
+          
+          <!-- Natural Eye Blinking Overlay -->
+          <img id="tra-avatar-blink-{{ section.id }}" class="tra-avatar-layer tra-avatar-blink" 
+               src="{{ 'royal-doll-head-blink.png' | asset_url }}" 
+               alt="Owl Blinking Eyes" 
+               loading="eager" />
+        </div>
+      </div>
+
+      <!-- Live Dress-up Quick Selection Grid -->
+      <div class="tra-dressup-bar">
+        <span class="tra-bar-label">Instant Live Drape</span>
+        <div class="tra-bar-buttons">
+          <button type="button" class="tra-dress-btn active" data-palette="cream" data-item="Safa (Ivory Silk)">
+            <span class="tra-btn-dot" style="background:#F3DFB2;"></span>
+            <span>Safa</span>
+          </button>
+          <button type="button" class="tra-dress-btn" data-palette="red" data-item="Achkan (Ruby Crimson)">
+            <span class="tra-btn-dot" style="background:#8B1E1E;"></span>
+            <span>Achkan</span>
+          </button>
+          <button type="button" class="tra-dress-btn" data-palette="blue" data-item="Dupatta (Sapphire Zari)">
+            <span class="tra-btn-dot" style="background:#1B3B6F;"></span>
+            <span>Dupatta</span>
+          </button>
+          <button type="button" class="tra-dress-btn" data-palette="green" data-item="Mojari (Emerald Velvet)">
+            <span class="tra-btn-dot" style="background:#1E4A38;"></span>
+            <span>Mojari</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PRODUCT SHOWCASE GRID -->
+  <section id="the-collection-{{ section.id }}" class="tra-collection-section">
+    <div class="tra-section-head">
+      <span class="tra-sub-title">CRAFTED FOR NOBILITY</span>
+      <h3 class="tra-section-title">The Masterpiece Gallery</h3>
+      <p class="tra-section-desc">Click any card thumbnail to instantly dress the royal owl mascot above.</p>
+    </div>
+
+    <div class="tra-product-grid">
+      
+      <!-- Card 1: Safa -->
+      <article class="tra-card" data-palette="cream" data-product="Safa (Leheriya Silk)">
+        <div class="tra-card-thumb-wrap">
+          <img src="{{ 'royal-doll-cream.png' | asset_url }}" alt="Safa (Leheriya Silk)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Drape</span>
+        </div>
+        <div class="tra-card-info">
+          <span class="tra-card-cat">Traditional Royal Headwear</span>
+          <h4 class="tra-card-title">Safa (Leheriya Silk)</h4>
+          <p class="tra-card-summary">Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown with a ruby kalgi medallion.</p>
+          <div class="tra-card-foot">
+            <span class="tra-card-price">Rs. 14,500</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Safa (Leheriya Silk)">Enquire about this piece</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2: Achkan -->
+      <article class="tra-card" data-palette="red" data-product="Achkan (Ruby Crimson)">
+        <div class="tra-card-thumb-wrap">
+          <img src="{{ 'royal-doll-red.png' | asset_url }}" alt="Achkan (Ruby Crimson)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Drape</span>
+        </div>
+        <div class="tra-card-info">
+          <span class="tra-card-cat">Ceremonial Outer Coat</span>
+          <h4 class="tra-card-title">Achkan (Ruby Crimson)</h4>
+          <p class="tra-card-summary">Tailored from raw mulberry silk with intricate zardozi wirework across collar and cuffs, fastened by antique buttons.</p>
+          <div class="tra-card-foot">
+            <span class="tra-card-price">Rs. 56,000</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Achkan (Ruby Crimson)">Enquire about this piece</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 3: Dupatta -->
+      <article class="tra-card" data-palette="blue" data-product="Dupatta (Sapphire Zari)">
+        <div class="tra-card-thumb-wrap">
+          <img src="{{ 'royal-doll-blue.png' | asset_url }}" alt="Dupatta (Sapphire Zari)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Drape</span>
+        </div>
+        <div class="tra-card-info">
+          <span class="tra-card-cat">Hand-Woven Royal Stole</span>
+          <h4 class="tra-card-title">Dupatta (Sapphire Zari)</h4>
+          <p class="tra-card-summary">Celestial midnight blue organza enriched with floral booti medallions in spun real silver and gold foil thread.</p>
+          <div class="tra-card-foot">
+            <span class="tra-card-price">Rs. 22,000</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Dupatta (Sapphire Zari)">Enquire about this piece</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 4: Mojari -->
+      <article class="tra-card" data-palette="green" data-product="Mojari (Emerald Velvet)">
+        <div class="tra-card-thumb-wrap">
+          <img src="{{ 'royal-doll-green.png' | asset_url }}" alt="Mojari (Emerald Velvet)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Drape</span>
+        </div>
+        <div class="tra-card-info">
+          <span class="tra-card-cat">Hand-Turned Leather Footwear</span>
+          <h4 class="tra-card-title">Mojari (Emerald Velvet)</h4>
+          <p class="tra-card-summary">Hand-stitched without a single nail. Features traditional upturned toe tips and intricate brass cord filigree.</p>
+          <div class="tra-card-foot">
+            <span class="tra-card-price">Rs. 9,500</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Mojari (Emerald Velvet)">Enquire about this piece</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 4. DEDICATED SECTION: "THE ROYAL STYLIST" (AI CUSTOMIZATION PANEL) -->
+  <section id="the-stylist-{{ section.id }}" class="tra-stylist-section">
+    <div class="tra-stylist-inner">
+      
+      <div class="tra-stylist-banner">
+        <div class="tra-stylist-pill">BESPOKE ATELIER</div>
+        <h3 class="tra-stylist-title">The Royal Stylist</h3>
+        <p class="tra-stylist-tagline">AI-assisted royal curation, customized vegetable dyes, and ancestral court significance.</p>
+      </div>
+
+      <!-- AI Generation Trigger & Sparkle Centerpiece -->
+      <div class="tra-ai-bar">
+        <button type="button" id="tra-ask-ai-btn-{{ section.id }}" class="tra-ai-btn">
+          <span class="tra-ai-sparkle-icon">✨</span>
+          <span id="tra-ai-btn-text-{{ section.id }}">Ask AI for Royal Match</span>
+          <span class="tra-ai-sparkle-icon">✨</span>
+        </button>
+        <span class="tra-ai-subtext">Click to trigger royal color harmony with magical court sparkles.</span>
+      </div>
+
+      <!-- Court Lore Insight Notification Box -->
+      <div id="tra-ai-insight-box-{{ section.id }}" class="tra-insight-box">
+        <div class="tra-insight-badge">Court Significance</div>
+        <div id="tra-ai-insight-title-{{ section.id }}" class="tra-insight-title">The Maharaja's Coronation</div>
+        <p id="tra-ai-insight-desc-{{ section.id }}" class="tra-insight-desc">
+          Pure ivory symbolizes truth and sovereignty, accented by ruby red to honor royal valor and victory in state processions.
+        </p>
+      </div>
+
+      <!-- Stylist Controls Grid: Left Presets / Right Mix & Match -->
+      <div class="tra-stylist-grid">
+        
+        <!-- Left: Curated Royal Palettes -->
+        <div class="tra-stylist-box">
+          <div class="tra-box-head">
+            <span class="tra-box-icon">👑</span>
+            <h4>Curated Royal Palettes</h4>
+          </div>
+
+          <div class="tra-presets-list">
+            <button type="button" class="tra-preset-item active" data-preset="coronation" data-palette="cream">
+              <div class="tra-pi-left">
+                <strong>The Maharaja's Coronation</strong>
+                <span>Ivory, Ruby & 24k Gold</span>
+              </div>
+              <div class="tra-pi-dots">
+                <span class="tra-dot" style="background:#F3DFB2;"></span>
+                <span class="tra-dot" style="background:#8B1E1E;"></span>
+                <span class="tra-dot" style="background:#D4AF37;"></span>
+              </div>
+            </button>
+
+            <button type="button" class="tra-preset-item" data-preset="mewar-starlight" data-palette="blue">
+              <div class="tra-pi-left">
+                <strong>The Mewar Starlight</strong>
+                <span>Lapis Blue, Silver & Amber</span>
+              </div>
+              <div class="tra-pi-dots">
+                <span class="tra-dot" style="background:#1B3B6F;"></span>
+                <span class="tra-dot" style="background:#E0E0E0;"></span>
+                <span class="tra-dot" style="background:#C27803;"></span>
+              </div>
+            </button>
+
+            <button type="button" class="tra-preset-item" data-preset="garden-gala" data-palette="green">
+              <div class="tra-pi-left">
+                <strong>The Royal Garden Gala</strong>
+                <span>Emerald, Saffron & Pearl</span>
+              </div>
+              <div class="tra-pi-dots">
+                <span class="tra-dot" style="background:#1E4A38;"></span>
+                <span class="tra-dot" style="background:#EA9B1B;"></span>
+                <span class="tra-dot" style="background:#FAF6EE;"></span>
+              </div>
+            </button>
+
+            <button type="button" class="tra-preset-item" data-preset="jodhpur-sunbreak" data-palette="cream">
+              <div class="tra-pi-left">
+                <strong>The Jodhpur Sunbreak</strong>
+                <span>Saffron Yellow, Indigo & Pearl</span>
+              </div>
+              <div class="tra-pi-dots">
+                <span class="tra-dot" style="background:#E5A93C;"></span>
+                <span class="tra-dot" style="background:#2C3E50;"></span>
+                <span class="tra-dot" style="background:#F5E6CC;"></span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Mix & Match Color Swatches & Hue Slider -->
+        <div class="tra-stylist-box">
+          <div class="tra-box-head">
+            <span class="tra-box-icon">🎨</span>
+            <h4>Mix &amp; Match Atelier</h4>
+          </div>
+
+          <!-- Garment Selector Tabs -->
+          <div class="tra-tabs">
+            <button type="button" class="tra-tab active" data-tab="safa">Safa (Turban)</button>
+            <button type="button" class="tra-tab" data-tab="achkan">Achkan (Coat)</button>
+            <button type="button" class="tra-tab" data-tab="dupatta">Dupatta (Stole)</button>
+            <button type="button" class="tra-tab" data-tab="mojari">Mojari (Shoes)</button>
+          </div>
+
+          <!-- Silk Color Swatches -->
+          <div class="tra-swatches-area">
+            <span class="tra-area-label">Pure Silk Dye Swatches</span>
+            <div class="tra-swatches-row">
+              <button type="button" class="tra-swatch active" data-palette="cream" title="Ivory Brocade" style="background:#F3DFB2;"></button>
+              <button type="button" class="tra-swatch" data-palette="red" title="Ruby Crimson" style="background:#8B1E1E;"></button>
+              <button type="button" class="tra-swatch" data-palette="blue" title="Sapphire Midnight" style="background:#1B3B6F;"></button>
+              <button type="button" class="tra-swatch" data-palette="green" title="Emerald Court" style="background:#1E4A38;"></button>
+              <button type="button" class="tra-swatch" data-palette="cream" title="Imperial Gold" style="background:#D4AF37;"></button>
+              <button type="button" class="tra-swatch" data-palette="red" title="Deep Amber" style="background:#C27803;"></button>
+            </div>
+          </div>
+
+          <!-- Fine Hue Slider -->
+          <div class="tra-slider-area">
+            <div class="tra-slider-head">
+              <span class="tra-area-label">Fine Vegetable Dye Hue</span>
+              <span id="tra-hue-label-{{ section.id }}" class="tra-hue-val">0° (Natural)</span>
+            </div>
+            <input type="range" id="tra-hue-slider-{{ section.id }}" class="tra-hue-range" min="0" max="360" value="0" />
+            <div class="tra-slider-hint">Slide to custom-tint the selected silk in real time on the royal owl.</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  /* ==========================================================
+     THE ROYAL ATTIRE - STYLES
+     ========================================================== */
+  #the-royal-attire-{{ section.id }} {
+    position: relative;
+    background-color: var(--tra-bg, #EA9B1B);
+    color: #1E1610;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+    padding-bottom: 80px;
+    box-sizing: border-box;
+  }
+
+  #the-royal-attire-{{ section.id }} * {
+    box-sizing: border-box;
+  }
+
+  /* Fullscreen AI Magic Canvas for Starburst */
+  .tra-magic-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 99998;
+  }
+
+  /* Antigravity Color-Changing Butterfly */
+  .tra-butterfly {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 38px;
+    height: 38px;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-100px, -100px);
+    transition: filter 0.4s ease;
+  }
+
+  .tra-butterfly-glow {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 229, 255, 0.45) 0%, rgba(0, 229, 255, 0) 70%);
+    pointer-events: none;
+    transition: background 0.5s ease;
+  }
+
+  .tra-butterfly-wings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 400px;
+  }
+
+  .tra-wing {
+    width: 18px;
+    height: 24px;
+    transform-origin: center right;
+    animation: traWingFlutterLeft 0.16s infinite alternate ease-in-out;
+  }
+
+  .tra-wing-right {
+    transform-origin: center left;
+    animation: traWingFlutterRight 0.16s infinite alternate ease-in-out;
+  }
+
+  @keyframes traWingFlutterLeft {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(65deg); }
+  }
+
+  @keyframes traWingFlutterRight {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(-65deg); }
+  }
+
+  .wing-fill {
+    fill: #00E5FF;
+    transition: fill 0.5s ease;
+  }
+
+  .wing-lower {
+    opacity: 0.85;
+  }
+
+  .tra-butterfly-body {
+    width: 4px;
+    height: 14px;
+    background: #111;
+    border-radius: 2px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .tra-bf-antennae {
+    position: absolute;
+    top: -4px;
+    left: -2px;
+    width: 8px;
+    height: 4px;
+    border-top: 1.5px solid #222;
+    border-radius: 4px 4px 0 0;
+  }
+
+  /* Butterfly Color Themes by Section */
+  .tra-butterfly[data-theme="blue"] .wing-fill { fill: #00E5FF; }
+  .tra-butterfly[data-theme="blue"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(0, 229, 255, 0.5) 0%, transparent 70%); }
+  
+  .tra-butterfly[data-theme="purple"] .wing-fill { fill: #E040FB; }
+  .tra-butterfly[data-theme="purple"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(224, 64, 251, 0.5) 0%, transparent 70%); }
+
+  .tra-butterfly[data-theme="gold"] .wing-fill { fill: #FFD700; }
+  .tra-butterfly[data-theme="gold"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, transparent 70%); }
+
+  .tra-butterfly[data-theme="ruby"] .wing-fill { fill: #FF1744; }
+  .tra-butterfly[data-theme="ruby"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(255, 23, 68, 0.5) 0%, transparent 70%); }
+
+  /* 1. Header & Nav */
+  .tra-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .tra-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tra-crown-icon {
+    color: #9B1B30;
+  }
+
+  .tra-brand-title {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #1E1610;
+  }
+
+  .tra-nav {
+    display: flex;
+    gap: 32px;
+  }
+
+  .tra-nav-link {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2D1E12;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.2s ease;
+  }
+
+  .tra-nav-link:hover {
+    color: #9B1B30;
+  }
+
+  .tra-social-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .tra-social-icon {
+    color: #2D1E12;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-flex;
+  }
+
+  .tra-social-icon:hover {
+    color: #9B1B30;
+    transform: translateY(-2px);
+  }
+
+  /* 2. Hero Section & Living Mascot */
+  .tra-hero-section {
+    padding: 50px 24px 30px;
+    text-align: center;
+  }
+
+  .tra-badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: rgba(155, 27, 48, 0.12);
+    color: #9B1B30;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  .tra-main-heading {
+    margin: 0 0 12px;
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #1E1610;
+  }
+
+  .tra-hero-sub {
+    max-width: 640px;
+    margin: 0 auto 36px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #3C2615;
+  }
+
+  /* Avatar Stage */
+  .tra-stage-container {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .tra-pedestal-glow {
+    position: absolute;
+    bottom: 50px;
+    width: 320px;
+    height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Mascot Rig: 210 x 415 ratio */
+  .tra-mascot-rig {
+    position: relative;
+    width: 250px;
+    height: 494px;
+    perspective: 1000px;
+    will-change: transform;
+    margin-bottom: 24px;
+  }
+
+  .tra-avatar-body-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 80%;
+    will-change: transform;
+  }
+
+  .tra-avatar-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .tra-avatar-head-pivot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Row 174 of 415 px is 41.9% from top - the exact collar line */
+    transform-origin: 50% 41.9%;
+    will-change: transform;
+  }
+
+  .tra-avatar-blink {
+    opacity: 0;
+    transition: opacity 0.06s ease;
+  }
+
+  .tra-avatar-blink.blinking {
+    opacity: 1;
+  }
+
+  /* Dress-up Quick Selection Bar */
+  .tra-dressup-bar {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 40px;
+    padding: 8px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+
+  .tra-bar-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #4A301A;
+  }
+
+  .tra-bar-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .tra-dress-btn {
+    border: none;
+    background: rgba(0,0,0,0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #2D1E12;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .tra-dress-btn:hover,
+  .tra-dress-btn.active {
+    background: #1E1610;
+    color: #FFF;
+  }
+
+  .tra-btn-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* 3. Product Showcase Grid */
+  .tra-collection-section {
+    padding: 60px 48px;
+  }
+
+  .tra-section-head {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .tra-sub-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #9B1B30;
+    text-transform: uppercase;
+  }
+
+  .tra-section-title {
+    margin: 6px 0 10px;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1E1610;
+  }
+
+  .tra-section-desc {
+    font-size: 0.95rem;
+    color: #4A301A;
+    margin: 0;
+  }
+
+  .tra-product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .tra-card {
+    background: #FAF6EE;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .tra-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+  }
+
+  .tra-card-thumb-wrap {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: #F3ECE0;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tra-card-img {
+    height: 90%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+
+  .tra-card-thumb-wrap:hover .tra-card-img {
+    transform: scale(1.06);
+  }
+
+  .tra-drape-pill {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(30, 22, 16, 0.88);
+    color: #FFF;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+
+  .tra-card-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .tra-card-cat {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9B1B30;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .tra-card-title {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1E1610;
+  }
+
+  .tra-card-summary {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #554032;
+    margin: 0 0 18px;
+    flex-grow: 1;
+  }
+
+  .tra-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .tra-card-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1E1610;
+  }
+
+  .tra-enquire-btn {
+    border: none;
+    background: #9B1B30;
+    color: #FFF;
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .tra-enquire-btn:hover {
+    background: #7A1223;
+  }
+
+  /* 4. Dedicated Section: "The Royal Stylist" */
+  .tra-stylist-section {
+    padding: 40px 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .tra-stylist-inner {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    padding: 40px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+  }
+
+  .tra-stylist-banner {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .tra-stylist-pill {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: #D4AF37;
+    background: #1E1610;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .tra-stylist-title {
+    margin: 0 0 8px;
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #1E1610;
+  }
+
+  .tra-stylist-tagline {
+    font-size: 0.95rem;
+    color: #554032;
+    margin: 0;
+  }
+
+  /* Ask AI Button Bar */
+  .tra-ai-bar {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .tra-ai-btn {
+    border: none;
+    background: linear-gradient(135deg, #9B1B30 0%, #D4AF37 100%);
+    color: #FFF;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 14px 32px;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(155, 27, 48, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tra-ai-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(155, 27, 48, 0.45);
+  }
+
+  .tra-ai-subtext {
+    display: block;
+    font-size: 0.8rem;
+    color: #6C5444;
+    margin-top: 8px;
+  }
+
+  /* Insight Box */
+  .tra-insight-box {
+    background: #FAF6EE;
+    border-left: 4px solid #D4AF37;
+    border-radius: 10px;
+    padding: 18px 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  }
+
+  .tra-insight-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9B1B30;
+    margin-bottom: 4px;
+  }
+
+  .tra-insight-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1E1610;
+    margin-bottom: 6px;
+  }
+
+  .tra-insight-desc {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #4A301A;
+    margin: 0;
+  }
+
+  /* Stylist Two-Box Grid */
+  .tra-stylist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .tra-stylist-box {
+    background: #FAF6EE;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .tra-box-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .tra-box-head h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1E1610;
+  }
+
+  /* Presets List */
+  .tra-presets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tra-preset-item {
+    border: 1px solid rgba(0,0,0,0.08);
+    background: #FFF;
+    border-radius: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    transition: all 0.2s ease;
+  }
+
+  .tra-preset-item:hover,
+  .tra-preset-item.active {
+    border-color: #9B1B30;
+    background: #FFF7F5;
+    box-shadow: 0 4px 12px rgba(155, 27, 48, 0.1);
+  }
+
+  .tra-pi-left strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #1E1610;
+  }
+
+  .tra-pi-left span {
+    font-size: 0.78rem;
+    color: #6C5444;
+  }
+
+  .tra-pi-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tra-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+
+  /* Tabs */
+  .tra-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tra-tab {
+    border: none;
+    background: rgba(0,0,0,0.06);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #4A301A;
+    transition: all 0.2s ease;
+  }
+
+  .tra-tab:hover,
+  .tra-tab.active {
+    background: #1E1610;
+    color: #FFF;
+  }
+
+  .tra-area-label {
+    display: block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6C5444;
+    margin-bottom: 10px;
+  }
+
+  .tra-swatches-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .tra-swatch {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #FFF;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.2s ease, outline 0.2s ease;
+  }
+
+  .tra-swatch:hover,
+  .tra-swatch.active {
+    transform: scale(1.15);
+    outline: 2px solid #9B1B30;
+    outline-offset: 2px;
+  }
+
+  /* Slider */
+  .tra-slider-area {
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .tra-slider-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .tra-hue-val {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #9B1B30;
+  }
+
+  .tra-hue-range {
+    width: 100%;
+    margin: 8px 0;
+    cursor: pointer;
+  }
+
+  .tra-slider-hint {
+    font-size: 0.75rem;
+    color: #7A6252;
+  }
+
+  /* Responsive Rules */
+  @media (max-width: 980px) {
+    .tra-header { padding: 18px 24px; }
+    .tra-product-grid { grid-template-columns: repeat(2, 1fr); }
+    .tra-stylist-grid { grid-template-columns: 1fr; }
+    .tra-collection-section { padding: 40px 24px; }
+    .tra-stylist-section { padding: 24px; }
+    .tra-stylist-inner { padding: 24px; }
+  }
+
+  @media (max-width: 640px) {
+    .tra-nav { display: none; }
+    .tra-main-heading { font-size: 2.1rem; }
+    .tra-product-grid { grid-template-columns: 1fr; }
+    .tra-header { padding: 16px; }
+  }
+</style>
+
+<script>
+(function() {
+  var sectionId = "{{ section.id }}";
+  var wrapper = document.getElementById("the-royal-attire-" + sectionId);
+  if (!wrapper) return;
+
+  // 1. Assets Map
+  var paletteMap = {
+    cream: {
+      body: "{{ 'royal-doll-cream-body.png' | asset_url }}",
+      head: "{{ 'royal-doll-cream-head.png' | asset_url }}"
+    },
+    red: {
+      body: "{{ 'royal-doll-red-body.png' | asset_url }}",
+      head: "{{ 'royal-doll-red-head.png' | asset_url }}"
+    },
+    blue: {
+      body: "{{ 'royal-doll-blue-body.png' | asset_url }}",
+      head: "{{ 'royal-doll-blue-head.png' | asset_url }}"
+    },
+    green: {
+      body: "{{ 'royal-doll-green-body.png' | asset_url }}",
+      head: "{{ 'royal-doll-green-head.png' | asset_url }}"
+    }
+  };
+
+  var bodyImg = document.getElementById("tra-avatar-body-" + sectionId);
+  var headImg = document.getElementById("tra-avatar-head-" + sectionId);
+  var blinkImg = document.getElementById("tra-avatar-blink-" + sectionId);
+  var headPivot = document.getElementById("tra-avatar-head-pivot-" + sectionId);
+  var bodyWrap = wrapper.querySelector(".tra-avatar-body-wrap");
+  var mascotRig = document.getElementById("tra-mascot-rig-" + sectionId);
+
+  // 2. Character Mechanics: Breathing, Blinking, Head Sway & Cursor Tilt
+  var targetRotY = 0, currentRotY = 0;
+  var targetRotX = 0, currentRotX = 0;
+  var isHovering = false;
+
+  window.addEventListener("mousemove", function(e) {
+    if (!mascotRig) return;
+    var rect = mascotRig.getBoundingClientRect();
+    var centerX = rect.left + rect.width / 2;
+    var centerY = rect.top + rect.height * 0.42;
+
+    var diffX = (e.clientX - centerX) / (window.innerWidth * 0.5);
+    var diffY = (e.clientY - centerY) / (window.innerHeight * 0.5);
+
+    // Limit continuous head sway within natural anatomical bounds (-26deg to +26deg)
+    targetRotY = Math.max(-26, Math.min(26, diffX * 26));
+    targetRotX = Math.max(-12, Math.min(12, -diffY * 12));
+    isHovering = true;
+  });
+
+  window.addEventListener("mouseleave", function() {
+    targetRotY = 0;
+    targetRotX = 0;
+    isHovering = false;
+  });
+
+  // Autonomous Blinking Loop (with double-blink probability)
+  function triggerBlink() {
+    if (!blinkImg) return;
+    blinkImg.classList.add("blinking");
+    setTimeout(function() {
+      blinkImg.classList.remove("blinking");
+      // 25% chance of realistic double-blink
+      if (Math.random() < 0.25) {
+        setTimeout(function() {
+          blinkImg.classList.add("blinking");
+          setTimeout(function() {
+            blinkImg.classList.remove("blinking");
+          }, 110);
+        }, 130);
+      }
+    }, 120);
+
+    var nextBlink = 2600 + Math.random() * 2400;
+    setTimeout(triggerBlink, nextBlink);
+  }
+  setTimeout(triggerBlink, 2000);
+
+  // Main 60FPS Animation Loop: Breathing & Smooth Head Sway
+  function animateCharacter(time) {
+    // 1. Idle breathing sine wave (chest expansion scaleY/scaleX)
+    var breath = Math.sin(time * 0.0022);
+    if (bodyWrap) {
+      var scaleY = 1 + breath * 0.018;
+      var scaleX = 1 - breath * 0.010;
+      bodyWrap.style.transform = "scale(" + scaleX + ", " + scaleY + ")";
+    }
+
+    // 2. Smooth spring-damped head rotation
+    currentRotY += (targetRotY - currentRotY) * 0.085;
+    currentRotX += (targetRotX - currentRotX) * 0.085;
+
+    // Organic idle sway when mouse is stationary
+    var idleSway = Math.sin(time * 0.0014) * 2.2;
+    var finalRotY = currentRotY + idleSway;
+    var finalTiltZ = finalRotY * 0.16;
+
+    if (headPivot) {
+      headPivot.style.transform = 
+        "rotateY(" + finalRotY.toFixed(2) + "deg) " +
+        "rotateX(" + currentRotX.toFixed(2) + "deg) " +
+        "rotateZ(" + finalTiltZ.toFixed(2) + "deg)";
+    }
+
+    requestAnimationFrame(animateCharacter);
+  }
+  requestAnimationFrame(animateCharacter);
+
+  // 3. Instant Live Drape Switching
+  function applyPalette(paletteName) {
+    if (!paletteMap[paletteName]) return;
+    if (bodyImg) bodyImg.src = paletteMap[paletteName].body;
+    if (headImg) headImg.src = paletteMap[paletteName].head;
+    if (mascotRig) mascotRig.setAttribute("data-palette", paletteName);
+
+    // Update active state in dress-up bar
+    var dressBtns = wrapper.querySelectorAll(".tra-dress-btn");
+    dressBtns.forEach(function(btn) {
+      if (btn.getAttribute("data-palette") === paletteName) {
+        btn.classList.add("active");
+      } else {
+        btn.classList.remove("active");
+      }
+    });
+  }
+
+  // Bind Dress-up bar buttons
+  var dressBtns = wrapper.querySelectorAll(".tra-dress-btn");
+  dressBtns.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var p = btn.getAttribute("data-palette");
+      applyPalette(p);
+    });
+  });
+
+  // Bind Product Card thumbnail clicks to drape onto character
+  var cardThumbs = wrapper.querySelectorAll(".tra-card-thumb-wrap");
+  cardThumbs.forEach(function(thumb) {
+    thumb.addEventListener("click", function() {
+      var card = thumb.closest(".tra-card");
+      if (!card) return;
+      var p = card.getAttribute("data-palette");
+      applyPalette(p);
+
+      // Smooth scroll back up to character on small screens
+      if (window.innerWidth < 768) {
+        var mascotEl = document.getElementById("the-mascot-" + sectionId);
+        if (mascotEl) mascotEl.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  });
+
+  // 4. Antigravity Color-Changing Butterfly Cursor
+  var butterfly = document.getElementById("tra-butterfly-cursor-" + sectionId);
+  if (butterfly) {
+    var bfX = window.innerWidth / 2;
+    var bfY = window.innerHeight / 2;
+    var targetBfX = bfX;
+    var targetBfY = bfY;
+
+    window.addEventListener("mousemove", function(e) {
+      targetBfX = e.clientX;
+      targetBfY = e.clientY;
+    });
+
+    function updateButterfly(time) {
+      // Buoyant physics lag + float
+      bfX += (targetBfX - bfX) * 0.12;
+      bfY += (targetBfY - bfY) * 0.12;
+
+      var hoverFloatY = Math.sin(time * 0.0035) * 11;
+      var hoverFloatX = Math.cos(time * 0.0028) * 5;
+
+      var posX = bfX + hoverFloatX + 16;
+      var posY = bfY + hoverFloatY - 24;
+
+      butterfly.style.transform = "translate(" + posX.toFixed(1) + "px, " + posY.toFixed(1) + "px)";
+
+      // Dynamic Section Color Shifting based on scroll position
+      var heroSec = document.getElementById("the-mascot-" + sectionId);
+      var collSec = document.getElementById("the-collection-" + sectionId);
+      var stylSec = document.getElementById("the-stylist-" + sectionId);
+
+      var scrollMid = window.scrollY + window.innerHeight * 0.45;
+
+      if (stylSec && scrollMid >= stylSec.offsetTop) {
+        butterfly.setAttribute("data-theme", "gold");
+      } else if (collSec && scrollMid >= collSec.offsetTop) {
+        butterfly.setAttribute("data-theme", "purple");
+      } else {
+        butterfly.setAttribute("data-theme", "blue");
+      }
+
+      requestAnimationFrame(updateButterfly);
+    }
+    requestAnimationFrame(updateButterfly);
+  }
+
+  // 5. The Royal Stylist: AI Generation & Particle Starburst
+  var magicCanvas = document.getElementById("tra-magic-canvas-" + sectionId);
+  var askAiBtn = document.getElementById("tra-ask-ai-btn-" + sectionId);
+  var aiBtnText = document.getElementById("tra-ai-btn-text-" + sectionId);
+  var insightTitle = document.getElementById("tra-ai-insight-title-" + sectionId);
+  var insightDesc = document.getElementById("tra-ai-insight-desc-" + sectionId);
+
+  var royalAiPresets = [
+    {
+      preset: "coronation",
+      title: "The Maharaja's Coronation",
+      palette: "cream",
+      insight: "Pure ivory symbolizes truth and sovereignty, accented by ruby red to honor royal valor and victory in state processions."
+    },
+    {
+      preset: "mewar-starlight",
+      title: "The Mewar Starlight",
+      palette: "blue",
+      insight: "Deep celestial lapis blue paired with gleaming gold zari mirrors the starlit skies over Lake Pichola, worn during autumn court banquets."
+    },
+    {
+      preset: "garden-gala",
+      title: "The Royal Garden Gala",
+      palette: "green",
+      insight: "Vibrant emerald silk embellished with marigold saffron captures the vitality of royal palace gardens in bloom."
+    },
+    {
+      preset: "jodhpur-sunbreak",
+      title: "The Jodhpur Sunbreak",
+      palette: "cream",
+      insight: "Warm sunbreak yellow paired with indigo trims celebrates the sun-drenched ramparts of Mehrangarh Fort."
+    }
+  ];
+
+  // Particle Starburst Canvas Animation
+  var particles = [];
+  function triggerStarburst(x, y) {
+    if (!magicCanvas) return;
+    magicCanvas.width = window.innerWidth;
+    magicCanvas.height = window.innerHeight;
+    var ctx = magicCanvas.getContext("2d");
+
+    var colors = ["#FFD700", "#FF1744", "#00E5FF", "#E040FB", "#FFF"];
+    for (var i = 0; i < 90; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 3 + Math.random() * 8;
+      particles.push({
+        x: x || window.innerWidth / 2,
+        y: y || window.innerHeight * 0.6,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 3 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        decay: 0.016 + Math.random() * 0.018
+      });
+    }
+
+    function renderParticles() {
+      ctx.clearRect(0, 0, magicCanvas.width, magicCanvas.height);
+      var alive = false;
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        if (p.alpha > 0) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.12; // gentle gravity
+          p.alpha -= p.decay;
+        }
+      }
+      if (alive) {
+        requestAnimationFrame(renderParticles);
+      } else {
+        particles = [];
+        ctx.clearRect(0, 0, magicCanvas.width, magicCanvas.height);
+      }
+    }
+    requestAnimationFrame(renderParticles);
+  }
+
+  // Ask AI Button Click Handler
+  if (askAiBtn) {
+    askAiBtn.addEventListener("click", function(e) {
+      if (aiBtnText) aiBtnText.textContent = "AI Consulting Court Lore...";
+
+      var rect = askAiBtn.getBoundingClientRect();
+      var clickX = rect.left + rect.width / 2;
+      var clickY = rect.top + rect.height / 2;
+
+      setTimeout(function() {
+        var choice = royalAiPresets[Math.floor(Math.random() * royalAiPresets.length)];
+        applyPalette(choice.palette);
+
+        if (insightTitle) insightTitle.textContent = choice.title;
+        if (insightDesc) insightDesc.textContent = choice.insight;
+
+        // Update preset list active state
+        var pItems = wrapper.querySelectorAll(".tra-preset-item");
+        pItems.forEach(function(item) {
+          if (item.getAttribute("data-preset") === choice.preset) {
+            item.classList.add("active");
+          } else {
+            item.classList.remove("active");
+          }
+        });
+
+        triggerStarburst(clickX, clickY);
+        if (aiBtnText) aiBtnText.textContent = "Ask AI for Royal Match";
+      }, 450);
+    });
+  }
+
+  // Preset list item clicks
+  var presetItems = wrapper.querySelectorAll(".tra-preset-item");
+  presetItems.forEach(function(item) {
+    item.addEventListener("click", function() {
+      var pName = item.getAttribute("data-preset");
+      var matched = royalAiPresets.find(function(rp) { return rp.preset === pName; });
+      if (matched) {
+        applyPalette(matched.palette);
+        if (insightTitle) insightTitle.textContent = matched.title;
+        if (insightDesc) insightDesc.textContent = matched.insight;
+
+        presetItems.forEach(function(pi) { pi.classList.remove("active"); });
+        item.classList.add("active");
+
+        var rect = item.getBoundingClientRect();
+        triggerStarburst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      }
+    });
+  });
+
+  // Swatches click
+  var swatches = wrapper.querySelectorAll(".tra-swatch");
+  swatches.forEach(function(sw) {
+    sw.addEventListener("click", function() {
+      var pal = sw.getAttribute("data-palette");
+      applyPalette(pal);
+      swatches.forEach(function(s) { s.classList.remove("active"); });
+      sw.classList.add("active");
+    });
+  });
+
+  // Hue slider tint
+  var hueSlider = document.getElementById("tra-hue-slider-" + sectionId);
+  var hueLabel = document.getElementById("tra-hue-label-" + sectionId);
+  if (hueSlider) {
+    hueSlider.addEventListener("input", function() {
+      var deg = hueSlider.value;
+      if (hueLabel) hueLabel.textContent = deg + "° Custom Tint";
+      if (bodyImg) bodyImg.style.filter = "hue-rotate(" + deg + "deg)";
+    });
+  }
+
+  // Enquire Buttons Toast / Alert
+  var enquireBtns = wrapper.querySelectorAll(".tra-enquire-btn");
+  enquireBtns.forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var piece = btn.getAttribute("data-piece");
+      alert("Thank you for your royal enquiry for "" + piece + "". Our master atelier specialist will reach out to schedule your private fitting.");
+    });
+  });
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "The Royal Attire",
+  "tag": "section",
+  "class": "the-royal-attire-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Aesthetic & Theme"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section Background Color",
+      "default": "#EA9B1B"
+    },
+    {
+      "type": "text",
+      "id": "brand_title",
+      "label": "Brand Title",
+      "default": "The Royal Attire"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Hero Subtitle",
+      "default": "THE COLLECTION"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Hero Main Heading",
+      "default": "Worn by royalty, made by hand"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Hero Description",
+      "default": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal owl in handcrafted Indian heritage attire."
+    },
+    {
+      "type": "header",
+      "content": "Interactive Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_butterfly",
+      "label": "Enable Antigravity Butterfly Cursor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_ai_stylist",
+      "label": "Enable 'The Royal Stylist' AI Panel",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "The Royal Attire",
+      "category": "Custom Interactive"
+    }
+  ]
+}
+{% endschema %}

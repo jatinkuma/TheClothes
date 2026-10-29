@@ -301,10 +301,10 @@
         "product_item_kG8deN": {
           "type": "product_item",
           "settings": {
-            "product": "",
+            "product": "black-gold-sherwani",
             "category": "safa",
             "outfit_palette": "cream",
-            "title_override": "Royal Safa Turban",
+            "title_override": "Black Gold Sherwani",
             "subtitle": "Hand-Dyed Leheriya Silk with Brocade Kalangi",
             "price_override": "₹ 14,500",
             "description": "Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown."
@@ -313,7 +313,7 @@
         "product_item_iCmzrB": {
           "type": "product_item",
           "settings": {
-            "product": "",
+            "product": "blush-pink-sherwani",
             "category": "sherwani",
             "outfit_palette": "cream",
             "title_override": "Imperial Ivory Sherwani",
@@ -387,6 +387,8 @@
         "text_alignment": "center",
         "doll_max_height": 560,
         "enable_idle_float": true,
+        "enable_doll_cursor_tracking": true,
+        "custom_3d_model_url": "",
         "enable_butterfly": true,
         "butterfly_speed": 8,
         "bg_color": "#fbf2e1",

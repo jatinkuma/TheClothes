@@ -243,14 +243,71 @@
 
             <!-- Head & Neck Layer (Pivots independently on the neck socket) -->
             <div id="RoyalDollHeadRig-{{ section.id }}" class="royal-doll-head-rig">
+              <!-- Multi-angle Head Views matching reference furry character with Rajasthani safa -->
+              <img
+                id="RoyalHead-far-left-{{ section.id }}"
+                class="royal-head-angle"
+                src="{{ 'royal-doll-head-far-left.png' | asset_url }}"
+                alt="Royal Furry Mascot Head Looking Far Left"
+                width="415"
+                height="415"
+                loading="eager"
+              >
+              <img
+                id="RoyalHead-left-{{ section.id }}"
+                class="royal-head-angle"
+                src="{{ 'royal-doll-head-left.png' | asset_url }}"
+                alt="Royal Furry Mascot Head Looking Left"
+                width="415"
+                height="415"
+                loading="eager"
+              >
+              <img
+                id="RoyalHead-center-{{ section.id }}"
+                class="royal-head-angle active"
+                src="{{ 'royal-doll-head-center.png' | asset_url }}"
+                alt="Royal Furry Mascot Head Center"
+                width="415"
+                height="415"
+                loading="eager"
+              >
+              <img
+                id="RoyalHead-right-{{ section.id }}"
+                class="royal-head-angle"
+                src="{{ 'royal-doll-head-right.png' | asset_url }}"
+                alt="Royal Furry Mascot Head Looking Right"
+                width="415"
+                height="415"
+                loading="eager"
+              >
+              <img
+                id="RoyalHead-far-right-{{ section.id }}"
+                class="royal-head-angle"
+                src="{{ 'royal-doll-head-far-right.png' | asset_url }}"
+                alt="Royal Furry Mascot Head Looking Far Right"
+                width="415"
+                height="415"
+                loading="eager"
+              >
+              <img
+                id="RoyalHead-blink-{{ section.id }}"
+                class="royal-head-angle"
+                src="{{ 'royal-doll-head-blink.png' | asset_url }}"
+                alt="Royal Furry Mascot Head Blinking"
+                width="415"
+                height="415"
+                loading="eager"
+              >
+
+              <!-- Color Outfit Variations for Head -->
               <img
                 id="RoyalDollHead-cream-{{ section.id }}"
-                class="royal-head-img active"
+                class="royal-head-img"
                 data-outfit-key="cream"
                 src="{{ 'royal-doll-cream-head.png' | asset_url }}"
                 alt="Imperial Ivory Safa & Face"
-                width="848"
-                height="1264"
+                width="415"
+                height="415"
                 loading="eager"
               >
               <img
@@ -790,32 +847,35 @@
     pointer-events: none;
   }
 
-  /* Body Rig: Torso, Sherwani, Arms, Legs, Mojari (Pivots at feet/hips) */
+  /* Body Rig: Torso, Sherwani, Arms, Legs, Mojari (Remains mostly stationary) */
   .royal-doll-body-rig {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    transform-origin: center 88%;
+    transform-origin: center bottom;
     transform-style: preserve-3d;
     will-change: transform;
-    z-index: 2;
+    z-index: 1;
+    pointer-events: none;
   }
 
-  /* Head & Neck Rig: Sits in neck socket, pivots on neck collar base */
+  /* Head & Neck Rig: Sits in neck socket, pivots naturally on neck collar base */
   .royal-doll-head-rig {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    transform-origin: 50% 37.5%;
+    transform-origin: 50% 42% 0;
     transform-style: preserve-3d;
     will-change: transform;
-    z-index: 1;
+    z-index: 2;
+    pointer-events: none;
   }
 
   .royal-body-img,
   .royal-head-img,
+  .royal-head-angle,
   .royal-doll-img {
     position: absolute;
     bottom: 0;
@@ -836,6 +896,7 @@
 
   .royal-body-img.active,
   .royal-head-img.active,
+  .royal-head-angle.active,
   .royal-doll-img.active {
     opacity: 1;
     visibility: visible;
@@ -1207,7 +1268,7 @@
     filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.7));
   }
 
-  /* Left Wing */
+  /* Left Wing: continuous steady flapping */
   .butterfly-wing.wing-left {
     position: absolute;
     right: 50%;
@@ -1218,11 +1279,11 @@
     height: 64px;
     transform-origin: right 45%;
     transform-style: preserve-3d;
-    animation: flapLeftWing 0.16s ease-in-out infinite alternate;
+    animation: flapLeftWing 0.15s ease-in-out infinite alternate !important;
     z-index: 2;
   }
 
-  /* Right Wing */
+  /* Right Wing: continuous steady flapping */
   .butterfly-wing.wing-right {
     position: absolute;
     left: 50%;
@@ -1233,7 +1294,7 @@
     height: 64px;
     transform-origin: left 45%;
     transform-style: preserve-3d;
-    animation: flapRightWing 0.16s ease-in-out infinite alternate;
+    animation: flapRightWing 0.15s ease-in-out infinite alternate !important;
     z-index: 2;
   }
 
@@ -1371,6 +1432,47 @@
       var bodyRig = document.getElementById('RoyalDollBodyRig-{{ section.id }}');
       var bodyImgs = sectionContainer.querySelectorAll('.royal-body-img');
       var headImgs = sectionContainer.querySelectorAll('.royal-head-img');
+      var headAngles = sectionContainer.querySelectorAll('.royal-head-angle');
+
+      var headFarLeft = document.getElementById('RoyalHead-far-left-{{ section.id }}');
+      var headLeft = document.getElementById('RoyalHead-left-{{ section.id }}');
+      var headCenter = document.getElementById('RoyalHead-center-{{ section.id }}');
+      var headRight = document.getElementById('RoyalHead-right-{{ section.id }}');
+      var headFarRight = document.getElementById('RoyalHead-far-right-{{ section.id }}');
+      var headBlink = document.getElementById('RoyalHead-blink-{{ section.id }}');
+
+      // Natural eye blinking loop
+      var isBlinkingNow = false;
+      function triggerBlink() {
+        isBlinkingNow = true;
+        setTimeout(function() {
+          isBlinkingNow = false;
+          scheduleBlink();
+        }, 180);
+      }
+      function scheduleBlink() {
+        var delay = Math.random() * 3200 + 2600;
+        setTimeout(triggerBlink, delay);
+      }
+      scheduleBlink();
+
+      var currentHeadAngle = 'center';
+      function setHeadAngleView(key) {
+        if (currentHeadAngle === key) return;
+        currentHeadAngle = key;
+        if (!headAngles || headAngles.length === 0) return;
+        headAngles.forEach(function(img) {
+          img.classList.remove('active');
+        });
+        var targetImg = null;
+        if (key === 'far-left') targetImg = headFarLeft;
+        else if (key === 'left') targetImg = headLeft;
+        else if (key === 'right') targetImg = headRight;
+        else if (key === 'far-right') targetImg = headFarRight;
+        else if (key === 'blink') targetImg = headBlink;
+        else targetImg = headCenter;
+        if (targetImg) targetImg.classList.add('active');
+      }
       var customDollBox = document.getElementById('RoyalDollCustom-{{ section.id }}');
       var cards = sectionContainer.querySelectorAll('.royal-product-card');
       var categoryPills = sectionContainer.querySelectorAll('.royal-cat-pill');
@@ -1460,13 +1562,27 @@
             }
           });
 
-          headImgs.forEach(function(img) {
-            if (img.getAttribute('data-outfit-key') === outfitKey) {
-              img.classList.add('active');
-            } else {
+          if (outfitKey === 'cream') {
+            headAngles.forEach(function(img) {
+              img.style.display = 'block';
+            });
+            headImgs.forEach(function(img) {
               img.classList.remove('active');
-            }
-          });
+            });
+            setHeadAngleView('center');
+          } else {
+            headAngles.forEach(function(img) {
+              img.style.display = 'none';
+              img.classList.remove('active');
+            });
+            headImgs.forEach(function(img) {
+              if (img.getAttribute('data-outfit-key') === outfitKey) {
+                img.classList.add('active');
+              } else {
+                img.classList.remove('active');
+              }
+            });
+          }
         }
       }
 
@@ -1639,81 +1755,93 @@
       function animateStage(time) {
         if (prefersReducedMotion) return;
 
-        // --- A. 3D Doll Head, Neck & Body Cursor Tracking ---
+        // --- A. Character Head and Neck Rotation (Torso remains stationary!) ---
         if (dollViewer && enableDollTracking) {
-          var targetBodyRotY = 0;
-          var targetBodyRotX = 0;
-          var targetBodyTransX = 0;
-
           var targetHeadRotY = 0;
           var targetHeadRotX = 0;
           var targetHeadRotZ = 0;
-          var targetHeadTransX = 0;
 
           if (isCursorInside) {
             var dollRect = dollViewer.getBoundingClientRect();
             var dollMidX = dollRect.left + dollRect.width / 2;
-            var dollMidY = dollRect.top + dollRect.height * 0.38;
+            var dollMidY = dollRect.top + dollRect.height * 0.42;
 
-            var relX = (currentClientX - dollMidX) / (window.innerWidth * 0.42);
-            var relY = (currentClientY - dollMidY) / (window.innerHeight * 0.42);
+            var relX = (currentClientX - dollMidX) / (window.innerWidth * 0.45);
+            var relY = (currentClientY - dollMidY) / (window.innerHeight * 0.45);
 
-            relX = Math.max(-1.2, Math.min(1.2, relX));
-            relY = Math.max(-1.2, Math.min(1.2, relY));
+            relX = Math.max(-1.1, Math.min(1.1, relX));
+            relY = Math.max(-1.0, Math.min(1.0, relY));
 
-            // HEAD & NECK: Active rotation following the cursor
-            // Moves smoothly to the side where the cursor is
-            targetHeadRotY = relX * 28;
-            targetHeadRotX = -relY * 12;
-            targetHeadRotZ = relX * 4.5;
-            targetHeadTransX = relX * 12;
+            // HEAD & NECK: Active rotational movement on the neck pivot
+            targetHeadRotY = relX * 24;  // 3D Y rotation
+            targetHeadRotX = -relY * 8;  // subtle nod
+            targetHeadRotZ = relX * 2.5; // natural tilt
 
-            // BODY: Grounded posture with subtle secondary lean
-            targetBodyRotY = relX * 7;
-            targetBodyRotX = -relY * 3.5;
-            targetBodyTransX = relX * 8;
-          } else if (butterfly && (!isCursorInside || (time - lastMoveTime > 3000))) {
-            // When mouse is idle, head and neck swivel to watch the autonomous butterfly!
+            // Select matching 3D perspective angle frame of the furry character
+            var activeAngleKey = 'center';
+            if (relX < -0.45) {
+              activeAngleKey = 'far-left';
+            } else if (relX < -0.15) {
+              activeAngleKey = 'left';
+            } else if (relX > 0.45) {
+              activeAngleKey = 'far-right';
+            } else if (relX > 0.15) {
+              activeAngleKey = 'right';
+            }
+
+            if (isBlinkingNow && activeAngleKey === 'center') {
+              activeAngleKey = 'blink';
+            }
+
+            setHeadAngleView(activeAngleKey);
+          } else if (butterfly && (time - lastMoveTime > 3000)) {
+            // Autonomous butterfly tracking when idle
             var dollLocalX = width * 0.5;
             var diffX = (posX - dollLocalX) / (width * 0.45);
-            var diffY = (posY - (height * 0.35)) / (height * 0.45);
+            var diffY = (posY - (height * 0.42)) / (height * 0.45);
 
-            diffX = Math.max(-1.1, Math.min(1.1, diffX));
-            diffY = Math.max(-1.1, Math.min(1.1, diffY));
+            diffX = Math.max(-1.0, Math.min(1.0, diffX));
+            diffY = Math.max(-1.0, Math.min(1.0, diffY));
 
-            targetHeadRotY = diffX * 22;
-            targetHeadRotX = -diffY * 10;
-            targetHeadRotZ = diffX * 3;
-            targetHeadTransX = diffX * 8;
+            targetHeadRotY = diffX * 20;
+            targetHeadRotX = -diffY * 7;
+            targetHeadRotZ = diffX * 2;
 
-            targetBodyRotY = diffX * 5;
-            targetBodyTransX = diffX * 5;
+            var activeAngleKey = 'center';
+            if (diffX < -0.4) activeAngleKey = 'far-left';
+            else if (diffX < -0.15) activeAngleKey = 'left';
+            else if (diffX > 0.4) activeAngleKey = 'far-right';
+            else if (diffX > 0.15) activeAngleKey = 'right';
+
+            if (isBlinkingNow && activeAngleKey === 'center') {
+              activeAngleKey = 'blink';
+            }
+
+            setHeadAngleView(activeAngleKey);
+          } else {
+            // Returns smoothly toward neutral position
+            targetHeadRotY = 0;
+            targetHeadRotX = 0;
+            targetHeadRotZ = 0;
+            setHeadAngleView(isBlinkingNow ? 'blink' : 'center');
           }
 
-          // Smooth lerp damping for fluid, organic motion
+          // Smooth lerp damping for fluid, organic rotation
           headRotY += (targetHeadRotY - headRotY) * 0.085;
           headRotX += (targetHeadRotX - headRotX) * 0.085;
           headRotZ += (targetHeadRotZ - headRotZ) * 0.085;
-          headTransX += (targetHeadTransX - headTransX) * 0.085;
 
-          bodyRotY += (targetBodyRotY - bodyRotY) * 0.07;
-          bodyRotX += (targetBodyRotX - bodyRotX) * 0.07;
-          bodyTransX += (targetBodyTransX - bodyTransX) * 0.07;
+          var idleY = enableIdleFloat ? Math.sin(time * 0.0016) * 5 : 0;
 
-          var idleY = enableIdleFloat ? Math.sin(time * 0.0016) * 6 : 0;
-
-          // Apply to Body Rig
+          // Torso, Body & Legs remain mostly stationary!
           if (bodyRig) {
-            bodyRig.style.transform =
-              'translate3d(' + bodyTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
-              'rotateY(' + bodyRotY.toFixed(2) + 'deg) ' +
-              'rotateX(' + bodyRotX.toFixed(2) + 'deg)';
+            bodyRig.style.transform = 'translate3d(0px, ' + idleY.toFixed(2) + 'px, 0px)';
           }
 
-          // Apply to Head Rig (turns on neck joint!)
+          // Head & Neck rotate together naturally on believable neck pivot (50% 42% 0)
           if (headRig) {
             headRig.style.transform =
-              'translate3d(' + headTransX.toFixed(2) + 'px, ' + idleY.toFixed(2) + 'px, 0px) ' +
+              'translate3d(0px, ' + idleY.toFixed(2) + 'px, 0px) ' +
               'rotateY(' + headRotY.toFixed(2) + 'deg) ' +
               'rotateX(' + headRotX.toFixed(2) + 'deg) ' +
               'rotateZ(' + headRotZ.toFixed(2) + 'deg)';

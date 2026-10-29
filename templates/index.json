@@ -295,6 +295,19 @@
         "padding-block-end": 48
       }
     },
+    "the_royal_attire": {
+      "type": "the-royal-attire",
+      "name": "The Royal Attire",
+      "settings": {
+        "bg_color": "#ea9b1b",
+        "brand_title": "The Royal Attire",
+        "subtitle": "THE COLLECTION",
+        "heading": "Worn by royalty, made by hand",
+        "description": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal owl in handcrafted Indian heritage attire.",
+        "enable_butterfly": true,
+        "enable_ai_stylist": true
+      }
+    },
     "interactive_royal_doll_JwazkP": {
       "type": "interactive-royal-doll",
       "blocks": {
@@ -379,6 +392,7 @@
         "product_item_LmdyBr",
         "product_item_LiMR97"
       ],
+      "disabled": true,
       "name": "Royal Fashion Doll",
       "settings": {
         "subtitle": "The Royal Attire",
@@ -397,19 +411,6 @@
         "use_default_bg": true,
         "padding_top": 60,
         "padding_bottom": 80
-      }
-    },
-    "the_royal_attire": {
-      "type": "the-royal-attire",
-      "name": "The Royal Attire",
-      "settings": {
-        "bg_color": "#EA9B1B",
-        "brand_title": "The Royal Attire",
-        "subtitle": "THE COLLECTION",
-        "heading": "Worn by royalty, made by hand",
-        "description": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal owl in handcrafted Indian heritage attire.",
-        "enable_butterfly": true,
-        "enable_ai_stylist": true
       }
     }
   },

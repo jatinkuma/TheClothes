@@ -5,52 +5,62 @@ import { Crown, Sparkles } from 'lucide-react';
 export const PRODUCTS_DATA = [
   {
     id: 'safa',
+    categoryKey: 'safa',
     title: 'Safa (Leheriya Silk)',
-    category: 'Royal Turban',
-    description: 'Wave-dyed in spiralling bands, wound by hand into the Jodhpuri crown. Finished with a ruby kalgi.',
+    category: 'Safa (Royal Turban)',
+    paletteKey: 'cream',
+    description: 'Wave-dyed in spiralling bands, wound by hand into the prestigious Jodhpuri crown. Finished with an antique ruby kalgi brooch.',
     image: './assets/royal-card-safa.jpg',
     leadTime: '7-10 Days Custom Crafting',
     origin: 'Jodhpur, Rajasthan',
   },
   {
-    id: 'ghagra',
-    title: 'Ghagra (Gota-Patti Zari)',
-    category: 'Ceremonial Drapes',
-    description: 'Scalloped gold ribbon laid in radiating bands, pleated to the hem opens to a full circle in motion.',
-    image: './assets/royal-card-ghagra.jpg',
-    leadTime: '18-24 Days Bespoke Stitching',
-    origin: 'Jaipur, Rajasthan',
-  },
-  {
-    id: 'mojari',
-    title: 'Mojari (Hand-Embroidered Leather)',
-    category: 'Footwear',
-    description: 'Curled at the toe, stitched without a single nail, embroidered across the vamp in coloured zari.',
-    image: './assets/royal-card-mojari.jpg',
-    leadTime: '5-7 Days Artisan Guild',
-    origin: 'Jodhpur, Rajasthan',
-  },
-  {
     id: 'achkan',
+    categoryKey: 'achkan',
     title: 'Achkan (Raw Silk & Zari)',
-    category: 'Imperial Coat',
-    description: 'Cut long and close to the body, collar and placket traced in fine gold thread.',
+    category: 'Achkan (Royal Jacket)',
+    paletteKey: 'cream',
+    description: 'Cut long and close to the body, collar and placket traced in 24k gold thread and finished with pure freshwater pearl buttons.',
     image: './assets/royal-card-sherwani.jpg',
     leadTime: '14-20 Days Master Tailoring',
     origin: 'Mewar, Rajasthan',
   },
   {
-    id: 'odhni',
-    title: 'Odhni (Bandhani Tie-Dye)',
-    category: 'Silk Veil',
-    description: 'Thousands of points tied by fingertip before dyeing, each dot opening into a perfect white circle.',
+    id: 'dupatta',
+    categoryKey: 'dupatta',
+    title: 'Dupatta (Ceremonial Brocade)',
+    category: 'Dupatta (Scarf)',
+    paletteKey: 'red',
+    description: 'Woven with scalloped gold zari borders, pleated softly over the shoulder to open into a radiating ceremonial sash in motion.',
     image: './assets/royal-card-odhni.jpg',
     leadTime: '10-14 Days Heritage Craft',
     origin: 'Bikaner, Rajasthan',
   },
+  {
+    id: 'mojari',
+    categoryKey: 'mojari',
+    title: 'Mojari (Hand-Embroidered Leather)',
+    category: 'Mojari (Shoes)',
+    paletteKey: 'gold',
+    description: 'Curled at the toe, stitched without a single nail, intricately embroidered across the vamp in antique gold and coloured zari.',
+    image: './assets/royal-card-mojari.jpg',
+    leadTime: '5-7 Days Artisan Guild',
+    origin: 'Jodhpur, Rajasthan',
+  },
+  {
+    id: 'ghagra',
+    categoryKey: 'ghagra',
+    title: 'Ghagra (Gota-Patti Zari)',
+    category: 'Ceremonial Drapes',
+    paletteKey: 'red',
+    description: 'Scalloped gold ribbon laid in radiating bands, pleated to the hem opens to a full circle in celebratory court motion.',
+    image: './assets/royal-card-ghagra.jpg',
+    leadTime: '18-24 Days Bespoke Stitching',
+    origin: 'Jaipur, Rajasthan',
+  },
 ];
 
-export default function ProductGrid({ onEnquire }) {
+export default function ProductGrid({ onEnquire, onDrape, activeOutfit }) {
   return (
     <section id="collection" className="py-20 px-6 max-w-7xl mx-auto">
       
@@ -58,7 +68,7 @@ export default function ProductGrid({ onEnquire }) {
       <div className="text-center max-w-3xl mx-auto mb-16">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-950/10 border border-amber-900/15 mb-4 text-xs uppercase tracking-widest font-bold text-amber-950">
           <Crown className="w-3.5 h-3.5 text-amber-900" />
-          <span>Curated Regalia</span>
+          <span>Curated Royal Regalia</span>
         </div>
 
         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-neutral-900 mb-4 tracking-tight">
@@ -66,34 +76,75 @@ export default function ProductGrid({ onEnquire }) {
         </h2>
 
         <p className="text-base sm:text-lg text-neutral-900/80 leading-relaxed font-normal">
-          Each creation in this showcase is an artisanal heirloom, woven and hand-finished in our Chandpole atelier by hereditary master craftsmen.
+          Click any piece thumbnail or button to instantly preview that garment draped seamlessly onto the royal owl avatar above.
         </p>
       </div>
 
-      {/* Responsive Grid: 1 col on mobile, 2 col on tablet, 3 col on desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-        {PRODUCTS_DATA.map((product, index) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            index={index}
-            onEnquire={onEnquire}
+      {/* Product Showcase Grid: Safa, Achkan, Dupatta, Mojari */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        {PRODUCTS_DATA.slice(0, 4).map((product, index) => {
+          const isDraped =
+            (product.categoryKey === 'safa' && activeOutfit?.safaKey === product.paletteKey) ||
+            (product.categoryKey === 'achkan' && activeOutfit?.achkanKey === product.paletteKey) ||
+            (product.categoryKey === 'dupatta' && activeOutfit?.dupattaKey === product.paletteKey) ||
+            (product.categoryKey === 'mojari' && activeOutfit?.mojariKey === product.paletteKey);
+
+          return (
+            <ProductCard
+              key={product.id}
+              product={product}
+              index={index}
+              isDraped={isDraped}
+              onEnquire={onEnquire}
+              onDrape={onDrape}
+            />
+          );
+        })}
+      </div>
+
+      {/* Additional Heirloom Item Banner */}
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-12 gap-8 items-center bg-[#fdf6e7]/90 rounded-3xl p-6 sm:p-8 border border-amber-900/15 shadow-md">
+        <div className="md:col-span-4 aspect-[4/3] rounded-2xl overflow-hidden bg-amber-950/5">
+          <img
+            src={PRODUCTS_DATA[4].image}
+            alt={PRODUCTS_DATA[4].title}
+            className="w-full h-full object-cover"
+            loading="lazy"
           />
-        ))}
-      </div>
-
-      {/* Atelier Banner Quote */}
-      <div className="mt-16 p-8 rounded-3xl bg-[#fdf6e7]/70 border border-amber-900/15 text-center flex flex-col items-center max-w-4xl mx-auto shadow-sm">
-        <Sparkles className="w-6 h-6 text-amber-700 mb-3" />
-        <p className="font-serif italic text-lg sm:text-xl text-neutral-900 max-w-2xl mb-2">
-          &ldquo;True royal craft does not rush. It lives in the quiet rhythm of the hand, the golden thread, and the patience of generations.&rdquo;
-        </p>
-        <span className="text-xs uppercase tracking-widest font-bold text-amber-950/80">
-          — The Royal Ateliers of Chandpole
-        </span>
+        </div>
+        <div className="md:col-span-8 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-bold text-amber-900 mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Full Regalia Highlight</span>
+            </div>
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
+              {PRODUCTS_DATA[4].title}
+            </h3>
+            <p className="text-sm text-neutral-800 leading-relaxed mb-6">
+              {PRODUCTS_DATA[4].description}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={() => onDrape(PRODUCTS_DATA[4])}
+              className="px-6 py-3 rounded-full bg-neutral-900 hover:bg-neutral-950 text-[#F3DFB2] font-bold text-xs uppercase tracking-wider transition-all shadow-md flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Drape Ceremonial Colors</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onEnquire(PRODUCTS_DATA[4])}
+              className="px-6 py-3 rounded-full bg-amber-950/10 hover:bg-amber-950/20 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all border border-amber-900/20"
+            >
+              <span>Enquire About Piece</span>
+            </button>
+          </div>
+        </div>
       </div>
 
     </section>
   );
 }
-

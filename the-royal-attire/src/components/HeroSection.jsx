@@ -1,8 +1,8 @@
 import React from 'react';
 import OwlStage from './OwlStage.jsx';
-import { ArrowDown, Sparkles, Compass } from 'lucide-react';
+import { ArrowDown, Sparkles, Compass, Wand2 } from 'lucide-react';
 
-export default function HeroSection({ onExploreClick }) {
+export default function HeroSection({ onExploreClick, onOpenStylist, outfit, onSelectGarment }) {
   return (
     <section className="relative min-h-[calc(100vh-80px)] flex items-center justify-center pt-8 pb-16 px-6 overflow-hidden">
       
@@ -21,7 +21,7 @@ export default function HeroSection({ onExploreClick }) {
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/10 border border-amber-900/15 mb-6 text-xs uppercase tracking-widest font-bold text-amber-950">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-800 animate-ping" />
-            <span>Autumn &bull; Winter Atelier</span>
+            <span>Autumn &bull; Winter Regal Atelier</span>
           </div>
 
           <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-neutral-900 leading-[1.08] mb-4">
@@ -46,13 +46,14 @@ export default function HeroSection({ onExploreClick }) {
               <ArrowDown className="w-4 h-4 animate-bounce text-amber-400" />
             </button>
 
-            <a
-              href="#heritage"
+            <button
+              type="button"
+              onClick={onOpenStylist}
               className="w-full sm:w-auto px-7 py-4 rounded-full bg-amber-950/10 hover:bg-amber-950/20 text-neutral-950 font-semibold text-sm tracking-wider uppercase transition-all duration-300 border border-amber-900/20 flex items-center justify-center gap-2"
             >
-              <Compass className="w-4 h-4" />
-              <span>Our Heritage</span>
-            </a>
+              <Wand2 className="w-4 h-4 text-amber-900" />
+              <span>The Royal Stylist (AI)</span>
+            </button>
           </div>
 
           {/* Luxury Highlights Bar */}
@@ -72,13 +73,12 @@ export default function HeroSection({ onExploreClick }) {
           </div>
         </div>
 
-        {/* Right Column: Centerpiece 3D Owl Character Stage */}
+        {/* Right Column: Centerpiece 3D Animated Owl Avatar with Interactive Dress-Up */}
         <div className="lg:col-span-6 flex items-center justify-center relative">
-          <OwlStage />
+          <OwlStage outfit={outfit} onSelectGarment={onSelectGarment} />
         </div>
 
       </div>
     </section>
   );
 }
-

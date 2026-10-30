@@ -68,3 +68,4 @@ You do **not** need to touch any Liquid, CSS, or JavaScript code to replace the 
 6. Select the **The Royal Attire** section on the homepage.
 7. Paste your link into the **"Custom 3D Character Model URL (.glb)"** field under the *Replaceable 3D Character Model* settings group.
 8. Click **Save**. The 3D engine will instantly load your new character, bind its head and neck bones to the cursor tracking, and enable 360° interactive rotation.
+

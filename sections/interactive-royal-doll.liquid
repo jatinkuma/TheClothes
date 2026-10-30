@@ -190,162 +190,56 @@
           <!-- Animated Royal Aura -->
           <div class="royal-aura-disc"></div>
 
-          <!-- Articulated 3D Doll Character Container -->
+          <!-- Master Doll Character Container -->
           <div
             id="RoyalDollViewer-{{ section.id }}"
-            class="royal-doll-character"
-            data-doll-tracking="{{ section.settings.enable_doll_cursor_tracking | default: true }}"
-            data-idle-float="{{ section.settings.enable_idle_float | default: true }}"
+            class="royal-doll-character {% if section.settings.enable_idle_float %}royal-doll--idle{% endif %}"
           >
-            <!-- Genuine Three.js 3D Skeletal Rig Engine (Actual Head & Neck Bone Rotation) -->
-            <div id="RoyalThreeContainer-{{ section.id }}" class="royal-three-container"></div>
-            <!-- Body Layer (Torso, Sherwani, Arms, Legs, Mojari) -->
-            <div id="RoyalDollBodyRig-{{ section.id }}" class="royal-doll-body-rig">
-              <img
-                id="RoyalDollBody-cream-{{ section.id }}"
-                class="royal-body-img active"
-                data-outfit-key="cream"
-                src="{{ 'royal-doll-cream-body.png' | asset_url }}"
-                alt="Imperial Ivory Sherwani Body"
-                width="848"
-                height="1264"
-                loading="eager"
-              >
-              <img
-                id="RoyalDollBody-red-{{ section.id }}"
-                class="royal-body-img"
-                data-outfit-key="red"
-                src="{{ 'royal-doll-red-body.png' | asset_url }}"
-                alt="Ruby Red Royal Sherwani Body"
-                width="848"
-                height="1264"
-                loading="lazy"
-              >
-              <img
-                id="RoyalDollBody-blue-{{ section.id }}"
-                class="royal-body-img"
-                data-outfit-key="blue"
-                src="{{ 'royal-doll-blue-body.png' | asset_url }}"
-                alt="Sapphire Blue Royal Sherwani Body"
-                width="848"
-                height="1264"
-                loading="lazy"
-              >
-              <img
-                id="RoyalDollBody-green-{{ section.id }}"
-                class="royal-body-img"
-                data-outfit-key="green"
-                src="{{ 'royal-doll-green-body.png' | asset_url }}"
-                alt="Emerald Green Heritage Sherwani Body"
-                width="848"
-                height="1264"
-                loading="lazy"
-              >
-            </div>
+            <!-- Default Base Doll (Cream & Gold Master) -->
+            <img
+              id="RoyalDollBase-{{ section.id }}"
+              class="royal-doll-img active"
+              src="{{ section.settings.default_doll_image | default: 'royal-doll-cream.png' | asset_url }}"
+              alt="Royal Indian Fashion Doll"
+              width="848"
+              height="1264"
+              loading="eager"
+            >
 
-            <!-- Head & Neck Layer (Pivots independently on the neck socket) -->
-            <div id="RoyalDollHeadRig-{{ section.id }}" class="royal-doll-head-rig">
-              <!-- Multi-angle Head Views matching reference furry character with Rajasthani safa -->
-              <img
-                id="RoyalHead-far-left-{{ section.id }}"
-                class="royal-head-angle"
-                src="{{ 'royal-doll-head-far-left.png' | asset_url }}"
-                alt="Royal Furry Mascot Head Looking Far Left"
-                width="415"
-                height="415"
-                loading="eager"
-              >
-              <img
-                id="RoyalHead-left-{{ section.id }}"
-                class="royal-head-angle"
-                src="{{ 'royal-doll-head-left.png' | asset_url }}"
-                alt="Royal Furry Mascot Head Looking Left"
-                width="415"
-                height="415"
-                loading="eager"
-              >
-              <img
-                id="RoyalHead-center-{{ section.id }}"
-                class="royal-head-angle active"
-                src="{{ 'royal-doll-head-center.png' | asset_url }}"
-                alt="Royal Furry Mascot Head Center"
-                width="415"
-                height="415"
-                loading="eager"
-              >
-              <img
-                id="RoyalHead-right-{{ section.id }}"
-                class="royal-head-angle"
-                src="{{ 'royal-doll-head-right.png' | asset_url }}"
-                alt="Royal Furry Mascot Head Looking Right"
-                width="415"
-                height="415"
-                loading="eager"
-              >
-              <img
-                id="RoyalHead-far-right-{{ section.id }}"
-                class="royal-head-angle"
-                src="{{ 'royal-doll-head-far-right.png' | asset_url }}"
-                alt="Royal Furry Mascot Head Looking Far Right"
-                width="415"
-                height="415"
-                loading="eager"
-              >
-              <img
-                id="RoyalHead-blink-{{ section.id }}"
-                class="royal-head-angle"
-                src="{{ 'royal-doll-head-blink.png' | asset_url }}"
-                alt="Royal Furry Mascot Head Blinking"
-                width="415"
-                height="415"
-                loading="eager"
-              >
+            <!-- Preloaded Alternate Outfits for Instant, Seamless Crossfade -->
+            <img
+              id="RoyalDollOutfit-red-{{ section.id }}"
+              class="royal-doll-img"
+              data-outfit-key="red"
+              src="{{ 'royal-doll-red.png' | asset_url }}"
+              alt="Ruby Red Royal Court Sherwani"
+              width="848"
+              height="1264"
+              loading="lazy"
+            >
+            <img
+              id="RoyalDollOutfit-blue-{{ section.id }}"
+              class="royal-doll-img"
+              data-outfit-key="blue"
+              src="{{ 'royal-doll-blue.png' | asset_url }}"
+              alt="Sapphire Blue Royal Sherwani"
+              width="848"
+              height="1264"
+              loading="lazy"
+            >
+            <img
+              id="RoyalDollOutfit-green-{{ section.id }}"
+              class="royal-doll-img"
+              data-outfit-key="green"
+              src="{{ 'royal-doll-green.png' | asset_url }}"
+              alt="Emerald Green Heritage Sherwani"
+              width="848"
+              height="1264"
+              loading="lazy"
+            >
 
-              <!-- Color Outfit Variations for Head -->
-              <img
-                id="RoyalDollHead-cream-{{ section.id }}"
-                class="royal-head-img"
-                data-outfit-key="cream"
-                src="{{ 'royal-doll-cream-head.png' | asset_url }}"
-                alt="Imperial Ivory Safa & Face"
-                width="415"
-                height="415"
-                loading="eager"
-              >
-              <img
-                id="RoyalDollHead-red-{{ section.id }}"
-                class="royal-head-img"
-                data-outfit-key="red"
-                src="{{ 'royal-doll-red-head.png' | asset_url }}"
-                alt="Ruby Red Royal Safa & Face"
-                width="848"
-                height="1264"
-                loading="lazy"
-              >
-              <img
-                id="RoyalDollHead-blue-{{ section.id }}"
-                class="royal-head-img"
-                data-outfit-key="blue"
-                src="{{ 'royal-doll-blue-head.png' | asset_url }}"
-                alt="Sapphire Blue Royal Safa & Face"
-                width="848"
-                height="1264"
-                loading="lazy"
-              >
-              <img
-                id="RoyalDollHead-green-{{ section.id }}"
-                class="royal-head-img"
-                data-outfit-key="green"
-                src="{{ 'royal-doll-green-head.png' | asset_url }}"
-                alt="Emerald Green Heritage Safa & Face"
-                width="848"
-                height="1264"
-                loading="lazy"
-              >
-            </div>
-
-            <!-- Optional Custom Merchant Full-Body Image Layer -->
-            <div id="RoyalDollCustom-{{ section.id }}" class="royal-doll-custom-layer" aria-hidden="true"></div>
+            <!-- Optional Custom Merchant Layer Overlays (Option B) -->
+            <div id="RoyalDollOverlays-{{ section.id }}" class="royal-doll-layer-stack" aria-hidden="true"></div>
           </div>
 
           <!-- Current Outfit Title Tag -->
@@ -816,8 +710,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    perspective: 1100px;
-    transform-style: preserve-3d;
   }
 
   .royal-aura-disc {
@@ -831,96 +723,52 @@
     background: radial-gradient(circle, rgba(255, 240, 190, 0.6) 0%, rgba(229, 155, 43, 0.18) 60%, transparent 80%);
     pointer-events: none;
     z-index: 1;
-    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  /* 3D Articulated Doll Rig */
+  /* 3D Doll Character Container */
   .royal-doll-character {
     position: relative;
-    width: min(100%, 380px);
+    width: min(100%, 420px);
     height: var(--royal-doll-height);
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     z-index: 2;
-    perspective: 1100px;
-    transform-style: preserve-3d;
-    filter: drop-shadow(0 15px 25px rgba(43, 24, 16, 0.12));
-    pointer-events: none;
+    transform-origin: bottom center;
   }
 
-  /* Three.js 3D Skeletal Character Rig Container */
-  .royal-three-container {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .royal-three-container canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
+  /* Gentle Royal Idle Movement */
+  .royal-doll--idle {
+    animation: royalDollIdle 5.5s ease-in-out infinite;
   }
 
-  /* Body Rig: Torso, Sherwani, Arms, Legs, Mojari (Stationary) */
-  .royal-doll-body-rig {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform-origin: center bottom;
-    transform-style: preserve-3d;
-    will-change: transform;
-    z-index: 1;
-    pointer-events: none;
+  @keyframes royalDollIdle {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-9px) rotate(0.4deg);
+    }
   }
 
-  /* Head & Neck Rig: Sits in neck socket, pivots naturally on collar socket (row 174 / 415 = 41.9%) */
-  .royal-doll-head-rig {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform-origin: 50% 41.9% 0;
-    transform-style: preserve-3d;
-    will-change: transform;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .royal-body-img,
-  .royal-head-img,
-  .royal-head-angle,
   .royal-doll-img {
     position: absolute;
-    top: 50%;
+    bottom: 0;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     height: 100%;
-    max-height: 100%;
     width: auto;
     max-width: 100%;
     object-fit: contain;
-    object-position: center center;
+    object-position: bottom center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.45s;
     user-select: none;
     -webkit-user-drag: none;
     pointer-events: none;
   }
 
-  .royal-body-img.active,
-  .royal-head-img.active,
-  .royal-head-angle.active,
   .royal-doll-img.active {
     opacity: 1;
     visibility: visible;
@@ -946,12 +794,12 @@
     transition: transform 0.3s ease;
   }
 
-  /* Selected Product Information Panel (Layered above butterfly) */
+  /* Selected Product Information Panel */
   .royal-selected-info {
     grid-column: 3;
     padding-left: 20px;
     position: relative;
-    z-index: 25;
+    z-index: 5;
   }
 
   .selected-info-inner {
@@ -1038,10 +886,10 @@
     box-shadow: 0 6px 20px rgba(200, 147, 50, 0.35);
   }
 
-  /* Collection Strip / Horizontal Track (Layered above butterfly) */
+  /* Collection Strip / Horizontal Track */
   .royal-collection-strip {
     position: relative;
-    z-index: 30;
+    z-index: 6;
   }
 
   .royal-strip-heading {
@@ -1114,7 +962,6 @@
   /* Individual Product Card */
   .royal-product-card {
     position: relative;
-    z-index: 31;
     flex: 0 0 250px;
     background: rgba(255, 255, 255, 0.8);
     border: 1.5px solid rgba(200, 147, 50, 0.2);
@@ -1260,7 +1107,7 @@
     width: 90px;
     height: 70px;
     pointer-events: none;
-    z-index: 12;
+    z-index: 15;
     transform: translate3d(-200px, -200px, 0);
     will-change: transform;
     transition: opacity 0.3s ease;
@@ -1293,7 +1140,7 @@
     filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.7));
   }
 
-  /* Left Wing: continuous steady flapping (uninterrupted at all times) */
+  /* Left Wing */
   .butterfly-wing.wing-left {
     position: absolute;
     right: 50%;
@@ -1304,11 +1151,11 @@
     height: 64px;
     transform-origin: right 45%;
     transform-style: preserve-3d;
-    animation: flapLeftWing 0.14s ease-in-out infinite alternate;
+    animation: flapLeftWing 0.16s ease-in-out infinite alternate;
     z-index: 2;
   }
 
-  /* Right Wing: continuous steady flapping (uninterrupted at all times) */
+  /* Right Wing */
   .butterfly-wing.wing-right {
     position: absolute;
     left: 50%;
@@ -1319,7 +1166,7 @@
     height: 64px;
     transform-origin: left 45%;
     transform-style: preserve-3d;
-    animation: flapRightWing 0.14s ease-in-out infinite alternate;
+    animation: flapRightWing 0.16s ease-in-out infinite alternate;
     z-index: 2;
   }
 
@@ -1442,8 +1289,6 @@
   }
 </style>
 
-<script src="{{ 'three.min.js' | asset_url }}" defer></script>
-<script src="{{ 'GLTFLoader.js' | asset_url }}" defer></script>
 <script>
   (function() {
     /**
@@ -1455,206 +1300,8 @@
       if (!sectionContainer) return;
 
       var dollViewer = document.getElementById('RoyalDollViewer-{{ section.id }}');
-      var headRig = document.getElementById('RoyalDollHeadRig-{{ section.id }}');
-      var bodyRig = document.getElementById('RoyalDollBodyRig-{{ section.id }}');
-      var bodyImgs = sectionContainer.querySelectorAll('.royal-body-img');
-      var headImgs = sectionContainer.querySelectorAll('.royal-head-img');
-      var headAngles = sectionContainer.querySelectorAll('.royal-head-angle');
-
-      var headFarLeft = document.getElementById('RoyalHead-far-left-{{ section.id }}');
-      var headLeft = document.getElementById('RoyalHead-left-{{ section.id }}');
-      var headCenter = document.getElementById('RoyalHead-center-{{ section.id }}');
-      var headRight = document.getElementById('RoyalHead-right-{{ section.id }}');
-      var headFarRight = document.getElementById('RoyalHead-far-right-{{ section.id }}');
-      var headBlink = document.getElementById('RoyalHead-blink-{{ section.id }}');
-
-      // =========================================================================
-      // Three.js Genuine 3D Skeletal Bone / Joint Character Rig
-      // =========================================================================
-      var threeContainer = document.getElementById('RoyalThreeContainer-{{ section.id }}');
-      var threeScene = null, threeCamera = null, threeRenderer = null;
-      var rootBone = null, spineBone = null, neckBone = null, headBone = null;
-      var torsoMat = null, headMat = null;
-      var isThreeReady = false;
-      var outfitTextureMap = {};
-
-      function initThreeRig() {
-        if (typeof THREE === 'undefined' || !threeContainer || isThreeReady) return;
-        try {
-          var cWidth = threeContainer.clientWidth || (dollViewer ? dollViewer.offsetWidth : 380) || 380;
-          var cHeight = threeContainer.clientHeight || (dollViewer ? dollViewer.offsetHeight : 560) || 560;
-
-          threeScene = new THREE.Scene();
-          // Camera placed with generous headroom so head is never clipped
-          threeCamera = new THREE.PerspectiveCamera(30, cWidth / cHeight, 0.1, 100);
-          threeCamera.position.set(0, 0.05, 4.2);
-
-          threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-          threeRenderer.setSize(cWidth, cHeight);
-          threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-          threeContainer.innerHTML = '';
-          threeContainer.appendChild(threeRenderer.domElement);
-
-          // Warm Palace Lighting
-          var tAmb = new THREE.AmbientLight(0xfff7e6, 1.35);
-          threeScene.add(tAmb);
-
-          var tKey = new THREE.DirectionalLight(0xffeedd, 1.3);
-          tKey.position.set(2.5, 4, 3.5);
-          threeScene.add(tKey);
-
-          var tRim = new THREE.DirectionalLight(0x00e5ff, 0.5);
-          tRim.position.set(-3, 2, -2);
-          threeScene.add(tRim);
-
-          // Texture Maps for authentic mascot character in Rajasthani attire
-          var tLoader = new THREE.TextureLoader();
-          outfitTextureMap = {
-            cream: tLoader.load("{{ 'royal-doll-cream-body.png' | asset_url }}"),
-            red: tLoader.load("{{ 'royal-doll-red-body.png' | asset_url }}"),
-            blue: tLoader.load("{{ 'royal-doll-blue-body.png' | asset_url }}"),
-            green: tLoader.load("{{ 'royal-doll-green-body.png' | asset_url }}")
-          };
-          var tHead = tLoader.load("{{ 'royal-doll-head-center.png' | asset_url }}");
-
-          // Anatomical Skeleton Bones (Root -> Spine -> Neck -> Head)
-          // Character is 2.0 units tall, centered at y = 0.0 (from y = -1.0 to y = +1.0)
-          // In the 210x415 texture, the collar socket is at row 174 (41.93% from top = 1.1614 units from bottom)
-          var charH = 2.0;
-          var collarYFromBottom = (415 - 174) / 415 * charH; // 1.1614 units
-
-          rootBone = new THREE.Bone();
-          rootBone.name = "root";
-          rootBone.position.set(0, -1.0, 0);
-
-          spineBone = new THREE.Bone();
-          spineBone.name = "spine";
-          spineBone.position.set(0, 0, 0); // Torso / Sherwani anchor at character base
-          rootBone.add(spineBone);
-
-          neckBone = new THREE.Bone();
-          neckBone.name = "neck";
-          neckBone.position.set(0, collarYFromBottom, 0); // Anatomical collar pivot joint
-          spineBone.add(neckBone);
-
-          headBone = new THREE.Bone();
-          headBone.name = "head";
-          headBone.position.set(0, 0, 0); // Coincident with neck pivot
-          neckBone.add(headBone);
-
-          threeScene.add(rootBone);
-
-          // Torso / Sherwani 3D Curved Mesh (Attached to spineBone - stationary!)
-          var torsoGeo = new THREE.CylinderGeometry(0.55, 0.65, charH, 32, 1, true, -Math.PI * 0.44, Math.PI * 0.88);
-          torsoMat = new THREE.MeshStandardMaterial({
-            map: outfitTextureMap.cream,
-            transparent: true,
-            alphaTest: 0.05,
-            roughness: 0.35,
-            side: THREE.DoubleSide
-          });
-          var torsoMesh = new THREE.Mesh(torsoGeo, torsoMat);
-          torsoMesh.position.set(0, charH / 2, 0); // Centered at y = 1.0 on spineBone (world y = 0.0)
-          spineBone.add(torsoMesh);
-
-          // Head, Safa, Kalgi & Sunglasses 3D Curved Mesh (Attached to headBone!)
-          var headGeo = new THREE.CylinderGeometry(0.55, 0.55, charH, 32, 1, true, -Math.PI * 0.44, Math.PI * 0.88);
-          headMat = new THREE.MeshStandardMaterial({
-            map: tHead,
-            transparent: true,
-            alphaTest: 0.05,
-            roughness: 0.35,
-            side: THREE.DoubleSide
-          });
-          var headMesh = new THREE.Mesh(headGeo, headMat);
-          // Offset relative to headBone so head center matches torso center with zero gap!
-          headMesh.position.set(0, (charH / 2) - collarYFromBottom, 0);
-          headBone.add(headMesh);
-
-          // Optional External GLB Model Support
-          var custom3dUrl = "{{ section.settings.custom_3d_model_url }}";
-          if (custom3dUrl && custom3dUrl.trim() !== '' && typeof THREE.GLTFLoader !== 'undefined') {
-            var gltfLoader = new THREE.GLTFLoader();
-            gltfLoader.load(custom3dUrl, function(gltf) {
-              var customModel = gltf.scene;
-              customModel.traverse(function(node) {
-                if (node.isBone) {
-                  var bName = node.name.toLowerCase();
-                  if (bName.includes('head')) headBone = node;
-                  else if (bName.includes('neck')) neckBone = node;
-                }
-              });
-              threeScene.remove(rootBone);
-              threeScene.add(customModel);
-            }, undefined, function(err) {
-              console.warn('Custom 3D model load error:', err);
-            });
-          }
-
-          isThreeReady = true;
-
-          // Hide 2D layers since genuine 3D WebGL skeletal rig is active
-          if (bodyRig) bodyRig.style.display = 'none';
-          if (headRig) headRig.style.display = 'none';
-
-        } catch (err) {
-          console.warn('Three.js initialization:', err);
-          isThreeReady = false;
-        }
-      }
-
-      // Check if THREE is loaded or poll for defer completion
-      if (typeof THREE !== 'undefined') {
-        initThreeRig();
-      } else {
-        var threeCheckCount = 0;
-        var threeInterval = setInterval(function() {
-          threeCheckCount++;
-          if (typeof THREE !== 'undefined') {
-            clearInterval(threeInterval);
-            initThreeRig();
-          } else if (threeCheckCount > 30) {
-            clearInterval(threeInterval);
-          }
-        }, 100);
-        window.addEventListener('load', function() {
-          if (!isThreeReady && typeof THREE !== 'undefined') initThreeRig();
-        });
-      }
-
-      // Natural eye blinking loop
-      var isBlinkingNow = false;
-      function triggerBlink() {
-        isBlinkingNow = true;
-        setTimeout(function() {
-          isBlinkingNow = false;
-          scheduleBlink();
-        }, 180);
-      }
-      function scheduleBlink() {
-        var delay = Math.random() * 3200 + 2600;
-        setTimeout(triggerBlink, delay);
-      }
-      scheduleBlink();
-
-      var currentHeadAngle = 'center';
-      function setHeadAngleView(key) {
-        if (currentHeadAngle === key) return;
-        currentHeadAngle = key;
-        if (!headAngles || headAngles.length === 0) return;
-        headAngles.forEach(function(img) {
-          img.classList.remove('active');
-        });
-        var targetImg = null;
-        if (key === 'far-left') targetImg = headFarLeft;
-        else if (key === 'left') targetImg = headLeft;
-        else if (key === 'right') targetImg = headRight;
-        else if (key === 'far-right') targetImg = headFarRight;
-        else if (key === 'blink') targetImg = headBlink;
-        else targetImg = headCenter;
-        if (targetImg) targetImg.classList.add('active');
-      }
-      var customDollBox = document.getElementById('RoyalDollCustom-{{ section.id }}');
+      var baseDoll = document.getElementById('RoyalDollBase-{{ section.id }}');
+      var outfitImgs = sectionContainer.querySelectorAll('.royal-doll-img');
       var cards = sectionContainer.querySelectorAll('.royal-product-card');
       var categoryPills = sectionContainer.querySelectorAll('.royal-cat-pill');
       var cardsTrack = document.getElementById('RoyalCardsTrack-{{ section.id }}');
@@ -1677,7 +1324,7 @@
       function selectCard(card) {
         if (!card) return;
 
-        // Visual Card Selection State
+        // Visual Card State
         cards.forEach(function(c) {
           c.classList.remove('selected');
           c.setAttribute('aria-pressed', 'false');
@@ -1686,78 +1333,65 @@
         card.setAttribute('aria-pressed', 'true');
 
         // Extract metadata
-        var outfitKey = (card.getAttribute('data-outfit-key') || 'cream').toLowerCase().trim();
+        var outfitKey = card.getAttribute('data-outfit-key') || 'cream';
         var customOutfitUrl = card.getAttribute('data-outfit-url');
-        var title = card.getAttribute('data-title') || '';
-        var subtitle = card.getAttribute('data-subtitle') || '';
-        var price = card.getAttribute('data-price') || '';
-        var story = card.getAttribute('data-story') || '';
-        var category = card.getAttribute('data-category') || 'Royal';
-        var productUrl = card.getAttribute('data-product-url') || '#';
-        var cardIndex = card.querySelector('.card-index') ? card.querySelector('.card-index').textContent.trim() : '01';
+        var title = card.getAttribute('data-title');
+        var subtitle = card.getAttribute('data-subtitle');
+        var price = card.getAttribute('data-price');
+        var story = card.getAttribute('data-story');
+        var category = card.getAttribute('data-category');
+        var productUrl = card.getAttribute('data-product-url');
+        var cardIndex = card.querySelector('.card-index') ? card.querySelector('.card-index').textContent : '01';
 
-        // 1. Synchronously update Product Details Card (Title, Price, Subtitle, Story, Category, Number, CTA)
-        if (titleEl) titleEl.textContent = title;
-        if (subtitleEl) subtitleEl.textContent = subtitle;
-        if (priceEl) priceEl.textContent = price;
-        if (storyEl) storyEl.textContent = story;
-        if (categoryEl) categoryEl.textContent = category.toUpperCase() + ' CREATION';
-        if (numberEl) numberEl.textContent = cardIndex;
-        if (outfitBadgeEl) outfitBadgeEl.textContent = title;
-        if (ctaEl) {
-          ctaEl.setAttribute('href', productUrl && productUrl !== '#' ? productUrl : '#the-collection');
+        // Update Info Panel
+        if (titleEl && title) titleEl.textContent = title;
+        if (subtitleEl && subtitle) subtitleEl.textContent = subtitle;
+        if (priceEl && price) priceEl.textContent = price;
+        if (storyEl && story) storyEl.textContent = story;
+        if (categoryEl && category) categoryEl.textContent = category.toUpperCase() + ' CREATION';
+        if (numberEl && cardIndex) numberEl.textContent = cardIndex;
+        if (outfitBadgeEl && title) outfitBadgeEl.textContent = title;
+        if (ctaEl && productUrl) {
+          ctaEl.setAttribute('href', productUrl !== '#' ? productUrl : '#');
         }
 
-        // 2. Synchronously update Character Attire
-        var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
+        // Crossfade Doll Appearance
+        var matched = false;
 
+        // A) If merchant specified a custom uploaded doll image in block
         if (customOutfitUrl && customOutfitUrl.trim() !== '') {
-          // Merchant custom uploaded character attire
+          // Check if dynamic custom image element exists
+          var customImg = document.getElementById('RoyalCustomDoll-{{ section.id }}');
           if (!customImg) {
             customImg = document.createElement('img');
             customImg.id = 'RoyalCustomDoll-{{ section.id }}';
             customImg.className = 'royal-doll-img';
             customImg.alt = title;
-            if (customDollBox) customDollBox.appendChild(customImg);
+            dollViewer.appendChild(customImg);
           }
           customImg.src = customOutfitUrl;
+          outfitImgs.forEach(function(img) { img.classList.remove('active'); });
           customImg.classList.add('active');
-          if (isThreeReady && threeContainer) threeContainer.style.display = 'none';
-          if (bodyRig) bodyRig.style.display = 'none';
-          if (headRig) headRig.style.display = 'none';
-        } else {
-          // Built-in Royal Outfit Palette (cream, red, blue, green)
-          if (customImg) customImg.classList.remove('active');
+          matched = true;
+        }
 
-          if (!outfitTextureMap[outfitKey]) {
-            console.warn('Outfit palette "' + outfitKey + '" not found in texture maps, defaulting to cream.');
-            outfitKey = 'cream';
-          }
-
-          // A) Update Three.js 3D WebGL material
-          if (isThreeReady && torsoMat && outfitTextureMap[outfitKey]) {
-            torsoMat.map = outfitTextureMap[outfitKey];
-            torsoMat.needsUpdate = true;
-            if (threeContainer) threeContainer.style.display = 'block';
-          }
-
-          // B) Update 2D fallback layers
-          if (bodyRig) bodyRig.style.display = isThreeReady ? 'none' : 'flex';
-          if (headRig) headRig.style.display = isThreeReady ? 'none' : 'flex';
-
-          bodyImgs.forEach(function(img) {
+        // B) Match against preloaded character variations (cream, red, blue, green)
+        if (!matched) {
+          var targetImg = null;
+          outfitImgs.forEach(function(img) {
             if (img.getAttribute('data-outfit-key') === outfitKey) {
-              img.classList.add('active');
-            } else {
-              img.classList.remove('active');
+              targetImg = img;
             }
           });
 
-          // Keep head active and seamless across all outfit changes
-          headAngles.forEach(function(img) {
-            img.style.display = 'block';
-          });
-          if (headCenter) headCenter.classList.add('active');
+          if (!targetImg && outfitKey === 'cream') {
+            targetImg = baseDoll;
+          }
+
+          if (targetImg) {
+            outfitImgs.forEach(function(img) { img.classList.remove('active'); });
+            targetImg.classList.add('active');
+          }
         }
       }
 
@@ -1813,313 +1447,142 @@
       });
 
       /* ----------------------------------------------------
-         2. Interactive 3D Cursor Tracking & Butterfly Engine
+         2. Interactive 3D Blue-Purple Butterfly Engine
          ---------------------------------------------------- */
       var butterfly = document.getElementById('RoyalButterfly-{{ section.id }}');
       var canvas = document.getElementById('RoyalButterflyCanvas-{{ section.id }}');
-      var auraDisc = sectionContainer.querySelector('.royal-aura-disc');
-      var enableDollTracking = dollViewer && dollViewer.getAttribute('data-doll-tracking') !== 'false';
-      var enableIdleFloat = dollViewer && dollViewer.getAttribute('data-idle-float') !== 'false';
-      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      var animationFrameId = null;
-      var rect = sectionContainer.getBoundingClientRect();
-      var width = sectionContainer.offsetWidth;
-      var height = sectionContainer.offsetHeight;
+      if (butterfly && canvas) {
+        var ctx = canvas.getContext('2d');
+        var animationFrameId = null;
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (canvas) {
-        canvas.width = width;
-        canvas.height = height;
-      }
+        // Position & Flight Physics State
+        var rect = sectionContainer.getBoundingClientRect();
+        var width = (canvas.width = sectionContainer.offsetWidth);
+        var height = (canvas.height = sectionContainer.offsetHeight);
 
-      function handleResize() {
-        if (!sectionContainer) return;
-        rect = sectionContainer.getBoundingClientRect();
-        width = sectionContainer.offsetWidth;
-        height = sectionContainer.offsetHeight;
-        if (canvas) {
-          canvas.width = width;
-          canvas.height = height;
+        // Resize Canvas on Window Resize
+        function handleResize() {
+          if (!sectionContainer) return;
+          width = canvas.width = sectionContainer.offsetWidth;
+          height = canvas.height = sectionContainer.offsetHeight;
         }
-        if (isThreeReady && threeCamera && threeRenderer && threeContainer) {
-          var nw = threeContainer.clientWidth || (dollViewer ? dollViewer.offsetWidth : 400) || 400;
-          var nh = threeContainer.clientHeight || (dollViewer ? dollViewer.offsetHeight : 560) || 560;
-          threeCamera.aspect = nw / nh;
-          threeCamera.updateProjectionMatrix();
-          threeRenderer.setSize(nw, nh);
-        }
-      }
-      window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', handleResize);
 
-      // Mouse & Pointer Tracking State
-      var isCursorInside = false;
-      var lastMoveTime = performance.now();
-      var currentClientX = window.innerWidth * 0.5;
-      var currentClientY = window.innerHeight * 0.5;
+        // Initial coordinates (start near top-left of section, as in reference video)
+        var posX = width * 0.18;
+        var posY = height * 0.15;
+        var targetX = posX;
+        var targetY = posY;
+        var currentAngle = 0;
+        var speedVal = parseFloat(butterfly.getAttribute('data-speed')) || 8;
+        var ease = speedVal / 100;
+        var isCursorInside = false;
+        var lastMoveTime = performance.now();
+        var particles = [];
 
-      // Butterfly Position & Flight State
-      var posX = width * 0.2;
-      var posY = height * 0.2;
-      var targetX = posX;
-      var targetY = posY;
-      var currentAngle = 0;
-      var speedVal = butterfly ? (parseFloat(butterfly.getAttribute('data-speed')) || 8) : 8;
-      var ease = speedVal / 100;
-      var particles = [];
-
-      // Body 3D Orientation State
-      var bodyRotY = 0;
-      var bodyRotX = 0;
-      var bodyTransX = 0;
-
-      // Head & Neck 3D Orientation State
-      var headRotY = 0;
-      var headRotX = 0;
-      var headRotZ = 0;
-      var headTransX = 0;
-
-      // Sparkle Particle Class
-      function Particle(x, y) {
-        this.x = x + (Math.random() - 0.5) * 8;
-        this.y = y + (Math.random() - 0.5) * 8;
-        this.radius = Math.random() * 2.2 + 0.8;
-        this.alpha = 1;
-        this.decay = Math.random() * 0.025 + 0.015;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = Math.random() * 0.5 + 0.3;
-        var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
-        this.color = hues[Math.floor(Math.random() * hues.length)];
-      }
-
-      Particle.prototype.update = function() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.alpha -= this.decay;
-      };
-
-      Particle.prototype.draw = function(c) {
-        c.save();
-        c.globalAlpha = Math.max(0, this.alpha);
-        c.fillStyle = this.color;
-        c.shadowColor = this.color;
-        c.shadowBlur = 6;
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        c.fill();
-        c.restore();
-      };
-
-      var stageContainer = sectionContainer.querySelector('.royal-showcase-stage') || sectionContainer;
-      var cardsSection = sectionContainer.querySelector('.royal-collection-strip');
-      var isHoveringCards = false;
-
-      function updateTargetFromEvent(e) {
-        var clientX = e.clientX;
-        var clientY = e.clientY;
-        if (e.touches && e.touches.length > 0) {
-          clientX = e.touches[0].clientX;
-          clientY = e.touches[0].clientY;
-        }
-        currentClientX = clientX;
-        currentClientY = clientY;
-        rect = sectionContainer.getBoundingClientRect();
-
-        var rawX = clientX - rect.left;
-        var rawY = clientY - rect.top;
-
-        // Check if cursor is over product cards or below the upper interactive stage
-        var cardsRect = cardsSection ? cardsSection.getBoundingClientRect() : null;
-        if (cardsRect && clientY >= cardsRect.top - 15) {
-          isHoveringCards = true;
-        } else {
-          isHoveringCards = false;
+        // Sparkle Particle Class
+        function Particle(x, y) {
+          this.x = x + (Math.random() - 0.5) * 8;
+          this.y = y + (Math.random() - 0.5) * 8;
+          this.radius = Math.random() * 2.2 + 0.8;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.025 + 0.015;
+          this.vx = (Math.random() - 0.5) * 0.8;
+          this.vy = Math.random() * 0.5 + 0.3; // gentle drift downwards
+          // Royal iridescent hues: Cyan, Violet, Gold
+          var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
+          this.color = hues[Math.floor(Math.random() * hues.length)];
         }
 
-        // Strictly confine butterfly target to the upper interactive stage
-        var stageHeight = stageContainer.offsetHeight || (height * 0.65);
-        var maxButterflyY = Math.max(120, stageHeight - 40);
+        Particle.prototype.update = function() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+        };
 
-        targetX = Math.max(40, Math.min(width - 80, rawX));
-        targetY = Math.max(30, Math.min(maxButterflyY, rawY));
+        Particle.prototype.draw = function(c) {
+          c.save();
+          c.globalAlpha = Math.max(0, this.alpha);
+          c.fillStyle = this.color;
+          c.shadowColor = this.color;
+          c.shadowBlur = 6;
+          c.beginPath();
+          c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          c.fill();
+          c.restore();
+        };
 
-        isCursorInside = true;
-        lastMoveTime = performance.now();
-      }
-
-      sectionContainer.addEventListener('mousemove', updateTargetFromEvent);
-      sectionContainer.addEventListener('mouseenter', updateTargetFromEvent);
-      sectionContainer.addEventListener('mouseleave', function() {
-        isCursorInside = false;
-      });
-      sectionContainer.addEventListener('touchmove', updateTargetFromEvent, { passive: true });
-      sectionContainer.addEventListener('touchstart', updateTargetFromEvent, { passive: true });
-
-      // Unified 60fps Animation Loop
-      function animateStage(time) {
-        if (prefersReducedMotion) return;
-
-        // --- A. Character Head and Neck Rotation (Torso remains stationary!) ---
-        if (dollViewer && enableDollTracking) {
-          var targetHeadRotY = 0;
-          var targetHeadRotX = 0;
-          var targetHeadRotZ = 0;
-
-          if (isCursorInside) {
-            var dollRect = dollViewer.getBoundingClientRect();
-            var dollMidX = dollRect.left + dollRect.width / 2;
-            var dollMidY = dollRect.top + dollRect.height * 0.42;
-
-            var relX = (currentClientX - dollMidX) / (window.innerWidth * 0.45);
-            var relY = (currentClientY - dollMidY) / (window.innerHeight * 0.45);
-
-            relX = Math.max(-1.1, Math.min(1.1, relX));
-            relY = Math.max(-1.0, Math.min(1.0, relY));
-
-            // HEAD & NECK: Active rotational movement on the neck pivot
-            targetHeadRotY = relX * 24;  // 3D Y rotation
-            targetHeadRotX = -relY * 8;  // subtle nod
-            targetHeadRotZ = relX * 2.5; // natural tilt
-
-            // Select matching 3D perspective angle frame of the furry character
-            var activeAngleKey = 'center';
-            if (relX < -0.45) {
-              activeAngleKey = 'far-left';
-            } else if (relX < -0.15) {
-              activeAngleKey = 'left';
-            } else if (relX > 0.45) {
-              activeAngleKey = 'far-right';
-            } else if (relX > 0.15) {
-              activeAngleKey = 'right';
-            }
-
-            if (isBlinkingNow && activeAngleKey === 'center') {
-              activeAngleKey = 'blink';
-            }
-
-            setHeadAngleView(activeAngleKey);
-          } else if (butterfly && (time - lastMoveTime > 3000)) {
-            // Autonomous butterfly tracking when idle
-            var dollLocalX = width * 0.5;
-            var diffX = (posX - dollLocalX) / (width * 0.45);
-            var diffY = (posY - (height * 0.42)) / (height * 0.45);
-
-            diffX = Math.max(-1.0, Math.min(1.0, diffX));
-            diffY = Math.max(-1.0, Math.min(1.0, diffY));
-
-            targetHeadRotY = diffX * 20;
-            targetHeadRotX = -diffY * 7;
-            targetHeadRotZ = diffX * 2;
-
-            var activeAngleKey = 'center';
-            if (diffX < -0.4) activeAngleKey = 'far-left';
-            else if (diffX < -0.15) activeAngleKey = 'left';
-            else if (diffX > 0.4) activeAngleKey = 'far-right';
-            else if (diffX > 0.15) activeAngleKey = 'right';
-
-            if (isBlinkingNow && activeAngleKey === 'center') {
-              activeAngleKey = 'blink';
-            }
-
-            setHeadAngleView(activeAngleKey);
-          } else {
-            // Returns smoothly toward neutral position
-            targetHeadRotY = 0;
-            targetHeadRotX = 0;
-            targetHeadRotZ = 0;
-            setHeadAngleView(isBlinkingNow ? 'blink' : 'center');
+        // Pointer Tracking (Mouse & Touch)
+        function updateTargetFromEvent(e) {
+          var clientX = e.clientX;
+          var clientY = e.clientY;
+          if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
           }
-
-          // Smooth lerp damping for fluid, organic rotation
-          headRotY += (targetHeadRotY - headRotY) * 0.085;
-          headRotX += (targetHeadRotX - headRotX) * 0.085;
-          headRotZ += (targetHeadRotZ - headRotZ) * 0.085;
-
-          var idleY = enableIdleFloat ? Math.sin(time * 0.0016) * 5 : 0;
-
-          // Torso, Body & Legs remain mostly stationary!
-          if (bodyRig) {
-            bodyRig.style.transform = 'translate3d(0px, ' + idleY.toFixed(2) + 'px, 0px)';
-          }
-
-          // Head & Neck rotate together naturally on believable neck pivot (50% 42% 0)
-          if (headRig) {
-            headRig.style.transform =
-              'translate3d(0px, ' + idleY.toFixed(2) + 'px, 0px) ' +
-              'rotateY(' + headRotY.toFixed(2) + 'deg) ' +
-              'rotateX(' + headRotX.toFixed(2) + 'deg) ' +
-              'rotateZ(' + headRotZ.toFixed(2) + 'deg)';
-          }
-
-          // Drive Genuine Three.js 3D Skeletal Rig (Actual Head & Neck Bone Rotation)
-          if (isThreeReady && headBone && neckBone) {
-            var targetYawRad = (targetHeadRotY * Math.PI) / 180;
-            var targetPitchRad = (targetHeadRotX * Math.PI) / 180;
-            var targetRollRad = (targetHeadRotZ * Math.PI) / 180;
-
-            // Smooth bone rotation on anatomical neck and head joints
-            neckBone.rotation.y += (targetYawRad * 0.35 - neckBone.rotation.y) * 0.085;
-            headBone.rotation.y += (targetYawRad * 0.65 - headBone.rotation.y) * 0.085;
-            headBone.rotation.x += (targetPitchRad - headBone.rotation.x) * 0.085;
-            headBone.rotation.z += (targetRollRad - headBone.rotation.z) * 0.085;
-
-            // Torso, Body & Legs remain strictly stationary!
-            spineBone.rotation.y = 0;
-            rootBone.rotation.y = 0;
-            rootBone.position.y = -1.05 + idleY * 0.005;
-
-            threeRenderer.render(threeScene, threeCamera);
-          }
-
-          // Background Golden Aura Disc Counter-Parallax
-          if (auraDisc) {
-            var auraX = -headRotY * 1.6;
-            var auraY = -headRotX * 1.2;
-            auraDisc.style.transform = 'translate3d(calc(-50% + ' + auraX.toFixed(1) + 'px), ' + auraY.toFixed(1) + 'px, 0)';
-          }
+          rect = sectionContainer.getBoundingClientRect();
+          targetX = clientX - rect.left;
+          targetY = clientY - rect.top;
+          isCursorInside = true;
+          lastMoveTime = performance.now();
         }
 
-        // --- B. Interactive 3D Butterfly Flight ---
-        if (butterfly && canvas) {
-          var ctx = canvas.getContext('2d');
+        sectionContainer.addEventListener('mousemove', updateTargetFromEvent);
+        sectionContainer.addEventListener('mouseenter', updateTargetFromEvent);
+        sectionContainer.addEventListener('mouseleave', function() {
+          isCursorInside = false;
+        });
+        sectionContainer.addEventListener('touchmove', updateTargetFromEvent, { passive: true });
+        sectionContainer.addEventListener('touchstart', updateTargetFromEvent, { passive: true });
 
-          // If mouse is idle, outside, or hovering over product cards,
-          // maintain autonomous curved patrol gracefully around the doll podium in the upper stage
-          if (!isCursorInside || isHoveringCards || (time - lastMoveTime > 3500)) {
+        // Continuous Flight & Flapping Animation Loop
+        function animateFlight(time) {
+          if (prefersReducedMotion) return;
+
+          // If mouse is idle or outside, autonomous royal curved patrol around doll
+          if (!isCursorInside || (time - lastMoveTime > 3500)) {
+            var patrolCenterY = height * 0.32;
             var patrolCenterX = width * 0.5;
-            var patrolCenterY = height * 0.28;
             var t = time * 0.0012;
-            targetX = patrolCenterX + Math.cos(t) * (width * 0.25);
-            targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.12);
+            // Elegant Infinity / Lissajous path
+            targetX = patrolCenterX + Math.cos(t) * (width * 0.28);
+            targetY = patrolCenterY + Math.sin(t * 2) * (height * 0.18);
           }
 
+          // Calculate displacement to target
           var dx = targetX - posX;
           var dy = targetY - posY;
           var dist = Math.sqrt(dx * dx + dy * dy);
 
+          // Smooth interpolation towards target
           var vx = dx * ease;
           var vy = dy * ease;
           posX += vx;
           posY += vy;
 
-          var hoverX = Math.sin(time * 0.0035) * 8;
-          var hoverY = Math.cos(time * 0.0042) * 6;
+          // Natural organic sinusoidal drift while hovering
+          var hoverX = Math.sin(time * 0.0035) * 10;
+          var hoverY = Math.cos(time * 0.0042) * 8;
           var finalX = posX + hoverX;
           var finalY = posY + hoverY;
 
-          // Strictly clamp within interactive stage bounds (never enters product cards)
-          var stageHeight = stageContainer.offsetHeight || (height * 0.65);
-          var maxFlightY = Math.max(100, stageHeight - 30);
+          // Clamping strictly inside section boundary
           finalX = Math.max(30, Math.min(width - 70, finalX));
-          finalY = Math.max(25, Math.min(maxFlightY, finalY));
+          finalY = Math.max(30, Math.min(height - 70, finalY));
 
+          // Calculate travel angle with smooth shortest-path angular interpolation
           if (dist > 2) {
             var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
             var angleDiff = (targetAngle - currentAngle + 540) % 360 - 180;
             currentAngle += angleDiff * 0.12;
           }
 
+          // Dynamic banking/tilt in 3D
           var tilt = Math.max(-25, Math.min(25, vx * 1.8));
 
+          // Modulate flapping frequency: rapid flap when darting, graceful flap when hovering
           if (dist > 40) {
             butterfly.classList.add('fast-flap');
             butterfly.classList.remove('hover-flap');
@@ -2128,15 +1591,18 @@
             butterfly.classList.add('hover-flap');
           }
 
+          // Apply 3D transform (centered on butterfly body)
           butterfly.style.transform =
             'translate3d(' + (finalX - 45) + 'px, ' + (finalY - 35) + 'px, 0px) ' +
             'rotate(' + currentAngle.toFixed(1) + 'deg) ' +
             'rotateY(' + tilt.toFixed(1) + 'deg)';
 
+          // Spawn sparkling particles behind butterfly
           if (Math.random() < 0.45 && particles.length < 50) {
             particles.push(new Particle(finalX, finalY));
           }
 
+          // Update & Draw Particle Canvas
           ctx.clearRect(0, 0, width, height);
           for (var i = particles.length - 1; i >= 0; i--) {
             particles[i].update();
@@ -2146,20 +1612,21 @@
               particles[i].draw(ctx);
             }
           }
+
+          animationFrameId = requestAnimationFrame(animateFlight);
         }
 
-        animationFrameId = requestAnimationFrame(animateStage);
+        // Start 60fps loop
+        animationFrameId = requestAnimationFrame(animateFlight);
+
+        // Teardown logic on section unload
+        document.addEventListener('shopify:section:unload', function(e) {
+          if (e.detail && e.detail.sectionId === '{{ section.id }}') {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('resize', handleResize);
+          }
+        });
       }
-
-      animationFrameId = requestAnimationFrame(animateStage);
-
-      // Teardown logic on section unload
-      document.addEventListener('shopify:section:unload', function(e) {
-        if (e.detail && e.detail.sectionId === '{{ section.id }}') {
-          if (animationFrameId) cancelAnimationFrame(animationFrameId);
-          window.removeEventListener('resize', handleResize);
-        }
-      });
     }
 
     // Initialize on DOM load
@@ -2242,18 +1709,6 @@
       "id": "enable_idle_float",
       "label": "Enable Gentle Idle Floating Animation",
       "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_doll_cursor_tracking",
-      "label": "Enable 3D Head/Neck Cursor Tracking",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "custom_3d_model_url",
-      "label": "Custom Rigged 3D Character Model URL (GLB/GLTF)",
-      "info": "Optional: upload your rigged .glb character to Shopify Files and paste URL here. If empty, uses the built-in 3D rigged mascot."
     },
     {
       "type": "header",
@@ -2413,8 +1868,7 @@
         "bg_color": "#fbf2e1",
         "accent_color": "#c89332",
         "enable_butterfly": true,
-        "enable_idle_float": true,
-        "enable_doll_cursor_tracking": true
+        "enable_idle_float": true
       },
       "blocks": [
         {

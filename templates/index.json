@@ -9,6 +9,20 @@
  */
 {
   "sections": {
+    "interactive_hero_3d": {
+      "type": "interactive-hero-3d",
+      "settings": {
+        "brand_title": "The Royal Attire *",
+        "subheading": "THE COLLECTION",
+        "heading": "Worn by royalty, made by hand",
+        "description": "Step into the royal atelier. Hand-spun silk, royal zardozi, and time-honored Indian craftsmanship brought alive in interactive 3D.",
+        "bg_color": "#E2A522",
+        "character_model_url": "",
+        "tracking_sensitivity": 28,
+        "enable_butterfly": true,
+        "butterfly_color": "#00E5FF"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -414,6 +428,7 @@
     }
   },
   "order": [
+    "interactive_hero_3d",
     "hero_jVaWmY",
     "product_list_fa6P9H",
     "the_royal_attire",

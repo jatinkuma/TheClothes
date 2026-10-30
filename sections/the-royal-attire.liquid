@@ -1162,7 +1162,7 @@
 
   // 2. CONFIGURABLE & REPLACEABLE 3D CHARACTER MODEL URL
   // Default to royal-owl.glb, or use merchant custom 3D model URL from theme settings
-  var defaultModelUrl = "{{ 'royal-owl.glb' | asset_url }}";
+  var defaultModelUrl = "{{ 'royal-attire-character.glb' | asset_url }}";
   var customModelUrl = "{{ section.settings.character_3d_model_url }}";
   var activeCharacterUrl = (customModelUrl && customModelUrl.trim() !== "") ? customModelUrl.trim() : defaultModelUrl;
 

@@ -425,9 +425,23 @@
         "enable_butterfly": true,
         "butterfly_color": "#00e5ff"
       }
+    },
+    "interactive_royal_mascot": {
+      "type": "interactive-royal-mascot",
+      "settings": {
+        "bg_color": "#E5A625",
+        "mascot_size": 340,
+        "sensitivity": 24,
+        "enable_butterfly": true,
+        "butterfly_color": "#00E5FF",
+        "enable_sparkles": true,
+        "show_hint": true,
+        "hint_text": "Interactive 3D Mascot • Move mouse or drag to explore"
+      }
     }
   },
   "order": [
+    "interactive_royal_mascot",
     "hero_jVaWmY",
     "product_list_fa6P9H",
     "the_royal_attire",

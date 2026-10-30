@@ -1,13 +1,14 @@
 {% comment %}
-  THE ROYAL ATTIRE - Luxury Interactive 3D Mascot Showcase & Atelier
-  - Three.js WebGL 3D Engine with rigged skeletal bone rotation & 360° interactive view
-  - Supports custom .glb / .gltf 3D character models via theme settings
+  THE ROYAL ATTIRE - Replaceable 3D Character & Interactive Fashion System
+  - Three.js WebGL 3D Engine with rigged skeletal bone rotation & 360° interactive viewer
+  - Fully replaceable 3D character system (.glb / .gltf) via section settings
+  - Product-based 3D clothing system: loads matching 3D Sherwani outfits on product click
+  - Real-time continuous head & neck rotation following the cursor with natural easing
   - Complete, unified, connected character presentation with NO cut seams or neck gaps
-  - Seamless product outfit switching for Safa, Achkan, Dupatta, and Mojari
   - Global butterfly cursor is rendered globally via layout/theme.liquid
 {% endcomment %}
 
-<!-- Three.js & GLTF Loader for Rigged 3D Character Models -->
+<!-- Three.js & GLTF Loader for Rigged 3D Character & Clothing Models -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
@@ -50,145 +51,145 @@
     </div>
   </header>
 
-  <!-- 2. HERO SHOWCASE WITH REAL 3D CHARACTER ENGINE -->
+  <!-- 2. HERO SHOWCASE WITH REPLACEABLE 3D CHARACTER ENGINE -->
   <section id="the-mascot-{{ section.id }}" class="tra-hero-section">
     <div class="tra-hero-header">
       <span class="tra-badge">{{ section.settings.subtitle | default: 'THE COLLECTION' }}</span>
       <h2 class="tra-main-heading">{{ section.settings.heading | default: 'Worn by royalty, made by hand' }}</h2>
-      <p class="tra-hero-sub">{{ section.settings.description | default: 'Explore handcrafted heritage regalia. Select any piece below to instantly dress our royal mascot in authentic court attire.' }}</p>
+      <p class="tra-hero-sub">{{ section.settings.description | default: 'Explore handcrafted heritage regalia. Select any piece below to instantly dress our 3D royal character in authentic court attire.' }}</p>
     </div>
 
-    <!-- Central Stage: 3D Animated Living Character Stage -->
+    <!-- Central Stage: Replaceable 3D Animated Character Stage -->
     <div class="tra-stage-container" id="tra-stage-container-{{ section.id }}">
       <div class="tra-pedestal-glow"></div>
       
-      <!-- Interactive 3D WebGL Canvas for Rigged 3D Character Models (.glb) -->
-      <canvas id="tra-3d-webgl-canvas-{{ section.id }}" class="tra-3d-webgl-canvas" style="display: none;"></canvas>
+      <!-- 3D Model Loading Spinner -->
+      <div id="tra-3d-spinner-{{ section.id }}" class="tra-3d-spinner">
+        <div class="tra-spinner-circle"></div>
+        <span>Preparing 3D Atelier...</span>
+      </div>
 
-      <!-- Complete, Unified, Connected Character Stage (NO CHOPPED HEAD/BODY, NO NECK GAPS) -->
-      <div id="tra-mascot-stage-{{ section.id }}" class="tra-mascot-stage">
-        
-        <!-- Coordinated 3D Perspective Gaze & Breathing Rig -->
+      <!-- Real-Time Interactive 3D WebGL Canvas for Rigged 3D Character & Outfits -->
+      <canvas id="tra-3d-webgl-canvas-{{ section.id }}" class="tra-3d-webgl-canvas"></canvas>
+
+      <!-- Complete Unified Fallback Stage (Used when WebGL is initializing or loading) -->
+      <div id="tra-mascot-stage-{{ section.id }}" class="tra-mascot-stage" style="display: none;">
         <div id="tra-character-gaze-rig-{{ section.id }}" class="tra-character-gaze-rig">
-          
-          <!-- Unified Master Character Image Stack -->
           <div class="tra-character-inner">
-            <!-- Active Selected Outfit Image -->
             <img id="tra-unified-character-{{ section.id }}" 
                  class="tra-unified-character-img"
                  src="{{ 'royal-owl-master.png' | asset_url }}" 
                  alt="The Royal Mascot in Ceremonial Court Attire" 
                  loading="eager" />
           </div>
-
         </div>
       </div>
 
-      <!-- 3D 360-degree Interactive Control Cue -->
+      <!-- 3D 360-Degree Interactive Rotation Cue -->
       <div class="tra-3d-cue">
         <span class="tra-3d-cue-icon">↺</span>
-        <span class="tra-3d-cue-text">Interactive 3D Gaze Tracking &bull; Move cursor or drag to view</span>
+        <span class="tra-3d-cue-text">Real-Time 3D Gaze Tracking &bull; Drag horizontally to rotate 360°</span>
       </div>
 
-      <!-- Live Dress-up Quick Selection Bar -->
+      <!-- Live Quick-Dressing Outfit Bar -->
       <div class="tra-dressup-bar">
-        <span class="tra-bar-label">Live Outfit Preview</span>
+        <span class="tra-bar-label">Live 3D Sherwani</span>
         <div class="tra-bar-buttons">
-          <button type="button" class="tra-dress-btn active" data-outfit="safa" data-item="Safa (Leheriya Silk)">
-            <span class="tra-btn-dot" style="background:#E53935;"></span>
-            <span>Safa</span>
+          <button type="button" class="tra-dress-btn active" data-outfit="maroon" data-model="{{ 'sherwani-maroon.glb' | asset_url }}" data-item="Maroon Sherwani">
+            <span class="tra-btn-dot" style="background:#8B1E1E;"></span>
+            <span>Maroon</span>
           </button>
-          <button type="button" class="tra-dress-btn" data-outfit="achkan" data-item="Achkan (Raw Silk)">
-            <span class="tra-btn-dot" style="background:#F3DFB2;"></span>
-            <span>Achkan</span>
+          <button type="button" class="tra-dress-btn" data-outfit="blue" data-model="{{ 'sherwani-blue.glb' | asset_url }}" data-item="Blue Sherwani">
+            <span class="tra-btn-dot" style="background:#1B3B6F;"></span>
+            <span>Blue</span>
           </button>
-          <button type="button" class="tra-dress-btn" data-outfit="dupatta" data-item="Dupatta (Royal Zari)">
-            <span class="tra-btn-dot" style="background:#9B1B30;"></span>
-            <span>Dupatta</span>
+          <button type="button" class="tra-dress-btn" data-outfit="ivory" data-model="{{ 'sherwani-ivory.glb' | asset_url }}" data-item="Ivory Sherwani">
+            <span class="tra-btn-dot" style="background:#F5E5C9;"></span>
+            <span>Ivory</span>
           </button>
-          <button type="button" class="tra-dress-btn" data-outfit="mojari" data-item="Mojari (Velvet Leather)">
-            <span class="tra-btn-dot" style="background:#D4AF37;"></span>
-            <span>Mojari</span>
+          <button type="button" class="tra-dress-btn" data-outfit="emerald" data-model="{{ 'sherwani-emerald.glb' | asset_url }}" data-item="Emerald Sherwani">
+            <span class="tra-btn-dot" style="background:#1E4A38;"></span>
+            <span>Emerald</span>
           </button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 3. PRODUCT SHOWCASE GRID -->
+  <!-- 3. PRODUCT SHOWCASE GRID (SHOPIFY PRODUCT-BASED 3D CLOTHING SYSTEM) -->
   <section id="the-collection-{{ section.id }}" class="tra-collection-section">
     <div class="tra-section-head">
       <span class="tra-sub-title">CRAFTED FOR NOBILITY</span>
       <h3 class="tra-section-title">The Masterpiece Gallery</h3>
-      <p class="tra-section-desc">Click any product to equip its complete authentic outfit directly on the royal character above.</p>
+      <p class="tra-section-desc">Click any Sherwani to equip its tailored 3D outfit directly onto the character above.</p>
     </div>
 
     <div class="tra-product-grid">
       
-      <!-- Card 1: Safa (Leheriya Silk) -->
-      <article class="tra-card" data-outfit="safa" data-product="Safa (Leheriya Silk)">
+      <!-- Card 1: Maroon Sherwani -->
+      <article class="tra-card active" data-outfit="maroon" data-model="{{ 'sherwani-maroon.glb' | asset_url }}" data-product="Maroon Royal Sherwani">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-owl-safa.png' | asset_url }}" alt="Safa (Leheriya Silk)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Equip</span>
+          <img src="{{ 'royal-owl-dupatta.png' | asset_url }}" alt="Maroon Royal Sherwani" class="tra-card-img" />
+          <span class="tra-drape-pill">Equipped in 3D</span>
         </div>
         <div class="tra-card-info">
-          <span class="tra-card-cat">Traditional Royal Headwear</span>
-          <h4 class="tra-card-title">Safa (Leheriya Silk)</h4>
-          <p class="tra-card-summary">Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown with an antique ruby kalgi brooch.</p>
-          <div class="tra-card-foot">
-            <span class="tra-card-price">Rs. 14,500</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Safa (Leheriya Silk)">Enquire about this piece</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- Card 2: Achkan (Raw Silk & Zari) -->
-      <article class="tra-card" data-outfit="achkan" data-product="Achkan (Raw Silk & Zari)">
-        <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-owl-achkan.png' | asset_url }}" alt="Achkan (Raw Silk & Zari)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Equip</span>
-        </div>
-        <div class="tra-card-info">
-          <span class="tra-card-cat">Ceremonial Outer Coat</span>
-          <h4 class="tra-card-title">Achkan (Raw Silk &amp; Zari)</h4>
-          <p class="tra-card-summary">Tailored from ivory raw silk with intricate antique zardozi wirework across mandarin collar and cuffs, fastened by royal buttons.</p>
+          <span class="tra-card-cat">Ceremonial State Regalia</span>
+          <h4 class="tra-card-title">Maroon Royal Sherwani</h4>
+          <p class="tra-card-summary">Hand-tailored raw mulberry silk sherwani enriched with antique gold zardozi placket embroidery and ruby brooch stole.</p>
           <div class="tra-card-foot">
             <span class="tra-card-price">Rs. 56,000</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Achkan (Raw Silk & Zari)">Enquire about this piece</button>
+            <button type="button" class="tra-enquire-btn" data-piece="Maroon Royal Sherwani">Enquire about this piece</button>
           </div>
         </div>
       </article>
 
-      <!-- Card 3: Dupatta / Odhni -->
-      <article class="tra-card" data-outfit="dupatta" data-product="Dupatta (Royal Zari)">
+      <!-- Card 2: Blue Sherwani -->
+      <article class="tra-card" data-outfit="blue" data-model="{{ 'sherwani-blue.glb' | asset_url }}" data-product="Sapphire Blue Jodhpuri">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-owl-dupatta.png' | asset_url }}" alt="Dupatta (Royal Zari)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Equip</span>
+          <img src="{{ 'royal-owl-achkan.png' | asset_url }}" alt="Sapphire Blue Jodhpuri" class="tra-card-img" />
+          <span class="tra-drape-pill">Equip in 3D</span>
         </div>
         <div class="tra-card-info">
-          <span class="tra-card-cat">Hand-Woven Royal Stole</span>
-          <h4 class="tra-card-title">Dupatta (Royal Zari)</h4>
-          <p class="tra-card-summary">Deep ruby crimson silk enriched with bandhani floral medallions in spun real silver and gold thread with tassel borders.</p>
+          <span class="tra-card-cat">Royal Court Jodhpuri</span>
+          <h4 class="tra-card-title">Sapphire Blue Jodhpuri</h4>
+          <p class="tra-card-summary">Celestial lapis blue brocade adorned with spun real silver and gold thread floral booti motifs and mandarin collar.</p>
           <div class="tra-card-foot">
-            <span class="tra-card-price">Rs. 22,000</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Dupatta (Royal Zari)">Enquire about this piece</button>
+            <span class="tra-card-price">Rs. 52,000</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Sapphire Blue Jodhpuri">Enquire about this piece</button>
           </div>
         </div>
       </article>
 
-      <!-- Card 4: Mojari (Shoes) -->
-      <article class="tra-card" data-outfit="mojari" data-product="Mojari (Velvet Leather)">
+      <!-- Card 3: Ivory Sherwani -->
+      <article class="tra-card" data-outfit="ivory" data-model="{{ 'sherwani-ivory.glb' | asset_url }}" data-product="Imperial Ivory Sherwani">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-owl-mojari.png' | asset_url }}" alt="Mojari (Velvet Leather)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Equip</span>
+          <img src="{{ 'royal-owl-safa.png' | asset_url }}" alt="Imperial Ivory Sherwani" class="tra-card-img" />
+          <span class="tra-drape-pill">Equip in 3D</span>
         </div>
         <div class="tra-card-info">
-          <span class="tra-card-cat">Hand-Turned Leather Footwear</span>
-          <h4 class="tra-card-title">Mojari (Velvet Leather)</h4>
-          <p class="tra-card-summary">Hand-stitched genuine leather slippers featuring traditional upturned toe tips and intricate brass-cord filigree.</p>
+          <span class="tra-card-cat">Coronation Brocade Coat</span>
+          <h4 class="tra-card-title">Imperial Ivory Sherwani</h4>
+          <p class="tra-card-summary">Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping.</p>
           <div class="tra-card-foot">
-            <span class="tra-card-price">Rs. 9,500</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Mojari (Velvet Leather)">Enquire about this piece</button>
+            <span class="tra-card-price">Rs. 48,000</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Imperial Ivory Sherwani">Enquire about this piece</button>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 4: Emerald Sherwani -->
+      <article class="tra-card" data-outfit="emerald" data-model="{{ 'sherwani-emerald.glb' | asset_url }}" data-product="Emerald Heritage Sherwani">
+        <div class="tra-card-thumb-wrap">
+          <img src="{{ 'royal-owl-mojari.png' | asset_url }}" alt="Emerald Heritage Sherwani" class="tra-card-img" />
+          <span class="tra-drape-pill">Equip in 3D</span>
+        </div>
+        <div class="tra-card-info">
+          <span class="tra-card-cat">Palace Garden Gala Coat</span>
+          <h4 class="tra-card-title">Emerald Heritage Sherwani</h4>
+          <p class="tra-card-summary">Deep royal emerald silk coat inspired by imperial Mughal garden florals with handcrafted filigree cuffs and velvet mojari.</p>
+          <div class="tra-card-foot">
+            <span class="tra-card-price">Rs. 54,000</span>
+            <button type="button" class="tra-enquire-btn" data-piece="Emerald Heritage Sherwani">Enquire about this piece</button>
           </div>
         </div>
       </article>
@@ -236,19 +237,19 @@
           </div>
 
           <div class="tra-presets-list">
-            <button type="button" class="tra-preset-item active" data-preset="coronation" data-outfit="safa">
+            <button type="button" class="tra-preset-item active" data-preset="coronation" data-outfit="maroon">
               <div class="tra-pi-left">
                 <strong>The Maharaja's Coronation</strong>
                 <span>Ivory, Ruby &amp; 24k Gold</span>
               </div>
               <div class="tra-pi-dots">
-                <span class="tra-dot" style="background:#F3DFB2;"></span>
                 <span class="tra-dot" style="background:#8B1E1E;"></span>
+                <span class="tra-dot" style="background:#F3DFB2;"></span>
                 <span class="tra-dot" style="background:#D4AF37;"></span>
               </div>
             </button>
 
-            <button type="button" class="tra-preset-item" data-preset="mewar-starlight" data-outfit="achkan">
+            <button type="button" class="tra-preset-item" data-preset="mewar-starlight" data-outfit="blue">
               <div class="tra-pi-left">
                 <strong>The Mewar Starlight</strong>
                 <span>Lapis Blue, Silver &amp; Amber</span>
@@ -260,7 +261,7 @@
               </div>
             </button>
 
-            <button type="button" class="tra-preset-item" data-preset="garden-gala" data-outfit="dupatta">
+            <button type="button" class="tra-preset-item" data-preset="garden-gala" data-outfit="emerald">
               <div class="tra-pi-left">
                 <strong>The Royal Garden Gala</strong>
                 <span>Emerald, Saffron &amp; Pearl</span>
@@ -272,7 +273,7 @@
               </div>
             </button>
 
-            <button type="button" class="tra-preset-item" data-preset="jodhpur-sunbreak" data-outfit="mojari">
+            <button type="button" class="tra-preset-item" data-preset="jodhpur-sunbreak" data-outfit="ivory">
               <div class="tra-pi-left">
                 <strong>The Jodhpur Sunbreak</strong>
                 <span>Saffron Yellow, Indigo &amp; Pearl</span>
@@ -305,12 +306,12 @@
           <div class="tra-swatches-area">
             <span class="tra-area-label">Pure Silk Dye Swatches</span>
             <div class="tra-swatches-row">
-              <button type="button" class="tra-swatch active" data-outfit="achkan" title="Ivory Brocade" style="background:#F3DFB2;"></button>
-              <button type="button" class="tra-swatch" data-outfit="dupatta" title="Ruby Crimson" style="background:#8B1E1E;"></button>
-              <button type="button" class="tra-swatch" data-outfit="safa" title="Sapphire Midnight" style="background:#1B3B6F;"></button>
-              <button type="button" class="tra-swatch" data-outfit="mojari" title="Emerald Court" style="background:#1E4A38;"></button>
-              <button type="button" class="tra-swatch" data-outfit="achkan" title="Imperial Gold" style="background:#D4AF37;"></button>
-              <button type="button" class="tra-swatch" data-outfit="dupatta" title="Deep Amber" style="background:#C27803;"></button>
+              <button type="button" class="tra-swatch active" data-outfit="maroon" title="Ruby Crimson" style="background:#8B1E1E;"></button>
+              <button type="button" class="tra-swatch" data-outfit="blue" title="Sapphire Midnight" style="background:#1B3B6F;"></button>
+              <button type="button" class="tra-swatch" data-outfit="ivory" title="Ivory Brocade" style="background:#F3DFB2;"></button>
+              <button type="button" class="tra-swatch" data-outfit="emerald" title="Emerald Court" style="background:#1E4A38;"></button>
+              <button type="button" class="tra-swatch" data-outfit="ivory" title="Imperial Gold" style="background:#D4AF37;"></button>
+              <button type="button" class="tra-swatch" data-outfit="maroon" title="Deep Amber" style="background:#C27803;"></button>
             </div>
           </div>
 
@@ -321,7 +322,7 @@
               <span id="tra-hue-label-{{ section.id }}" class="tra-hue-val">0° (Natural)</span>
             </div>
             <input type="range" id="tra-hue-slider-{{ section.id }}" class="tra-hue-range" min="0" max="360" value="0" />
-            <div class="tra-slider-hint">Slide to custom-tint the selected silk in real time on the royal character.</div>
+            <div class="tra-slider-hint">Slide to custom-tint the selected 3D Sherwani in real time on the royal character.</div>
           </div>
 
         </div>
@@ -482,20 +483,50 @@
     pointer-events: none;
   }
 
-  /* WebGL Canvas for 3D Models */
+  /* 3D Spinner */
+  .tra-3d-spinner {
+    position: absolute;
+    top: 40%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #9B1B30;
+    z-index: 5;
+  }
+
+  .tra-spinner-circle {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(155, 27, 48, 0.2);
+    border-top-color: #9B1B30;
+    border-radius: 50%;
+    animation: traSpin 0.8s linear infinite;
+  }
+
+  @keyframes traSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* WebGL Canvas for Rigged 3D Character */
   .tra-3d-webgl-canvas {
     width: 380px;
     height: 520px;
     border-radius: 16px;
     cursor: grab;
     touch-action: none;
+    display: block;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 16px 32px rgba(0,0,0,0.18));
   }
 
   .tra-3d-webgl-canvas:active {
     cursor: grabbing;
   }
 
-  /* Complete, Connected Character Stage (NO CUTS, NO GAPS) */
+  /* Complete, Connected Unified Fallback Stage (NO CUTS, NO GAPS) */
   .tra-mascot-stage {
     position: relative;
     width: 300px;
@@ -535,7 +566,6 @@
     justify-content: center;
   }
 
-  /* High-Definition Master Character Image - Seamless and Connected */
   .tra-unified-character-img {
     width: 100%;
     height: 100%;
@@ -546,7 +576,7 @@
     transition: opacity 0.35s ease, filter 0.35s ease;
   }
 
-  /* 3D 360-degree Interactive Cue */
+  /* 3D 360-Degree Interactive Cue */
   .tra-3d-cue {
     display: flex;
     align-items: center;
@@ -555,22 +585,22 @@
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.06em;
-    color: rgba(30, 22, 16, 0.75);
-    background: rgba(255, 255, 255, 0.5);
+    color: rgba(30, 22, 16, 0.85);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(8px);
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.08);
   }
 
   .tra-3d-cue-icon {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #9B1B30;
   }
 
   /* Dress-up Quick Selection Bar */
   .tra-dressup-bar {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 40px;
@@ -726,7 +756,6 @@
 
   .tra-card.active .tra-drape-pill {
     background: #9B1B30;
-    content: "Equipped";
   }
 
   .tra-card-info {
@@ -1085,6 +1114,7 @@
     .tra-main-heading { font-size: 2.1rem; }
     .tra-product-grid { grid-template-columns: 1fr; }
     .tra-header { padding: 16px; }
+    .tra-3d-webgl-canvas { width: 300px; height: 420px; }
     .tra-mascot-stage { width: 260px; height: 410px; }
   }
 </style>
@@ -1095,13 +1125,32 @@
   var wrapper = document.getElementById("the-royal-attire-" + sectionId);
   if (!wrapper) return;
 
-  // 1. Outfit Map for the Complete Unified Character
+  // 1. OUTFIT MAP (MODULAR 3D GLB MODELS & 2D UNIFIED ASSETS)
   var outfitMap = {
-    safa: "{{ 'royal-owl-safa.png' | asset_url }}",
-    achkan: "{{ 'royal-owl-achkan.png' | asset_url }}",
-    dupatta: "{{ 'royal-owl-dupatta.png' | asset_url }}",
-    mojari: "{{ 'royal-owl-mojari.png' | asset_url }}",
-    master: "{{ 'royal-owl-master.png' | asset_url }}"
+    maroon: {
+      name: "Maroon Royal Sherwani",
+      model: "{{ 'sherwani-maroon.glb' | asset_url }}",
+      img: "{{ 'royal-owl-dupatta.png' | asset_url }}",
+      color: 0x8b1e1e
+    },
+    blue: {
+      name: "Sapphire Blue Jodhpuri",
+      model: "{{ 'sherwani-blue.glb' | asset_url }}",
+      img: "{{ 'royal-owl-achkan.png' | asset_url }}",
+      color: 0x1b3b6f
+    },
+    ivory: {
+      name: "Imperial Ivory Sherwani",
+      model: "{{ 'sherwani-ivory.glb' | asset_url }}",
+      img: "{{ 'royal-owl-safa.png' | asset_url }}",
+      color: 0xf3dfb2
+    },
+    emerald: {
+      name: "Emerald Heritage Sherwani",
+      model: "{{ 'sherwani-emerald.glb' | asset_url }}",
+      img: "{{ 'royal-owl-mojari.png' | asset_url }}",
+      color: 0x1e4a38
+    }
   };
 
   var charImg = document.getElementById("tra-unified-character-" + sectionId);
@@ -1109,89 +1158,168 @@
   var stageEl = document.getElementById("tra-stage-container-" + sectionId);
   var webglCanvas = document.getElementById("tra-3d-webgl-canvas-" + sectionId);
   var mascotStage = document.getElementById("tra-mascot-stage-" + sectionId);
-  var custom3DUrl = "{{ section.settings.custom_3d_model_url }}";
+  var spinner = document.getElementById("tra-3d-spinner-" + sectionId);
 
-  // 2. THREE.JS REAL-TIME 3D RIGGED ENGINE
-  var scene, camera, renderer, character3D, mixer;
-  var headBone = null, neckBone = null, spineBone = null;
-  var is3DLoaded = false;
-  var rotVelocityX = 0, rotVelocityY = 0;
-  var isDragging = false, previousMouseX = 0, previousMouseY = 0;
+  // 2. CONFIGURABLE & REPLACEABLE 3D CHARACTER MODEL URL
+  // Default to royal-owl.glb, or use merchant custom 3D model URL from theme settings
+  var defaultModelUrl = "{{ 'royal-owl.glb' | asset_url }}";
+  var customModelUrl = "{{ section.settings.character_3d_model_url }}";
+  var activeCharacterUrl = (customModelUrl && customModelUrl.trim() !== "") ? customModelUrl.trim() : defaultModelUrl;
 
-  if (custom3DUrl && custom3DUrl.trim() !== "" && typeof THREE !== "undefined") {
-    initThreeJS(custom3DUrl.trim());
-  }
+  // 3. THREE.JS REAL-TIME 3D RIGGED ENGINE
+  var scene, camera, renderer, characterGroup, activeOutfitMesh;
+  var headBone = null, neckBone = null, chestBone = null, spineBone = null, rootBone = null;
+  var outfitMountNode = null;
+  var is3DReady = false;
+  var gltfLoader = null;
 
-  function initThreeJS(modelUrl) {
-    if (!webglCanvas) return;
-    
-    // Setup Scene, Camera & Lighting
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(42, 380 / 520, 0.1, 1000);
-    camera.position.set(0, 1.2, 3.4);
+  // Mouse & 360 Drag Interaction Variables
+  var targetRotY = 0, targetRotX = 0;
+  var currentRotY = 0, currentRotX = 0;
+  var isDragging = false, prevMouseX = 0, orbitAngleY = 0;
 
-    renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, alpha: true, antialias: true });
-    renderer.setSize(380, 520);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-
-    // Warm Royal Studio Lighting
-    var ambientLight = new THREE.AmbientLight(0xfff5e6, 0.85);
-    scene.add(ambientLight);
-
-    var keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-    keyLight.position.set(2, 4, 3);
-    scene.add(keyLight);
-
-    var rimLight = new THREE.DirectionalLight(0xea9b1b, 0.7);
-    rimLight.position.set(-3, 2, -2);
-    scene.add(rimLight);
-
-    // Shadow Floor
-    var shadowGeo = new THREE.PlaneGeometry(3, 3);
-    var shadowMat = new THREE.ShadowMaterial({ opacity: 0.22 });
-    var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
-    shadowPlane.rotation.x = -Math.PI / 2;
-    shadowPlane.position.y = -0.05;
-    scene.add(shadowPlane);
-
-    // Load .GLB / .GLTF 3D Rigged Model
-    if (THREE.GLTFLoader) {
-      var loader = new THREE.GLTFLoader();
-      loader.load(modelUrl, function(gltf) {
-        character3D = gltf.scene;
-        character3D.position.set(0, 0, 0);
-        character3D.scale.set(1, 1, 1);
-        scene.add(character3D);
-
-        // Find rigged skeletal joints / bones
-        character3D.traverse(function(node) {
-          if (node.isBone) {
-            var name = node.name.toLowerCase();
-            if (name.indexOf("head") !== -1) headBone = node;
-            else if (name.indexOf("neck") !== -1) neckBone = node;
-            else if (name.indexOf("spine") !== -1) spineBone = node;
-          }
-          if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-          }
-        });
-
-        // Switch visible views
-        webglCanvas.style.display = "block";
-        if (mascotStage) mascotStage.style.display = "none";
-        is3DLoaded = true;
-
-      }, undefined, function(err) {
-        console.warn("Could not load custom 3D model, using high-definition unified character stage:", err);
-      });
+  function initThreeJSEngine() {
+    if (!webglCanvas || typeof THREE === "undefined") {
+      showFallbackStage();
+      return;
     }
 
-    // 360-degree Interactive Drag Orbit
+    try {
+      // Scene & Perspective Camera
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(38, 380 / 520, 0.1, 100);
+      camera.position.set(0, 1.15, 3.2);
+      camera.lookAt(0, 0.95, 0);
+
+      // WebGL Renderer
+      renderer = new THREE.WebGLRenderer({
+        canvas: webglCanvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance"
+      });
+      renderer.setSize(380, 520);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      // Studio Lighting
+      var ambientLight = new THREE.AmbientLight(0xfff8ee, 0.95);
+      scene.add(ambientLight);
+
+      var keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+      keyLight.position.set(2.5, 4.0, 3.0);
+      keyLight.castShadow = true;
+      scene.add(keyLight);
+
+      var rimLight = new THREE.DirectionalLight(0xea9b1b, 0.75);
+      rimLight.position.set(-2.5, 2.5, -2.0);
+      scene.add(rimLight);
+
+      // Pedestal Contact Shadow Plane
+      var shadowGeo = new THREE.PlaneGeometry(2.4, 2.4);
+      var shadowMat = new THREE.ShadowMaterial({ opacity: 0.28 });
+      var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+      shadowPlane.rotation.x = -Math.PI / 2;
+      shadowPlane.position.y = -0.06;
+      shadowPlane.receiveShadow = true;
+      scene.add(shadowPlane);
+
+      // Character Group container
+      characterGroup = new THREE.Group();
+      scene.add(characterGroup);
+
+      // GLTF Loader
+      if (typeof THREE.GLTFLoader !== "undefined") {
+        gltfLoader = new THREE.GLTFLoader();
+        loadCharacterModel(activeCharacterUrl);
+      } else {
+        showFallbackStage();
+      }
+
+      setup360DragControls();
+      requestAnimationFrame(renderLoop);
+
+    } catch (err) {
+      console.warn("Three.js initialization failed, using high-definition unified character stage:", err);
+      showFallbackStage();
+    }
+  }
+
+  // Load Replaceable 3D Character Model (.glb / .gltf)
+  function loadCharacterModel(modelUrl) {
+    if (!gltfLoader) return;
+    if (spinner) spinner.style.display = "flex";
+
+    gltfLoader.load(modelUrl, function(gltf) {
+      // Clear existing character if swapping
+      while (characterGroup.children.length > 0) {
+        characterGroup.remove(characterGroup.children[0]);
+      }
+
+      var charModel = gltf.scene;
+      charModel.position.set(0, 0, 0);
+      characterGroup.add(charModel);
+
+      // Reset bone references
+      headBone = null;
+      neckBone = null;
+      chestBone = null;
+      spineBone = null;
+      rootBone = null;
+      outfitMountNode = null;
+
+      // Inspect bone rig and assign standard Blender-compatible joints
+      charModel.traverse(function(node) {
+        if (node.isBone || node.type === "Bone") {
+          var name = (node.name || "").toLowerCase();
+          if (name.indexOf("head") !== -1 && !headBone) headBone = node;
+          else if (name.indexOf("neck") !== -1 && !neckBone) neckBone = node;
+          else if (name.indexOf("chest") !== -1 && !chestBone) chestBone = node;
+          else if (name.indexOf("spine") !== -1 && !spineBone) spineBone = node;
+          else if (name.indexOf("root") !== -1 && !rootBone) rootBone = node;
+        }
+        if (node.name && node.name.indexOf("Attachment_Outfit") !== -1) {
+          outfitMountNode = node;
+        }
+        if (node.isMesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+      });
+
+      // Default mount node fallback
+      if (!outfitMountNode) {
+        outfitMountNode = chestBone || spineBone || charModel;
+      }
+
+      // Hide spinner & show WebGL canvas
+      if (spinner) spinner.style.display = "none";
+      webglCanvas.style.display = "block";
+      if (mascotStage) mascotStage.style.display = "none";
+      is3DReady = true;
+
+      // Load initial Sherwani outfit
+      loadSherwaniOutfit("maroon");
+
+    }, undefined, function(error) {
+      console.warn("Could not load 3D GLB model from " + modelUrl + ", falling back to unified character stage:", error);
+      showFallbackStage();
+    });
+  }
+
+  // Fallback Stage when GLB is not loaded
+  function showFallbackStage() {
+    if (spinner) spinner.style.display = "none";
+    if (webglCanvas) webglCanvas.style.display = "none";
+    if (mascotStage) mascotStage.style.display = "flex";
+  }
+
+  // 360-Degree Interactive Drag Controls
+  function setup360DragControls() {
     webglCanvas.addEventListener("mousedown", function(e) {
       isDragging = true;
-      previousMouseX = e.clientX;
+      prevMouseX = e.clientX;
     });
 
     window.addEventListener("mouseup", function() {
@@ -1199,18 +1327,35 @@
     });
 
     window.addEventListener("mousemove", function(e) {
-      if (isDragging && character3D) {
-        var deltaX = e.clientX - previousMouseX;
-        character3D.rotation.y += deltaX * 0.012;
-        previousMouseX = e.clientX;
+      if (isDragging && characterGroup) {
+        var delta = e.clientX - prevMouseX;
+        orbitAngleY += delta * 0.015;
+        prevMouseX = e.clientX;
       }
     });
+
+    // Touch support for mobile 360 dragging
+    webglCanvas.addEventListener("touchstart", function(e) {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        prevMouseX = e.touches[0].clientX;
+      }
+    }, { passive: true });
+
+    window.addEventListener("touchend", function() {
+      isDragging = false;
+    });
+
+    window.addEventListener("touchmove", function(e) {
+      if (isDragging && characterGroup && e.touches.length === 1) {
+        var delta = e.touches[0].clientX - prevMouseX;
+        orbitAngleY += delta * 0.015;
+        prevMouseX = e.touches[0].clientX;
+      }
+    }, { passive: true });
   }
 
-  // 3. REAL-TIME SMOOTH CURSOR GAZE & 3D ORIENTATION ENGINE
-  var targetRotY = 0, targetRotX = 0;
-  var currentRotY = 0, currentRotX = 0;
-
+  // 4. REAL-TIME CURSOR GAZE CALCULATION & SMOOTH EASING
   window.addEventListener("mousemove", function(e) {
     if (!stageEl) return;
     var rect = stageEl.getBoundingClientRect();
@@ -1220,9 +1365,9 @@
     var deltaX = (e.clientX - centerX) / (window.innerWidth * 0.5);
     var deltaY = (e.clientY - centerY) / (window.innerHeight * 0.5);
 
-    // Natural human-like rotational limits
-    targetRotY = Math.max(-22, Math.min(22, deltaX * 22));
-    targetRotX = Math.max(-10, Math.min(10, -deltaY * 10));
+    // Natural human rotational limits (-28° to +28° yaw, -14° to +14° pitch)
+    targetRotY = Math.max(-28, Math.min(28, deltaX * 28));
+    targetRotX = Math.max(-14, Math.min(14, -deltaY * 14));
   }, { passive: true });
 
   window.addEventListener("mouseleave", function() {
@@ -1230,24 +1375,44 @@
     targetRotX = 0;
   });
 
-  // Main 60FPS Animation Loop
-  function animateScene(time) {
-    // 1. Smooth Spring-Damped Interpolation
+  // Main 60FPS Render & Physics Loop
+  function renderLoop(time) {
+    // Smooth Spring-Damped Interpolation
     currentRotY += (targetRotY - currentRotY) * 0.085;
     currentRotX += (targetRotX - currentRotX) * 0.085;
 
-    // 2. Drive 3D Skeletal Bones if loaded
-    if (is3DLoaded && character3D) {
+    // Organic idle breathing wave
+    var breathWave = Math.sin(time * 0.0024);
+
+    if (is3DReady && characterGroup) {
+      // 1. Apply 360 Orbit Rotation to entire character
+      characterGroup.rotation.y = orbitAngleY;
+
+      // 2. Idle breathing vertical expansion
+      characterGroup.position.y = breathWave * 0.015;
+
+      // 3. Drive 3D Head & Neck Bones with real 3D rotation
+      var radYaw = (currentRotY * Math.PI) / 180;
+      var radPitch = (currentRotX * Math.PI) / 180;
+      var radRoll = radYaw * 0.15; // Natural head tilt cocking
+
       if (headBone) {
-        headBone.rotation.y = (currentRotY * Math.PI) / 180 * 0.8;
-        headBone.rotation.x = (currentRotX * Math.PI) / 180 * 0.8;
+        headBone.rotation.y = radYaw * 0.75;
+        headBone.rotation.x = radPitch * 0.85;
+        headBone.rotation.z = radRoll;
       }
       if (neckBone) {
-        neckBone.rotation.y = (currentRotY * Math.PI) / 180 * 0.4;
+        neckBone.rotation.y = radYaw * 0.40;
+        neckBone.rotation.x = radPitch * 0.35;
       }
+      if (chestBone) {
+        chestBone.rotation.y = radYaw * 0.12;
+      }
+
       renderer.render(scene, camera);
+
     } else {
-      // 3. Drive Unified Connected Character with 3D Depth
+      // Drive Fallback Unified Character
       if (gazeRig) {
         var tiltZ = currentRotY * 0.14;
         gazeRig.style.transform = 
@@ -1257,22 +1422,40 @@
       }
     }
 
-    requestAnimationFrame(animateScene);
+    requestAnimationFrame(renderLoop);
   }
-  requestAnimationFrame(animateScene);
 
-  // 4. INSTANT PRODUCT OUTFIT SWITCHING (ALIGNED & CONNECTED)
-  function setCharacterOutfit(outfitKey) {
-    var newSrc = outfitMap[outfitKey] || outfitMap.master;
+  // 5. SHOPIFY PRODUCT-BASED 3D CLOTHING SYSTEM
+  function loadSherwaniOutfit(outfitKey) {
+    var outfitData = outfitMap[outfitKey];
+    if (!outfitData) return;
+
+    // A. 3D Modular Outfit Loading via Three.js
+    if (is3DReady && gltfLoader && outfitMountNode) {
+      gltfLoader.load(outfitData.model, function(gltf) {
+        // Remove previous 3D outfit mesh
+        if (activeOutfitMesh) {
+          outfitMountNode.remove(activeOutfitMesh);
+        }
+        activeOutfitMesh = gltf.scene;
+        activeOutfitMesh.position.set(0, 0, 0);
+        outfitMountNode.add(activeOutfitMesh);
+
+      }, undefined, function(err) {
+        console.warn("Could not load outfit model " + outfitData.model + ", using material tinting:", err);
+      });
+    }
+
+    // B. Unified High-Definition 2D Representation Synchronization
     if (charImg) {
       charImg.style.opacity = "0.75";
       setTimeout(function() {
-        charImg.src = newSrc;
+        charImg.src = outfitData.img;
         charImg.style.opacity = "1";
-      }, 80);
+      }, 70);
     }
 
-    // Update active state in dress-up bar
+    // C. Update active states across UI
     var dressBtns = wrapper.querySelectorAll(".tra-dress-btn");
     dressBtns.forEach(function(btn) {
       if (btn.getAttribute("data-outfit") === outfitKey) {
@@ -1282,23 +1465,25 @@
       }
     });
 
-    // Update active card in product showcase
     var cards = wrapper.querySelectorAll(".tra-card");
     cards.forEach(function(card) {
+      var pill = card.querySelector(".tra-drape-pill");
       if (card.getAttribute("data-outfit") === outfitKey) {
         card.classList.add("active");
+        if (pill) pill.textContent = "Equipped in 3D";
       } else {
         card.classList.remove("active");
+        if (pill) pill.textContent = "Equip in 3D";
       }
     });
   }
 
-  // Bind Dress-up bar buttons
+  // Bind Quick Dress-up bar buttons
   var dressBtns = wrapper.querySelectorAll(".tra-dress-btn");
   dressBtns.forEach(function(btn) {
     btn.addEventListener("click", function() {
       var outfitKey = btn.getAttribute("data-outfit");
-      setCharacterOutfit(outfitKey);
+      loadSherwaniOutfit(outfitKey);
     });
   });
 
@@ -1306,12 +1491,11 @@
   var productCards = wrapper.querySelectorAll(".tra-card");
   productCards.forEach(function(card) {
     card.addEventListener("click", function(e) {
-      // Prevent double trigger if user clicked "Enquire" button directly
       if (e.target.closest(".tra-enquire-btn")) return;
       var outfitKey = card.getAttribute("data-outfit");
-      setCharacterOutfit(outfitKey);
+      loadSherwaniOutfit(outfitKey);
 
-      // Smooth scroll up on mobile screens
+      // Smooth scroll back up to character on small screens
       if (window.innerWidth < 768) {
         var mascotEl = document.getElementById("the-mascot-" + sectionId);
         if (mascotEl) mascotEl.scrollIntoView({ behavior: "smooth" });
@@ -1319,7 +1503,7 @@
     });
   });
 
-  // 5. THE ROYAL STYLIST: AI GENERATION & PARTICLE STARBURST
+  // 6. THE ROYAL STYLIST: AI CUSTOMIZATION & STARBURST
   var magicCanvas = document.getElementById("tra-magic-canvas-" + sectionId);
   var askAiBtn = document.getElementById("tra-ask-ai-btn-" + sectionId);
   var aiBtnText = document.getElementById("tra-ai-btn-text-" + sectionId);
@@ -1330,31 +1514,29 @@
     {
       preset: "coronation",
       title: "The Maharaja's Coronation",
-      outfit: "safa",
+      outfit: "maroon",
       insight: "Pure ivory symbolizes truth and sovereignty, accented by ruby red to honor royal valor and victory in state processions."
     },
     {
       preset: "mewar-starlight",
       title: "The Mewar Starlight",
-      outfit: "achkan",
+      outfit: "blue",
       insight: "Deep celestial lapis blue paired with gleaming gold zari mirrors the starlit skies over Lake Pichola, worn during autumn court banquets."
     },
     {
       preset: "garden-gala",
       title: "The Royal Garden Gala",
-      outfit: "dupatta",
+      outfit: "emerald",
       insight: "Vibrant emerald silk embellished with marigold saffron captures the vitality of royal palace gardens in bloom."
     },
     {
       preset: "jodhpur-sunbreak",
       title: "The Jodhpur Sunbreak",
-      outfit: "mojari",
+      outfit: "ivory",
       insight: "Warm sunbreak yellow paired with indigo trims celebrates the sun-drenched ramparts of Mehrangarh Fort."
     }
   ];
 
-  // Particle Starburst Canvas Animation
-  var particles = [];
   function triggerStarburst(x, y) {
     if (!magicCanvas) return;
     magicCanvas.width = window.innerWidth;
@@ -1362,6 +1544,7 @@
     var ctx = magicCanvas.getContext("2d");
 
     var colors = ["#FFD700", "#FF1744", "#00E5FF", "#E040FB", "#FFF"];
+    var particles = [];
     for (var i = 0; i < 90; i++) {
       var angle = Math.random() * Math.PI * 2;
       var speed = 3 + Math.random() * 8;
@@ -1401,7 +1584,6 @@
       if (alive) {
         requestAnimationFrame(renderParticles);
       } else {
-        particles = [];
         ctx.clearRect(0, 0, magicCanvas.width, magicCanvas.height);
       }
     }
@@ -1412,19 +1594,17 @@
   if (askAiBtn) {
     askAiBtn.addEventListener("click", function(e) {
       if (aiBtnText) aiBtnText.textContent = "AI Consulting Court Lore...";
-
       var rect = askAiBtn.getBoundingClientRect();
       var clickX = rect.left + rect.width / 2;
       var clickY = rect.top + rect.height / 2;
 
       setTimeout(function() {
         var choice = royalAiPresets[Math.floor(Math.random() * royalAiPresets.length)];
-        setCharacterOutfit(choice.outfit);
+        loadSherwaniOutfit(choice.outfit);
 
         if (insightTitle) insightTitle.textContent = choice.title;
         if (insightDesc) insightDesc.textContent = choice.insight;
 
-        // Update preset list active state
         var pItems = wrapper.querySelectorAll(".tra-preset-item");
         pItems.forEach(function(item) {
           if (item.getAttribute("data-preset") === choice.preset) {
@@ -1447,7 +1627,7 @@
       var pName = item.getAttribute("data-preset");
       var matched = royalAiPresets.find(function(rp) { return rp.preset === pName; });
       if (matched) {
-        setCharacterOutfit(matched.outfit);
+        loadSherwaniOutfit(matched.outfit);
         if (insightTitle) insightTitle.textContent = matched.title;
         if (insightDesc) insightDesc.textContent = matched.insight;
 
@@ -1465,7 +1645,7 @@
   swatches.forEach(function(sw) {
     sw.addEventListener("click", function() {
       var pal = sw.getAttribute("data-outfit");
-      setCharacterOutfit(pal);
+      loadSherwaniOutfit(pal);
       swatches.forEach(function(s) { s.classList.remove("active"); });
       sw.classList.add("active");
     });
@@ -1479,10 +1659,17 @@
       var deg = hueSlider.value;
       if (hueLabel) hueLabel.textContent = deg + "° Custom Tint";
       if (charImg) charImg.style.filter = "hue-rotate(" + deg + "deg) drop-shadow(0 14px 28px rgba(0,0,0,0.18))";
+      if (activeOutfitMesh) {
+        activeOutfitMesh.traverse(function(node) {
+          if (node.isMesh && node.material && node.material.color) {
+            node.material.color.setHSL((deg / 360), 0.7, 0.45);
+          }
+        });
+      }
     });
   }
 
-  // Enquire Buttons Toast / Alert
+  // Enquire Buttons Alert
   var enquireBtns = wrapper.querySelectorAll(".tra-enquire-btn");
   enquireBtns.forEach(function(btn) {
     btn.addEventListener("click", function() {
@@ -1490,6 +1677,13 @@
       alert("Thank you for your royal enquiry for \"" + piece + "\". Our master atelier specialist will reach out to schedule your private fitting.");
     });
   });
+
+  // Initialize Three.js Engine on DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initThreeJSEngine);
+  } else {
+    initThreeJSEngine();
+  }
 
 })();
 </script>
@@ -1532,17 +1726,17 @@
       "type": "textarea",
       "id": "description",
       "label": "Hero Description",
-      "default": "Explore handcrafted heritage regalia. Select any piece below to instantly dress our royal mascot in authentic court attire."
+      "default": "Explore handcrafted heritage regalia. Select any piece below to instantly dress our 3D royal character in authentic court attire."
     },
     {
       "type": "header",
-      "content": "3D Character Model (.glb / .gltf)"
+      "content": "Replaceable 3D Character Model (.glb / .gltf)"
     },
     {
       "type": "text",
-      "id": "custom_3d_model_url",
-      "label": "Custom 3D Model URL (.glb)",
-      "info": "Upload your rigged 3D character model (.glb) in Shopify Admin > Content > Files, and paste the URL here for full real-time 3D rendering with cursor head-tracking and 360-degree rotation."
+      "id": "character_3d_model_url",
+      "label": "Custom 3D Character Model URL (.glb)",
+      "info": "Leave blank to use the built-in royal character. You can replace the 3D character anytime by uploading your rigged .glb model to Shopify Admin > Content > Files and pasting the URL here."
     },
     {
       "type": "header",

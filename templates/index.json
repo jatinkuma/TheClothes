@@ -9,20 +9,6 @@
  */
 {
   "sections": {
-    "interactive_hero_3d": {
-      "type": "interactive-hero-3d",
-      "settings": {
-        "brand_title": "The Royal Attire *",
-        "subheading": "THE COLLECTION",
-        "heading": "Worn by royalty, made by hand",
-        "description": "Step into the royal atelier. Hand-spun silk, royal zardozi, and time-honored Indian craftsmanship brought alive in interactive 3D.",
-        "bg_color": "#E2A522",
-        "character_model_url": "",
-        "tracking_sensitivity": 28,
-        "enable_butterfly": true,
-        "butterfly_color": "#00E5FF"
-      }
-    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -318,7 +304,7 @@
         "subtitle": "THE COLLECTION",
         "heading": "Worn by royalty, made by hand",
         "description": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal owl in handcrafted Indian heritage attire.",
-        "enable_butterfly": true,
+        "character_3d_model_url": "",
         "enable_ai_stylist": true
       }
     },
@@ -415,7 +401,6 @@
         "doll_max_height": 560,
         "enable_idle_float": true,
         "enable_doll_cursor_tracking": true,
-        "custom_3d_model_url": "",
         "enable_butterfly": true,
         "butterfly_speed": 8,
         "bg_color": "#fbf2e1",
@@ -425,13 +410,28 @@
         "padding_top": 60,
         "padding_bottom": 80
       }
+    },
+    "interactive_hero_3d_QnGc3H": {
+      "type": "interactive-hero-3d",
+      "name": "3D Mascot Hero",
+      "settings": {
+        "brand_title": "The Royal Attire *",
+        "subheading": "THE COLLECTION",
+        "heading": "Worn by royalty, made by hand",
+        "description": "Step into the royal atelier. Hand-spun silk, royal zardozi, and time-honored Indian craftsmanship brought alive in interactive 3D.",
+        "bg_color": "#e2a522",
+        "character_model_url": "",
+        "tracking_sensitivity": 28,
+        "enable_butterfly": true,
+        "butterfly_color": "#00e5ff"
+      }
     }
   },
   "order": [
-    "interactive_hero_3d",
     "hero_jVaWmY",
     "product_list_fa6P9H",
     "the_royal_attire",
-    "interactive_royal_doll_JwazkP"
+    "interactive_royal_doll_JwazkP",
+    "interactive_hero_3d_QnGc3H"
   ]
 }

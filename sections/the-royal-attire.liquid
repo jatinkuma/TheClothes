@@ -1169,6 +1169,7 @@
   // 3. THREE.JS REAL-TIME 3D RIGGED ENGINE
   var scene, camera, renderer, characterGroup, activeOutfitMesh;
   var headBone = null, neckBone = null, chestBone = null, spineBone = null, rootBone = null;
+  var eyeLeftBone = null, eyeRightBone = null;
   var outfitMountNode = null;
   var is3DReady = false;
   var gltfLoader = null;
@@ -1270,6 +1271,8 @@
       outfitMountNode = null;
 
       // Inspect bone rig and assign standard Blender-compatible joints
+      eyeLeftBone = null;
+      eyeRightBone = null;
       charModel.traverse(function(node) {
         if (node.isBone || node.type === "Bone") {
           var name = (node.name || "").toLowerCase();
@@ -1278,6 +1281,8 @@
           else if (name.indexOf("chest") !== -1 && !chestBone) chestBone = node;
           else if (name.indexOf("spine") !== -1 && !spineBone) spineBone = node;
           else if (name.indexOf("root") !== -1 && !rootBone) rootBone = node;
+          else if ((name.indexOf("eye.l") !== -1 || name === "eye_l" || name === "eye.l") && !eyeLeftBone) eyeLeftBone = node;
+          else if ((name.indexOf("eye.r") !== -1 || name === "eye_r" || name === "eye.r") && !eyeRightBone) eyeRightBone = node;
         }
         if (node.name && node.name.indexOf("Attachment_Outfit") !== -1) {
           outfitMountNode = node;
@@ -1407,6 +1412,29 @@
       }
       if (chestBone) {
         chestBone.rotation.y = radYaw * 0.12;
+      }
+
+      // 4. Drive 3D Eyes (Real-Time Cursor/Butterfly Gaze Tracking & Natural Blinking)
+      var eyeYaw = radYaw * 1.25;   // Eyes dart dynamically toward cursor/butterfly
+      var eyePitch = radPitch * 1.35;
+
+      // Natural organic blinking wave (brief blink pulse every ~3.5 seconds)
+      var blinkProgress = (time % 3600) / 3600;
+      var blinkScale = 1.0;
+      if (blinkProgress > 0.955) {
+        var bt = (blinkProgress - 0.955) / 0.045;
+        blinkScale = 1.0 - Math.sin(bt * Math.PI) * 0.90;
+      }
+
+      if (eyeLeftBone) {
+        eyeLeftBone.rotation.y = eyeYaw;
+        eyeLeftBone.rotation.x = eyePitch;
+        eyeLeftBone.scale.z = blinkScale;
+      }
+      if (eyeRightBone) {
+        eyeRightBone.rotation.y = eyeYaw;
+        eyeRightBone.rotation.x = eyePitch;
+        eyeRightBone.scale.z = blinkScale;
       }
 
       renderer.render(scene, camera);

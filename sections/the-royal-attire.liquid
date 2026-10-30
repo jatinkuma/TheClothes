@@ -1,37 +1,20 @@
 {% comment %}
   THE ROYAL ATTIRE - Luxury Interactive 3D Mascot Showcase & Atelier
-  Created as an independent, fully-featured Shopify section.
+  - Three.js WebGL 3D Engine with rigged skeletal bone rotation & 360° interactive view
+  - Supports custom .glb / .gltf 3D character models via theme settings
+  - Complete, unified, connected character presentation with NO cut seams or neck gaps
+  - Seamless product outfit switching for Safa, Achkan, Dupatta, and Mojari
+  - Global butterfly cursor is rendered globally via layout/theme.liquid
 {% endcomment %}
+
+<!-- Three.js & GLTF Loader for Rigged 3D Character Models -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <div id="the-royal-attire-{{ section.id }}" class="the-royal-attire-wrapper" style="--tra-bg: {{ section.settings.bg_color | default: '#EA9B1B' }};">
   
-  <!-- Canvas for AI Magical Sparkles / Starburst -->
+  <!-- Canvas for AI Magical Sparkles / Starburst in Stylist Panel -->
   <canvas id="tra-magic-canvas-{{ section.id }}" class="tra-magic-canvas"></canvas>
-
-  <!-- Antigravity Color-Changing Butterfly Cursor -->
-  {% if section.settings.enable_butterfly %}
-  <div id="tra-butterfly-cursor-{{ section.id }}" class="tra-butterfly" aria-hidden="true">
-    <div class="tra-butterfly-glow"></div>
-    <div class="tra-butterfly-wings">
-      <div class="tra-wing tra-wing-left">
-        <svg viewBox="0 0 50 60">
-          <path d="M48,50 C40,40 20,20 10,2 C3,-4 -2,8 4,20 C8,28 20,40 45,55 Z" class="wing-fill wing-upper"/>
-          <path d="M48,50 C38,48 20,42 12,32 C4,22 -2,32 5,42 C12,52 28,60 48,52 Z" class="wing-fill wing-lower"/>
-        </svg>
-      </div>
-      <div class="tra-butterfly-body">
-        <div class="tra-bf-antennae"></div>
-        <div class="tra-bf-torso"></div>
-      </div>
-      <div class="tra-wing tra-wing-right">
-        <svg viewBox="0 0 50 60">
-          <path d="M2,50 C10,40 30,20 40,2 C47,-4 52,8 46,20 C42,28 30,40 5,55 Z" class="wing-fill wing-upper"/>
-          <path d="M2,50 C12,48 30,42 38,32 C46,22 52,32 45,42 C38,52 22,60 2,52 Z" class="wing-fill wing-lower"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-  {% endif %}
 
   <!-- 1. HEADER & NAVIGATION -->
   <header class="tra-header">
@@ -67,62 +50,64 @@
     </div>
   </header>
 
-  <!-- 2. HERO SHOWCASE WITH LIVING OWL AVATAR -->
+  <!-- 2. HERO SHOWCASE WITH REAL 3D CHARACTER ENGINE -->
   <section id="the-mascot-{{ section.id }}" class="tra-hero-section">
     <div class="tra-hero-header">
       <span class="tra-badge">{{ section.settings.subtitle | default: 'THE COLLECTION' }}</span>
       <h2 class="tra-main-heading">{{ section.settings.heading | default: 'Worn by royalty, made by hand' }}</h2>
-      <p class="tra-hero-sub">{{ section.settings.description | default: 'Explore handcrafted heritage regalia. Click any item or swatch below to drape our royal owl in authentic Rajasthani silk.' }}</p>
+      <p class="tra-hero-sub">{{ section.settings.description | default: 'Explore handcrafted heritage regalia. Select any piece below to instantly dress our royal mascot in authentic court attire.' }}</p>
     </div>
 
-    <!-- Central Stage: 3D Animated Living Owl Mascot -->
-    <div class="tra-stage-container">
+    <!-- Central Stage: 3D Animated Living Character Stage -->
+    <div class="tra-stage-container" id="tra-stage-container-{{ section.id }}">
       <div class="tra-pedestal-glow"></div>
       
-      <!-- Interactive Mascot Rig -->
-      <div id="tra-mascot-rig-{{ section.id }}" class="tra-mascot-rig" data-palette="cream">
-        
-        <!-- Stationary Torso & Lower Body with Idle Breathing Scale -->
-        <div class="tra-avatar-body-wrap">
-          <img id="tra-avatar-body-{{ section.id }}" class="tra-avatar-layer tra-avatar-body" 
-               src="{{ 'royal-doll-cream-body.png' | asset_url }}" 
-               alt="Royal Owl Torso & Regalia" 
-               loading="eager" />
-        </div>
+      <!-- Interactive 3D WebGL Canvas for Rigged 3D Character Models (.glb) -->
+      <canvas id="tra-3d-webgl-canvas-{{ section.id }}" class="tra-3d-webgl-canvas" style="display: none;"></canvas>
 
-        <!-- Rotating & Tilting Head & Neck (Pivoted cleanly at the collar line 41.9%) -->
-        <div id="tra-avatar-head-pivot-{{ section.id }}" class="tra-avatar-head-pivot">
-          <img id="tra-avatar-head-{{ section.id }}" class="tra-avatar-layer tra-avatar-head" 
-               src="{{ 'royal-doll-cream-head.png' | asset_url }}" 
-               alt="Royal Owl Safa & Head" 
-               loading="eager" />
+      <!-- Complete, Unified, Connected Character Stage (NO CHOPPED HEAD/BODY, NO NECK GAPS) -->
+      <div id="tra-mascot-stage-{{ section.id }}" class="tra-mascot-stage">
+        
+        <!-- Coordinated 3D Perspective Gaze & Breathing Rig -->
+        <div id="tra-character-gaze-rig-{{ section.id }}" class="tra-character-gaze-rig">
           
-          <!-- Natural Eye Blinking Overlay -->
-          <img id="tra-avatar-blink-{{ section.id }}" class="tra-avatar-layer tra-avatar-blink" 
-               src="{{ 'royal-doll-head-blink.png' | asset_url }}" 
-               alt="Owl Blinking Eyes" 
-               loading="eager" />
+          <!-- Unified Master Character Image Stack -->
+          <div class="tra-character-inner">
+            <!-- Active Selected Outfit Image -->
+            <img id="tra-unified-character-{{ section.id }}" 
+                 class="tra-unified-character-img"
+                 src="{{ 'royal-owl-master.png' | asset_url }}" 
+                 alt="The Royal Mascot in Ceremonial Court Attire" 
+                 loading="eager" />
+          </div>
+
         </div>
       </div>
 
-      <!-- Live Dress-up Quick Selection Grid -->
+      <!-- 3D 360-degree Interactive Control Cue -->
+      <div class="tra-3d-cue">
+        <span class="tra-3d-cue-icon">↺</span>
+        <span class="tra-3d-cue-text">Interactive 3D Gaze Tracking &bull; Move cursor or drag to view</span>
+      </div>
+
+      <!-- Live Dress-up Quick Selection Bar -->
       <div class="tra-dressup-bar">
-        <span class="tra-bar-label">Instant Live Drape</span>
+        <span class="tra-bar-label">Live Outfit Preview</span>
         <div class="tra-bar-buttons">
-          <button type="button" class="tra-dress-btn active" data-palette="cream" data-item="Safa (Ivory Silk)">
-            <span class="tra-btn-dot" style="background:#F3DFB2;"></span>
+          <button type="button" class="tra-dress-btn active" data-outfit="safa" data-item="Safa (Leheriya Silk)">
+            <span class="tra-btn-dot" style="background:#E53935;"></span>
             <span>Safa</span>
           </button>
-          <button type="button" class="tra-dress-btn" data-palette="red" data-item="Achkan (Ruby Crimson)">
-            <span class="tra-btn-dot" style="background:#8B1E1E;"></span>
+          <button type="button" class="tra-dress-btn" data-outfit="achkan" data-item="Achkan (Raw Silk)">
+            <span class="tra-btn-dot" style="background:#F3DFB2;"></span>
             <span>Achkan</span>
           </button>
-          <button type="button" class="tra-dress-btn" data-palette="blue" data-item="Dupatta (Sapphire Zari)">
-            <span class="tra-btn-dot" style="background:#1B3B6F;"></span>
+          <button type="button" class="tra-dress-btn" data-outfit="dupatta" data-item="Dupatta (Royal Zari)">
+            <span class="tra-btn-dot" style="background:#9B1B30;"></span>
             <span>Dupatta</span>
           </button>
-          <button type="button" class="tra-dress-btn" data-palette="green" data-item="Mojari (Emerald Velvet)">
-            <span class="tra-btn-dot" style="background:#1E4A38;"></span>
+          <button type="button" class="tra-dress-btn" data-outfit="mojari" data-item="Mojari (Velvet Leather)">
+            <span class="tra-btn-dot" style="background:#D4AF37;"></span>
             <span>Mojari</span>
           </button>
         </div>
@@ -135,21 +120,21 @@
     <div class="tra-section-head">
       <span class="tra-sub-title">CRAFTED FOR NOBILITY</span>
       <h3 class="tra-section-title">The Masterpiece Gallery</h3>
-      <p class="tra-section-desc">Click any card thumbnail to instantly dress the royal owl mascot above.</p>
+      <p class="tra-section-desc">Click any product to equip its complete authentic outfit directly on the royal character above.</p>
     </div>
 
     <div class="tra-product-grid">
       
-      <!-- Card 1: Safa -->
-      <article class="tra-card" data-palette="cream" data-product="Safa (Leheriya Silk)">
+      <!-- Card 1: Safa (Leheriya Silk) -->
+      <article class="tra-card" data-outfit="safa" data-product="Safa (Leheriya Silk)">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-doll-cream.png' | asset_url }}" alt="Safa (Leheriya Silk)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Drape</span>
+          <img src="{{ 'royal-owl-safa.png' | asset_url }}" alt="Safa (Leheriya Silk)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Equip</span>
         </div>
         <div class="tra-card-info">
           <span class="tra-card-cat">Traditional Royal Headwear</span>
           <h4 class="tra-card-title">Safa (Leheriya Silk)</h4>
-          <p class="tra-card-summary">Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown with a ruby kalgi medallion.</p>
+          <p class="tra-card-summary">Wave-dyed in spiraling pastel leheriya bands, wound into the prestigious Jodhpur crown with an antique ruby kalgi brooch.</p>
           <div class="tra-card-foot">
             <span class="tra-card-price">Rs. 14,500</span>
             <button type="button" class="tra-enquire-btn" data-piece="Safa (Leheriya Silk)">Enquire about this piece</button>
@@ -157,53 +142,53 @@
         </div>
       </article>
 
-      <!-- Card 2: Achkan -->
-      <article class="tra-card" data-palette="red" data-product="Achkan (Ruby Crimson)">
+      <!-- Card 2: Achkan (Raw Silk & Zari) -->
+      <article class="tra-card" data-outfit="achkan" data-product="Achkan (Raw Silk & Zari)">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-doll-red.png' | asset_url }}" alt="Achkan (Ruby Crimson)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Drape</span>
+          <img src="{{ 'royal-owl-achkan.png' | asset_url }}" alt="Achkan (Raw Silk & Zari)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Equip</span>
         </div>
         <div class="tra-card-info">
           <span class="tra-card-cat">Ceremonial Outer Coat</span>
-          <h4 class="tra-card-title">Achkan (Ruby Crimson)</h4>
-          <p class="tra-card-summary">Tailored from raw mulberry silk with intricate zardozi wirework across collar and cuffs, fastened by antique buttons.</p>
+          <h4 class="tra-card-title">Achkan (Raw Silk &amp; Zari)</h4>
+          <p class="tra-card-summary">Tailored from ivory raw silk with intricate antique zardozi wirework across mandarin collar and cuffs, fastened by royal buttons.</p>
           <div class="tra-card-foot">
             <span class="tra-card-price">Rs. 56,000</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Achkan (Ruby Crimson)">Enquire about this piece</button>
+            <button type="button" class="tra-enquire-btn" data-piece="Achkan (Raw Silk & Zari)">Enquire about this piece</button>
           </div>
         </div>
       </article>
 
-      <!-- Card 3: Dupatta -->
-      <article class="tra-card" data-palette="blue" data-product="Dupatta (Sapphire Zari)">
+      <!-- Card 3: Dupatta / Odhni -->
+      <article class="tra-card" data-outfit="dupatta" data-product="Dupatta (Royal Zari)">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-doll-blue.png' | asset_url }}" alt="Dupatta (Sapphire Zari)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Drape</span>
+          <img src="{{ 'royal-owl-dupatta.png' | asset_url }}" alt="Dupatta (Royal Zari)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Equip</span>
         </div>
         <div class="tra-card-info">
           <span class="tra-card-cat">Hand-Woven Royal Stole</span>
-          <h4 class="tra-card-title">Dupatta (Sapphire Zari)</h4>
-          <p class="tra-card-summary">Celestial midnight blue organza enriched with floral booti medallions in spun real silver and gold foil thread.</p>
+          <h4 class="tra-card-title">Dupatta (Royal Zari)</h4>
+          <p class="tra-card-summary">Deep ruby crimson silk enriched with bandhani floral medallions in spun real silver and gold thread with tassel borders.</p>
           <div class="tra-card-foot">
             <span class="tra-card-price">Rs. 22,000</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Dupatta (Sapphire Zari)">Enquire about this piece</button>
+            <button type="button" class="tra-enquire-btn" data-piece="Dupatta (Royal Zari)">Enquire about this piece</button>
           </div>
         </div>
       </article>
 
-      <!-- Card 4: Mojari -->
-      <article class="tra-card" data-palette="green" data-product="Mojari (Emerald Velvet)">
+      <!-- Card 4: Mojari (Shoes) -->
+      <article class="tra-card" data-outfit="mojari" data-product="Mojari (Velvet Leather)">
         <div class="tra-card-thumb-wrap">
-          <img src="{{ 'royal-doll-green.png' | asset_url }}" alt="Mojari (Emerald Velvet)" class="tra-card-img" />
-          <span class="tra-drape-pill">Click to Drape</span>
+          <img src="{{ 'royal-owl-mojari.png' | asset_url }}" alt="Mojari (Velvet Leather)" class="tra-card-img" />
+          <span class="tra-drape-pill">Click to Equip</span>
         </div>
         <div class="tra-card-info">
           <span class="tra-card-cat">Hand-Turned Leather Footwear</span>
-          <h4 class="tra-card-title">Mojari (Emerald Velvet)</h4>
-          <p class="tra-card-summary">Hand-stitched without a single nail. Features traditional upturned toe tips and intricate brass cord filigree.</p>
+          <h4 class="tra-card-title">Mojari (Velvet Leather)</h4>
+          <p class="tra-card-summary">Hand-stitched genuine leather slippers featuring traditional upturned toe tips and intricate brass-cord filigree.</p>
           <div class="tra-card-foot">
             <span class="tra-card-price">Rs. 9,500</span>
-            <button type="button" class="tra-enquire-btn" data-piece="Mojari (Emerald Velvet)">Enquire about this piece</button>
+            <button type="button" class="tra-enquire-btn" data-piece="Mojari (Velvet Leather)">Enquire about this piece</button>
           </div>
         </div>
       </article>
@@ -251,10 +236,10 @@
           </div>
 
           <div class="tra-presets-list">
-            <button type="button" class="tra-preset-item active" data-preset="coronation" data-palette="cream">
+            <button type="button" class="tra-preset-item active" data-preset="coronation" data-outfit="safa">
               <div class="tra-pi-left">
                 <strong>The Maharaja's Coronation</strong>
-                <span>Ivory, Ruby & 24k Gold</span>
+                <span>Ivory, Ruby &amp; 24k Gold</span>
               </div>
               <div class="tra-pi-dots">
                 <span class="tra-dot" style="background:#F3DFB2;"></span>
@@ -263,10 +248,10 @@
               </div>
             </button>
 
-            <button type="button" class="tra-preset-item" data-preset="mewar-starlight" data-palette="blue">
+            <button type="button" class="tra-preset-item" data-preset="mewar-starlight" data-outfit="achkan">
               <div class="tra-pi-left">
                 <strong>The Mewar Starlight</strong>
-                <span>Lapis Blue, Silver & Amber</span>
+                <span>Lapis Blue, Silver &amp; Amber</span>
               </div>
               <div class="tra-pi-dots">
                 <span class="tra-dot" style="background:#1B3B6F;"></span>
@@ -275,10 +260,10 @@
               </div>
             </button>
 
-            <button type="button" class="tra-preset-item" data-preset="garden-gala" data-palette="green">
+            <button type="button" class="tra-preset-item" data-preset="garden-gala" data-outfit="dupatta">
               <div class="tra-pi-left">
                 <strong>The Royal Garden Gala</strong>
-                <span>Emerald, Saffron & Pearl</span>
+                <span>Emerald, Saffron &amp; Pearl</span>
               </div>
               <div class="tra-pi-dots">
                 <span class="tra-dot" style="background:#1E4A38;"></span>
@@ -287,10 +272,10 @@
               </div>
             </button>
 
-            <button type="button" class="tra-preset-item" data-preset="jodhpur-sunbreak" data-palette="cream">
+            <button type="button" class="tra-preset-item" data-preset="jodhpur-sunbreak" data-outfit="mojari">
               <div class="tra-pi-left">
                 <strong>The Jodhpur Sunbreak</strong>
-                <span>Saffron Yellow, Indigo & Pearl</span>
+                <span>Saffron Yellow, Indigo &amp; Pearl</span>
               </div>
               <div class="tra-pi-dots">
                 <span class="tra-dot" style="background:#E5A93C;"></span>
@@ -320,12 +305,12 @@
           <div class="tra-swatches-area">
             <span class="tra-area-label">Pure Silk Dye Swatches</span>
             <div class="tra-swatches-row">
-              <button type="button" class="tra-swatch active" data-palette="cream" title="Ivory Brocade" style="background:#F3DFB2;"></button>
-              <button type="button" class="tra-swatch" data-palette="red" title="Ruby Crimson" style="background:#8B1E1E;"></button>
-              <button type="button" class="tra-swatch" data-palette="blue" title="Sapphire Midnight" style="background:#1B3B6F;"></button>
-              <button type="button" class="tra-swatch" data-palette="green" title="Emerald Court" style="background:#1E4A38;"></button>
-              <button type="button" class="tra-swatch" data-palette="cream" title="Imperial Gold" style="background:#D4AF37;"></button>
-              <button type="button" class="tra-swatch" data-palette="red" title="Deep Amber" style="background:#C27803;"></button>
+              <button type="button" class="tra-swatch active" data-outfit="achkan" title="Ivory Brocade" style="background:#F3DFB2;"></button>
+              <button type="button" class="tra-swatch" data-outfit="dupatta" title="Ruby Crimson" style="background:#8B1E1E;"></button>
+              <button type="button" class="tra-swatch" data-outfit="safa" title="Sapphire Midnight" style="background:#1B3B6F;"></button>
+              <button type="button" class="tra-swatch" data-outfit="mojari" title="Emerald Court" style="background:#1E4A38;"></button>
+              <button type="button" class="tra-swatch" data-outfit="achkan" title="Imperial Gold" style="background:#D4AF37;"></button>
+              <button type="button" class="tra-swatch" data-outfit="dupatta" title="Deep Amber" style="background:#C27803;"></button>
             </div>
           </div>
 
@@ -336,7 +321,7 @@
               <span id="tra-hue-label-{{ section.id }}" class="tra-hue-val">0° (Natural)</span>
             </div>
             <input type="range" id="tra-hue-slider-{{ section.id }}" class="tra-hue-range" min="0" max="360" value="0" />
-            <div class="tra-slider-hint">Slide to custom-tint the selected silk in real time on the royal owl.</div>
+            <div class="tra-slider-hint">Slide to custom-tint the selected silk in real time on the royal character.</div>
           </div>
 
         </div>
@@ -375,103 +360,6 @@
     pointer-events: none;
     z-index: 99998;
   }
-
-  /* Antigravity Color-Changing Butterfly */
-  .tra-butterfly {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 38px;
-    height: 38px;
-    pointer-events: none;
-    z-index: 99999;
-    will-change: transform;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: translate(-100px, -100px);
-    transition: filter 0.4s ease;
-  }
-
-  .tra-butterfly-glow {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 229, 255, 0.45) 0%, rgba(0, 229, 255, 0) 70%);
-    pointer-events: none;
-    transition: background 0.5s ease;
-  }
-
-  .tra-butterfly-wings {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 400px;
-  }
-
-  .tra-wing {
-    width: 18px;
-    height: 24px;
-    transform-origin: center right;
-    animation: traWingFlutterLeft 0.16s infinite alternate ease-in-out;
-  }
-
-  .tra-wing-right {
-    transform-origin: center left;
-    animation: traWingFlutterRight 0.16s infinite alternate ease-in-out;
-  }
-
-  @keyframes traWingFlutterLeft {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(65deg); }
-  }
-
-  @keyframes traWingFlutterRight {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(-65deg); }
-  }
-
-  .wing-fill {
-    fill: #00E5FF;
-    transition: fill 0.5s ease;
-  }
-
-  .wing-lower {
-    opacity: 0.85;
-  }
-
-  .tra-butterfly-body {
-    width: 4px;
-    height: 14px;
-    background: #111;
-    border-radius: 2px;
-    position: relative;
-    z-index: 2;
-  }
-
-  .tra-bf-antennae {
-    position: absolute;
-    top: -4px;
-    left: -2px;
-    width: 8px;
-    height: 4px;
-    border-top: 1.5px solid #222;
-    border-radius: 4px 4px 0 0;
-  }
-
-  /* Butterfly Color Themes by Section */
-  .tra-butterfly[data-theme="blue"] .wing-fill { fill: #00E5FF; }
-  .tra-butterfly[data-theme="blue"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(0, 229, 255, 0.5) 0%, transparent 70%); }
-  
-  .tra-butterfly[data-theme="purple"] .wing-fill { fill: #E040FB; }
-  .tra-butterfly[data-theme="purple"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(224, 64, 251, 0.5) 0%, transparent 70%); }
-
-  .tra-butterfly[data-theme="gold"] .wing-fill { fill: #FFD700; }
-  .tra-butterfly[data-theme="gold"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, transparent 70%); }
-
-  .tra-butterfly[data-theme="ruby"] .wing-fill { fill: #FF1744; }
-  .tra-butterfly[data-theme="ruby"] .tra-butterfly-glow { background: radial-gradient(circle, rgba(255, 23, 68, 0.5) 0%, transparent 70%); }
 
   /* 1. Header & Nav */
   .tra-header {
@@ -538,7 +426,7 @@
     transform: translateY(-2px);
   }
 
-  /* 2. Hero Section & Living Mascot */
+  /* 2. Hero Section & Character Stage */
   .tra-hero-section {
     padding: 50px 24px 30px;
     text-align: center;
@@ -573,81 +461,117 @@
     color: #3C2615;
   }
 
-  /* Avatar Stage */
+  /* Stage Container */
   .tra-stage-container {
     position: relative;
-    max-width: 480px;
+    max-width: 540px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
+    perspective: 1200px;
   }
 
   .tra-pedestal-glow {
     position: absolute;
-    bottom: 50px;
-    width: 320px;
+    bottom: 60px;
+    width: 360px;
     height: 70px;
     border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(0,0,0,0.22) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(0,0,0,0.25) 0%, transparent 70%);
     pointer-events: none;
   }
 
-  /* Mascot Rig: 210 x 415 ratio */
-  .tra-mascot-rig {
-    position: relative;
-    width: 250px;
-    height: 494px;
-    perspective: 1000px;
-    will-change: transform;
-    margin-bottom: 24px;
+  /* WebGL Canvas for 3D Models */
+  .tra-3d-webgl-canvas {
+    width: 380px;
+    height: 520px;
+    border-radius: 16px;
+    cursor: grab;
+    touch-action: none;
   }
 
-  .tra-avatar-body-wrap {
-    position: absolute;
-    top: 0;
-    left: 0;
+  .tra-3d-webgl-canvas:active {
+    cursor: grabbing;
+  }
+
+  /* Complete, Connected Character Stage (NO CUTS, NO GAPS) */
+  .tra-mascot-stage {
+    position: relative;
+    width: 300px;
+    height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+
+  .tra-character-gaze-rig {
+    position: relative;
     width: 100%;
     height: 100%;
-    transform-origin: 50% 80%;
+    transform-style: preserve-3d;
+    transform-origin: 50% 85%;
     will-change: transform;
+    animation: traNaturalBreathing 4.6s ease-in-out infinite;
   }
 
-  .tra-avatar-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
+  @keyframes traNaturalBreathing {
+    0%, 100% {
+      transform: translateY(0px) scale(1, 1);
+    }
+    50% {
+      transform: translateY(-8px) scale(1.018, 1.026);
+    }
+  }
+
+  .tra-character-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* High-Definition Master Character Image - Seamless and Connected */
+  .tra-unified-character-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    pointer-events: none;
     user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 14px 28px rgba(0,0,0,0.18));
+    transition: opacity 0.35s ease, filter 0.35s ease;
   }
 
-  .tra-avatar-head-pivot {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Row 174 of 415 px is 41.9% from top - the exact collar line */
-    transform-origin: 50% 41.9%;
-    will-change: transform;
+  /* 3D 360-degree Interactive Cue */
+  .tra-3d-cue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: rgba(30, 22, 16, 0.75);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.06);
   }
 
-  .tra-avatar-blink {
-    opacity: 0;
-    transition: opacity 0.06s ease;
-  }
-
-  .tra-avatar-blink.blinking {
-    opacity: 1;
+  .tra-3d-cue-icon {
+    font-size: 1rem;
+    color: #9B1B30;
   }
 
   /* Dress-up Quick Selection Bar */
   .tra-dressup-bar {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 40px;
     padding: 8px 18px;
@@ -744,13 +668,21 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.06);
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(0,0,0,0.06);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 1.5px solid rgba(0,0,0,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
   }
 
   .tra-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+    border-color: rgba(155, 27, 48, 0.4);
+  }
+
+  .tra-card.active {
+    border-color: #9B1B30;
+    box-shadow: 0 14px 34px rgba(155, 27, 48, 0.18);
+    background: #FFF9F5;
   }
 
   .tra-card-thumb-wrap {
@@ -790,6 +722,11 @@
     pointer-events: none;
     opacity: 0.9;
     transition: opacity 0.2s ease;
+  }
+
+  .tra-card.active .tra-drape-pill {
+    background: #9B1B30;
+    content: "Equipped";
   }
 
   .tra-card-info {
@@ -1148,6 +1085,7 @@
     .tra-main-heading { font-size: 2.1rem; }
     .tra-product-grid { grid-template-columns: 1fr; }
     .tra-header { padding: 16px; }
+    .tra-mascot-stage { width: 260px; height: 410px; }
   }
 </style>
 
@@ -1157,125 +1095,200 @@
   var wrapper = document.getElementById("the-royal-attire-" + sectionId);
   if (!wrapper) return;
 
-  // 1. Assets Map
-  var paletteMap = {
-    cream: {
-      body: "{{ 'royal-doll-cream-body.png' | asset_url }}",
-      head: "{{ 'royal-doll-cream-head.png' | asset_url }}"
-    },
-    red: {
-      body: "{{ 'royal-doll-red-body.png' | asset_url }}",
-      head: "{{ 'royal-doll-red-head.png' | asset_url }}"
-    },
-    blue: {
-      body: "{{ 'royal-doll-blue-body.png' | asset_url }}",
-      head: "{{ 'royal-doll-blue-head.png' | asset_url }}"
-    },
-    green: {
-      body: "{{ 'royal-doll-green-body.png' | asset_url }}",
-      head: "{{ 'royal-doll-green-head.png' | asset_url }}"
-    }
+  // 1. Outfit Map for the Complete Unified Character
+  var outfitMap = {
+    safa: "{{ 'royal-owl-safa.png' | asset_url }}",
+    achkan: "{{ 'royal-owl-achkan.png' | asset_url }}",
+    dupatta: "{{ 'royal-owl-dupatta.png' | asset_url }}",
+    mojari: "{{ 'royal-owl-mojari.png' | asset_url }}",
+    master: "{{ 'royal-owl-master.png' | asset_url }}"
   };
 
-  var bodyImg = document.getElementById("tra-avatar-body-" + sectionId);
-  var headImg = document.getElementById("tra-avatar-head-" + sectionId);
-  var blinkImg = document.getElementById("tra-avatar-blink-" + sectionId);
-  var headPivot = document.getElementById("tra-avatar-head-pivot-" + sectionId);
-  var bodyWrap = wrapper.querySelector(".tra-avatar-body-wrap");
-  var mascotRig = document.getElementById("tra-mascot-rig-" + sectionId);
+  var charImg = document.getElementById("tra-unified-character-" + sectionId);
+  var gazeRig = document.getElementById("tra-character-gaze-rig-" + sectionId);
+  var stageEl = document.getElementById("tra-stage-container-" + sectionId);
+  var webglCanvas = document.getElementById("tra-3d-webgl-canvas-" + sectionId);
+  var mascotStage = document.getElementById("tra-mascot-stage-" + sectionId);
+  var custom3DUrl = "{{ section.settings.custom_3d_model_url }}";
 
-  // 2. Character Mechanics: Breathing, Blinking, Head Sway & Cursor Tilt
-  var targetRotY = 0, currentRotY = 0;
-  var targetRotX = 0, currentRotX = 0;
-  var isHovering = false;
+  // 2. THREE.JS REAL-TIME 3D RIGGED ENGINE
+  var scene, camera, renderer, character3D, mixer;
+  var headBone = null, neckBone = null, spineBone = null;
+  var is3DLoaded = false;
+  var rotVelocityX = 0, rotVelocityY = 0;
+  var isDragging = false, previousMouseX = 0, previousMouseY = 0;
+
+  if (custom3DUrl && custom3DUrl.trim() !== "" && typeof THREE !== "undefined") {
+    initThreeJS(custom3DUrl.trim());
+  }
+
+  function initThreeJS(modelUrl) {
+    if (!webglCanvas) return;
+    
+    // Setup Scene, Camera & Lighting
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(42, 380 / 520, 0.1, 1000);
+    camera.position.set(0, 1.2, 3.4);
+
+    renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, alpha: true, antialias: true });
+    renderer.setSize(380, 520);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+
+    // Warm Royal Studio Lighting
+    var ambientLight = new THREE.AmbientLight(0xfff5e6, 0.85);
+    scene.add(ambientLight);
+
+    var keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    keyLight.position.set(2, 4, 3);
+    scene.add(keyLight);
+
+    var rimLight = new THREE.DirectionalLight(0xea9b1b, 0.7);
+    rimLight.position.set(-3, 2, -2);
+    scene.add(rimLight);
+
+    // Shadow Floor
+    var shadowGeo = new THREE.PlaneGeometry(3, 3);
+    var shadowMat = new THREE.ShadowMaterial({ opacity: 0.22 });
+    var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+    shadowPlane.rotation.x = -Math.PI / 2;
+    shadowPlane.position.y = -0.05;
+    scene.add(shadowPlane);
+
+    // Load .GLB / .GLTF 3D Rigged Model
+    if (THREE.GLTFLoader) {
+      var loader = new THREE.GLTFLoader();
+      loader.load(modelUrl, function(gltf) {
+        character3D = gltf.scene;
+        character3D.position.set(0, 0, 0);
+        character3D.scale.set(1, 1, 1);
+        scene.add(character3D);
+
+        // Find rigged skeletal joints / bones
+        character3D.traverse(function(node) {
+          if (node.isBone) {
+            var name = node.name.toLowerCase();
+            if (name.indexOf("head") !== -1) headBone = node;
+            else if (name.indexOf("neck") !== -1) neckBone = node;
+            else if (name.indexOf("spine") !== -1) spineBone = node;
+          }
+          if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+          }
+        });
+
+        // Switch visible views
+        webglCanvas.style.display = "block";
+        if (mascotStage) mascotStage.style.display = "none";
+        is3DLoaded = true;
+
+      }, undefined, function(err) {
+        console.warn("Could not load custom 3D model, using high-definition unified character stage:", err);
+      });
+    }
+
+    // 360-degree Interactive Drag Orbit
+    webglCanvas.addEventListener("mousedown", function(e) {
+      isDragging = true;
+      previousMouseX = e.clientX;
+    });
+
+    window.addEventListener("mouseup", function() {
+      isDragging = false;
+    });
+
+    window.addEventListener("mousemove", function(e) {
+      if (isDragging && character3D) {
+        var deltaX = e.clientX - previousMouseX;
+        character3D.rotation.y += deltaX * 0.012;
+        previousMouseX = e.clientX;
+      }
+    });
+  }
+
+  // 3. REAL-TIME SMOOTH CURSOR GAZE & 3D ORIENTATION ENGINE
+  var targetRotY = 0, targetRotX = 0;
+  var currentRotY = 0, currentRotX = 0;
 
   window.addEventListener("mousemove", function(e) {
-    if (!mascotRig) return;
-    var rect = mascotRig.getBoundingClientRect();
+    if (!stageEl) return;
+    var rect = stageEl.getBoundingClientRect();
     var centerX = rect.left + rect.width / 2;
     var centerY = rect.top + rect.height * 0.42;
 
-    var diffX = (e.clientX - centerX) / (window.innerWidth * 0.5);
-    var diffY = (e.clientY - centerY) / (window.innerHeight * 0.5);
+    var deltaX = (e.clientX - centerX) / (window.innerWidth * 0.5);
+    var deltaY = (e.clientY - centerY) / (window.innerHeight * 0.5);
 
-    // Limit continuous head sway within natural anatomical bounds (-26deg to +26deg)
-    targetRotY = Math.max(-26, Math.min(26, diffX * 26));
-    targetRotX = Math.max(-12, Math.min(12, -diffY * 12));
-    isHovering = true;
-  });
+    // Natural human-like rotational limits
+    targetRotY = Math.max(-22, Math.min(22, deltaX * 22));
+    targetRotX = Math.max(-10, Math.min(10, -deltaY * 10));
+  }, { passive: true });
 
   window.addEventListener("mouseleave", function() {
     targetRotY = 0;
     targetRotX = 0;
-    isHovering = false;
   });
 
-  // Autonomous Blinking Loop (with double-blink probability)
-  function triggerBlink() {
-    if (!blinkImg) return;
-    blinkImg.classList.add("blinking");
-    setTimeout(function() {
-      blinkImg.classList.remove("blinking");
-      // 25% chance of realistic double-blink
-      if (Math.random() < 0.25) {
-        setTimeout(function() {
-          blinkImg.classList.add("blinking");
-          setTimeout(function() {
-            blinkImg.classList.remove("blinking");
-          }, 110);
-        }, 130);
-      }
-    }, 120);
-
-    var nextBlink = 2600 + Math.random() * 2400;
-    setTimeout(triggerBlink, nextBlink);
-  }
-  setTimeout(triggerBlink, 2000);
-
-  // Main 60FPS Animation Loop: Breathing & Smooth Head Sway
-  function animateCharacter(time) {
-    // 1. Idle breathing sine wave (chest expansion scaleY/scaleX)
-    var breath = Math.sin(time * 0.0022);
-    if (bodyWrap) {
-      var scaleY = 1 + breath * 0.018;
-      var scaleX = 1 - breath * 0.010;
-      bodyWrap.style.transform = "scale(" + scaleX + ", " + scaleY + ")";
-    }
-
-    // 2. Smooth spring-damped head rotation
+  // Main 60FPS Animation Loop
+  function animateScene(time) {
+    // 1. Smooth Spring-Damped Interpolation
     currentRotY += (targetRotY - currentRotY) * 0.085;
     currentRotX += (targetRotX - currentRotX) * 0.085;
 
-    // Organic idle sway when mouse is stationary
-    var idleSway = Math.sin(time * 0.0014) * 2.2;
-    var finalRotY = currentRotY + idleSway;
-    var finalTiltZ = finalRotY * 0.16;
-
-    if (headPivot) {
-      headPivot.style.transform = 
-        "rotateY(" + finalRotY.toFixed(2) + "deg) " +
-        "rotateX(" + currentRotX.toFixed(2) + "deg) " +
-        "rotateZ(" + finalTiltZ.toFixed(2) + "deg)";
+    // 2. Drive 3D Skeletal Bones if loaded
+    if (is3DLoaded && character3D) {
+      if (headBone) {
+        headBone.rotation.y = (currentRotY * Math.PI) / 180 * 0.8;
+        headBone.rotation.x = (currentRotX * Math.PI) / 180 * 0.8;
+      }
+      if (neckBone) {
+        neckBone.rotation.y = (currentRotY * Math.PI) / 180 * 0.4;
+      }
+      renderer.render(scene, camera);
+    } else {
+      // 3. Drive Unified Connected Character with 3D Depth
+      if (gazeRig) {
+        var tiltZ = currentRotY * 0.14;
+        gazeRig.style.transform = 
+          "rotateY(" + currentRotY.toFixed(2) + "deg) " +
+          "rotateX(" + currentRotX.toFixed(2) + "deg) " +
+          "rotateZ(" + tiltZ.toFixed(2) + "deg)";
+      }
     }
 
-    requestAnimationFrame(animateCharacter);
+    requestAnimationFrame(animateScene);
   }
-  requestAnimationFrame(animateCharacter);
+  requestAnimationFrame(animateScene);
 
-  // 3. Instant Live Drape Switching
-  function applyPalette(paletteName) {
-    if (!paletteMap[paletteName]) return;
-    if (bodyImg) bodyImg.src = paletteMap[paletteName].body;
-    if (headImg) headImg.src = paletteMap[paletteName].head;
-    if (mascotRig) mascotRig.setAttribute("data-palette", paletteName);
+  // 4. INSTANT PRODUCT OUTFIT SWITCHING (ALIGNED & CONNECTED)
+  function setCharacterOutfit(outfitKey) {
+    var newSrc = outfitMap[outfitKey] || outfitMap.master;
+    if (charImg) {
+      charImg.style.opacity = "0.75";
+      setTimeout(function() {
+        charImg.src = newSrc;
+        charImg.style.opacity = "1";
+      }, 80);
+    }
 
     // Update active state in dress-up bar
     var dressBtns = wrapper.querySelectorAll(".tra-dress-btn");
     dressBtns.forEach(function(btn) {
-      if (btn.getAttribute("data-palette") === paletteName) {
+      if (btn.getAttribute("data-outfit") === outfitKey) {
         btn.classList.add("active");
       } else {
         btn.classList.remove("active");
+      }
+    });
+
+    // Update active card in product showcase
+    var cards = wrapper.querySelectorAll(".tra-card");
+    cards.forEach(function(card) {
+      if (card.getAttribute("data-outfit") === outfitKey) {
+        card.classList.add("active");
+      } else {
+        card.classList.remove("active");
       }
     });
   }
@@ -1284,21 +1297,21 @@
   var dressBtns = wrapper.querySelectorAll(".tra-dress-btn");
   dressBtns.forEach(function(btn) {
     btn.addEventListener("click", function() {
-      var p = btn.getAttribute("data-palette");
-      applyPalette(p);
+      var outfitKey = btn.getAttribute("data-outfit");
+      setCharacterOutfit(outfitKey);
     });
   });
 
-  // Bind Product Card thumbnail clicks to drape onto character
-  var cardThumbs = wrapper.querySelectorAll(".tra-card-thumb-wrap");
-  cardThumbs.forEach(function(thumb) {
-    thumb.addEventListener("click", function() {
-      var card = thumb.closest(".tra-card");
-      if (!card) return;
-      var p = card.getAttribute("data-palette");
-      applyPalette(p);
+  // Bind Product Card Clicks
+  var productCards = wrapper.querySelectorAll(".tra-card");
+  productCards.forEach(function(card) {
+    card.addEventListener("click", function(e) {
+      // Prevent double trigger if user clicked "Enquire" button directly
+      if (e.target.closest(".tra-enquire-btn")) return;
+      var outfitKey = card.getAttribute("data-outfit");
+      setCharacterOutfit(outfitKey);
 
-      // Smooth scroll back up to character on small screens
+      // Smooth scroll up on mobile screens
       if (window.innerWidth < 768) {
         var mascotEl = document.getElementById("the-mascot-" + sectionId);
         if (mascotEl) mascotEl.scrollIntoView({ behavior: "smooth" });
@@ -1306,53 +1319,7 @@
     });
   });
 
-  // 4. Antigravity Color-Changing Butterfly Cursor
-  var butterfly = document.getElementById("tra-butterfly-cursor-" + sectionId);
-  if (butterfly) {
-    var bfX = window.innerWidth / 2;
-    var bfY = window.innerHeight / 2;
-    var targetBfX = bfX;
-    var targetBfY = bfY;
-
-    window.addEventListener("mousemove", function(e) {
-      targetBfX = e.clientX;
-      targetBfY = e.clientY;
-    });
-
-    function updateButterfly(time) {
-      // Buoyant physics lag + float
-      bfX += (targetBfX - bfX) * 0.12;
-      bfY += (targetBfY - bfY) * 0.12;
-
-      var hoverFloatY = Math.sin(time * 0.0035) * 11;
-      var hoverFloatX = Math.cos(time * 0.0028) * 5;
-
-      var posX = bfX + hoverFloatX + 16;
-      var posY = bfY + hoverFloatY - 24;
-
-      butterfly.style.transform = "translate(" + posX.toFixed(1) + "px, " + posY.toFixed(1) + "px)";
-
-      // Dynamic Section Color Shifting based on scroll position
-      var heroSec = document.getElementById("the-mascot-" + sectionId);
-      var collSec = document.getElementById("the-collection-" + sectionId);
-      var stylSec = document.getElementById("the-stylist-" + sectionId);
-
-      var scrollMid = window.scrollY + window.innerHeight * 0.45;
-
-      if (stylSec && scrollMid >= stylSec.offsetTop) {
-        butterfly.setAttribute("data-theme", "gold");
-      } else if (collSec && scrollMid >= collSec.offsetTop) {
-        butterfly.setAttribute("data-theme", "purple");
-      } else {
-        butterfly.setAttribute("data-theme", "blue");
-      }
-
-      requestAnimationFrame(updateButterfly);
-    }
-    requestAnimationFrame(updateButterfly);
-  }
-
-  // 5. The Royal Stylist: AI Generation & Particle Starburst
+  // 5. THE ROYAL STYLIST: AI GENERATION & PARTICLE STARBURST
   var magicCanvas = document.getElementById("tra-magic-canvas-" + sectionId);
   var askAiBtn = document.getElementById("tra-ask-ai-btn-" + sectionId);
   var aiBtnText = document.getElementById("tra-ai-btn-text-" + sectionId);
@@ -1363,25 +1330,25 @@
     {
       preset: "coronation",
       title: "The Maharaja's Coronation",
-      palette: "cream",
+      outfit: "safa",
       insight: "Pure ivory symbolizes truth and sovereignty, accented by ruby red to honor royal valor and victory in state processions."
     },
     {
       preset: "mewar-starlight",
       title: "The Mewar Starlight",
-      palette: "blue",
+      outfit: "achkan",
       insight: "Deep celestial lapis blue paired with gleaming gold zari mirrors the starlit skies over Lake Pichola, worn during autumn court banquets."
     },
     {
       preset: "garden-gala",
       title: "The Royal Garden Gala",
-      palette: "green",
+      outfit: "dupatta",
       insight: "Vibrant emerald silk embellished with marigold saffron captures the vitality of royal palace gardens in bloom."
     },
     {
       preset: "jodhpur-sunbreak",
       title: "The Jodhpur Sunbreak",
-      palette: "cream",
+      outfit: "mojari",
       insight: "Warm sunbreak yellow paired with indigo trims celebrates the sun-drenched ramparts of Mehrangarh Fort."
     }
   ];
@@ -1427,7 +1394,7 @@
 
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.12; // gentle gravity
+          p.vy += 0.12;
           p.alpha -= p.decay;
         }
       }
@@ -1452,7 +1419,7 @@
 
       setTimeout(function() {
         var choice = royalAiPresets[Math.floor(Math.random() * royalAiPresets.length)];
-        applyPalette(choice.palette);
+        setCharacterOutfit(choice.outfit);
 
         if (insightTitle) insightTitle.textContent = choice.title;
         if (insightDesc) insightDesc.textContent = choice.insight;
@@ -1480,7 +1447,7 @@
       var pName = item.getAttribute("data-preset");
       var matched = royalAiPresets.find(function(rp) { return rp.preset === pName; });
       if (matched) {
-        applyPalette(matched.palette);
+        setCharacterOutfit(matched.outfit);
         if (insightTitle) insightTitle.textContent = matched.title;
         if (insightDesc) insightDesc.textContent = matched.insight;
 
@@ -1497,8 +1464,8 @@
   var swatches = wrapper.querySelectorAll(".tra-swatch");
   swatches.forEach(function(sw) {
     sw.addEventListener("click", function() {
-      var pal = sw.getAttribute("data-palette");
-      applyPalette(pal);
+      var pal = sw.getAttribute("data-outfit");
+      setCharacterOutfit(pal);
       swatches.forEach(function(s) { s.classList.remove("active"); });
       sw.classList.add("active");
     });
@@ -1511,7 +1478,7 @@
     hueSlider.addEventListener("input", function() {
       var deg = hueSlider.value;
       if (hueLabel) hueLabel.textContent = deg + "° Custom Tint";
-      if (bodyImg) bodyImg.style.filter = "hue-rotate(" + deg + "deg)";
+      if (charImg) charImg.style.filter = "hue-rotate(" + deg + "deg) drop-shadow(0 14px 28px rgba(0,0,0,0.18))";
     });
   }
 
@@ -1520,7 +1487,7 @@
   enquireBtns.forEach(function(btn) {
     btn.addEventListener("click", function() {
       var piece = btn.getAttribute("data-piece");
-      alert("Thank you for your royal enquiry for "" + piece + "". Our master atelier specialist will reach out to schedule your private fitting.");
+      alert("Thank you for your royal enquiry for \"" + piece + "\". Our master atelier specialist will reach out to schedule your private fitting.");
     });
   });
 
@@ -1565,17 +1532,21 @@
       "type": "textarea",
       "id": "description",
       "label": "Hero Description",
-      "default": "Step into our royal boutique. Choose any piece below to instantly dress our 3D royal owl in handcrafted Indian heritage attire."
+      "default": "Explore handcrafted heritage regalia. Select any piece below to instantly dress our royal mascot in authentic court attire."
+    },
+    {
+      "type": "header",
+      "content": "3D Character Model (.glb / .gltf)"
+    },
+    {
+      "type": "text",
+      "id": "custom_3d_model_url",
+      "label": "Custom 3D Model URL (.glb)",
+      "info": "Upload your rigged 3D character model (.glb) in Shopify Admin > Content > Files, and paste the URL here for full real-time 3D rendering with cursor head-tracking and 360-degree rotation."
     },
     {
       "type": "header",
       "content": "Interactive Features"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_butterfly",
-      "label": "Enable Antigravity Butterfly Cursor",
-      "default": true
     },
     {
       "type": "checkbox",

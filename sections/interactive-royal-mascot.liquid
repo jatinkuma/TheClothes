@@ -1,30 +1,29 @@
 {% comment %}
   ==============================================================================
   ROYAL MASCOT — INTERACTIVE 3D WEBGL CARTOON MASCOT & BUTTERFLY SECTION
-  Built with Three.js WebGL Engine (Full Rigged 3D Polygonal Mesh)
   ------------------------------------------------------------------------------
   Features:
-  - 100% FRONT-FACING Rigged 3D Polygonal Model (GLB/GLTF via Three.js WebGL):
-    * Multicolored Rajasthani royal safa with jewel Kalgi brooch & upright white plume
-    * Round gold wireframe goggles/glasses with physical 3D depth on the snout
+  - 100% FRONT-FACING Rigged 3D Polygonal Model (GLB via Three.js WebGL):
     * Cute cartoon chipmunk head with chubby cream cheeks & dark button nose
+    * Round gold wireframe goggles with physical 3D depth resting on snout bridge
+    * Multicolored Rajasthani royal safa with jewel Kalgi brooch & upright white plume
     * Cream brocade Sherwani with gold buttons & royal red zardozi embroidered stole
     * Gold medallion necklace, churidar & curled royal mojari shoes
-    * Bushy squirrel/chipmunk tail curling at the back
-  - Signature "Momentable Action" matching the bottom section:
-    * Dynamic 3D perspective body leaning & horizontal displacement towards cursor
-    * Silky spring-mass lerp interpolation (damping factor 0.082)
+    * Bushy tail curled at back
+  - Continuous Circular 360° Movement ("Moment Like Circle"):
+    * Smooth circular 360° gaze tracking: as cursor circles around the mascot,
+      the head, goggles, and eyes follow in a fluid, continuous 360° circular loop
+    * Interactive 360° drag & spin orbit rotation with smooth momentum/inertia
+    * Signature bottom-section leaning & displacement action
     * Organic idle breathing & vertical floating wave
-    * Soft ground contact shadow reacting dynamically to character movement
-  - Perfect "Gogal Moment" (3D Goggles Parallax & Head Gaze):
-    * Head & Neck bones turn smoothly in 3D (yaw, pitch, curious roll tilt)
-    * 3D gold wireframe goggles rotate in true perspective with independent dynamic pop
-    * Eye.L & Eye.R bones dart smoothly behind the lenses, tracking cursor & butterfly
-    * Procedural eyelid blinking every ~3.5 seconds
-  - ZERO 360-degree rotation (No drag-to-spin; strictly natural gaze & posture tracking)
-  - Cyan / Electric Blue Butterfly with 3D wing fluttering & cursor trailing physics
-  - Live Canvas Fairy Dust Sparkle Trail
-  - Single-finger mobile touch gaze tracking with smooth return to neutral forward pose
+    * Soft ground contact shadow reacting dynamically in 360°
+  - FULL-SECTION Butterfly Flight & Live Canvas Fairy Dust Trail:
+    * Butterfly flies across the FULL 100% width and height of the entire section
+      from screen edge to screen edge without any half-section boundary clipping
+    * Smooth spring-damped flight physics with 3D wing fluttering & banking
+    * Live canvas fairy dust sparkle trail spanning the entire section width
+    * Autonomous circular flight patrol when mouse is idle
+  - Responsive Desktop, Tablet & Mobile touch support
   ==============================================================================
 {% endcomment %}
 
@@ -43,34 +42,12 @@
   <!-- Background Radiant Center Glow -->
   <div class="royal-mascot-bg-glow" aria-hidden="true"></div>
 
-  <!-- Stage Container -->
-  <div id="royal-mascot-stage-{{ section.id }}" class="royal-mascot-stage">
+  <!-- FULL-SECTION Fairy Dust Sparkle Particle Canvas -->
+  {% if section.settings.enable_sparkles %}
+    <canvas id="royal-mascot-sparkles-{{ section.id }}" class="royal-mascot-sparkles-canvas"></canvas>
+  {% endif %}
 
-    <!-- Fairy Dust Sparkle Canvas -->
-    {% if section.settings.enable_sparkles %}
-      <canvas id="royal-mascot-sparkles-{{ section.id }}" class="royal-mascot-sparkles-canvas"></canvas>
-    {% endif %}
-
-    <!-- Loading Spinner -->
-    <div id="royal-mascot-spinner-{{ section.id }}" class="royal-mascot-spinner" aria-live="polite">
-      <div class="royal-mascot-spinner-ring"></div>
-      <span class="royal-mascot-spinner-text">Awakening 3D Royal Mascot...</span>
-    </div>
-
-    <!-- WebGL Canvas for Rigged 3D Character (Front-Facing 3D Polygonal Model) -->
-    <canvas id="royal-mascot-canvas-{{ section.id }}" class="royal-mascot-canvas"></canvas>
-
-    <!-- Interactive Hint Pill Matching Reference Image -->
-    {% if section.settings.show_hint %}
-      <div class="royal-mascot-hint">
-        <span class="royal-mascot-hint-icon">✦</span>
-        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Interactive 3D Mascot • Move mouse or touch to explore' }}</span>
-      </div>
-    {% endif %}
-
-  </div>
-
-  <!-- Cyan / Electric Blue Butterfly Cursor Follower -->
+  <!-- FULL-SECTION Cyan / Electric Blue Butterfly Cursor -->
   {% if section.settings.enable_butterfly %}
     <div
       id="royal-mascot-butterfly-{{ section.id }}"
@@ -132,6 +109,28 @@
       </div>
     </div>
   {% endif %}
+
+  <!-- Central 3D Mascot Stage -->
+  <div id="royal-mascot-stage-{{ section.id }}" class="royal-mascot-stage">
+
+    <!-- Loading Spinner -->
+    <div id="royal-mascot-spinner-{{ section.id }}" class="royal-mascot-spinner" aria-live="polite">
+      <div class="royal-mascot-spinner-ring"></div>
+      <span class="royal-mascot-spinner-text">Awakening 3D Royal Mascot...</span>
+    </div>
+
+    <!-- WebGL Canvas for 3D Mascot Character -->
+    <canvas id="royal-mascot-canvas-{{ section.id }}" class="royal-mascot-canvas"></canvas>
+
+    <!-- Interactive Hint Pill Matching Reference Image -->
+    {% if section.settings.show_hint %}
+      <div class="royal-mascot-hint">
+        <span class="royal-mascot-hint-icon">✦</span>
+        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Interactive 3D Mascot • Move mouse in circles or drag to rotate' }}</span>
+      </div>
+    {% endif %}
+
+  </div>
 </div>
 
 <style>
@@ -141,7 +140,7 @@
   #royal-mascot-section-{{ section.id }} {
     position: relative;
     width: 100%;
-    min-height: 560px;
+    min-height: 580px;
     background-color: var(--mascot-bg, #E5A625);
     background: radial-gradient(ellipse at 50% 50%, #f4c45a 0%, #e2a022 55%, #c98818 100%);
     overflow: hidden;
@@ -164,6 +163,101 @@
     z-index: 1;
   }
 
+  /* FULL-SECTION Fairy Dust Canvas (Covers Entire Section Width & Height) */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-sparkles-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  /* FULL-SECTION Cyan / Electric Blue Butterfly (Flies Across Entire Section) */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-butterfly {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 86px;
+    height: 72px;
+    pointer-events: none !important;
+    z-index: 20;
+    will-change: transform;
+    filter: drop-shadow(0 4px 18px rgba(0, 229, 255, 0.90));
+    transition: opacity 0.3s ease;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-wings {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 480px;
+    width: 100%;
+    height: 100%;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-wing {
+    width: 42px;
+    height: 50px;
+    display: block;
+    transform-style: preserve-3d;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-wing-left {
+    transform-origin: 100% 50%;
+    animation: rmBfFlapLeft 0.12s ease-in-out infinite alternate;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-wing-right {
+    transform-origin: 0% 50%;
+    animation: rmBfFlapRight 0.12s ease-in-out infinite alternate;
+  }
+
+  @keyframes rmBfFlapLeft {
+    0% { transform: rotateY(0deg) scaleX(1); }
+    100% { transform: rotateY(76deg) scaleX(0.40); }
+  }
+
+  @keyframes rmBfFlapRight {
+    0% { transform: rotateY(0deg) scaleX(1); }
+    100% { transform: rotateY(-76deg) scaleX(0.40); }
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-body {
+    position: relative;
+    width: 4.5px;
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 3;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-antennae {
+    position: absolute;
+    top: -5px;
+    width: 12px;
+    height: 6px;
+    border-top: 1.8px solid #00E5FF;
+    border-radius: 8px 8px 0 0;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-thorax {
+    width: 4.5px;
+    height: 8px;
+    background: #091b35;
+    border-radius: 3px 3px 2px 2px;
+    border: 0.6px solid #00E5FF;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-bf-abdomen {
+    width: 3.5px;
+    height: 18px;
+    background: linear-gradient(to bottom, #091b35, #0288d1);
+    border-radius: 1px 1px 3px 3px;
+  }
+
   /* Stage Container */
   #royal-mascot-section-{{ section.id }} .royal-mascot-stage {
     position: relative;
@@ -182,24 +276,18 @@
     height: 100% !important;
     display: block;
     outline: none;
-    cursor: default;
+    cursor: grab;
     z-index: 4;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
   }
 
-  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas.active {
-    opacity: 1;
+  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas:active {
+    cursor: grabbing;
   }
 
-  /* Fairy Dust Canvas */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-sparkles-canvas {
-    position: absolute;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    pointer-events: none;
-    z-index: 15;
+  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas.active {
+    opacity: 1;
   }
 
   /* Loading Spinner */
@@ -263,93 +351,6 @@
     color: #241105;
   }
 
-  /* ==========================================================================
-     CYAN / ELECTRIC BLUE 3D BUTTERFLY
-     ========================================================================== */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-butterfly {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 86px;
-    height: 72px;
-    pointer-events: none !important;
-    z-index: 20;
-    will-change: transform;
-    filter: drop-shadow(0 4px 16px rgba(0, 229, 255, 0.85));
-    transition: opacity 0.3s ease;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-wings {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 480px;
-    width: 100%;
-    height: 100%;
-  }
-
-  #royal-bf-wing {
-    width: 42px;
-    height: 50px;
-    display: block;
-    transform-style: preserve-3d;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-wing-left {
-    transform-origin: 100% 50%;
-    animation: rmBfFlapLeft 0.12s ease-in-out infinite alternate;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-wing-right {
-    transform-origin: 0% 50%;
-    animation: rmBfFlapRight 0.12s ease-in-out infinite alternate;
-  }
-
-  @keyframes rmBfFlapLeft {
-    0% { transform: rotateY(0deg) scaleX(1); }
-    100% { transform: rotateY(76deg) scaleX(0.40); }
-  }
-
-  @keyframes rmBfFlapRight {
-    0% { transform: rotateY(0deg) scaleX(1); }
-    100% { transform: rotateY(-76deg) scaleX(0.40); }
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-body {
-    position: relative;
-    width: 4.5px;
-    height: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 3;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-antennae {
-    position: absolute;
-    top: -5px;
-    width: 12px;
-    height: 6px;
-    border-top: 1.8px solid #00E5FF;
-    border-radius: 8px 8px 0 0;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-thorax {
-    width: 4.5px;
-    height: 8px;
-    background: #091b35;
-    border-radius: 3px 3px 2px 2px;
-    border: 0.6px solid #00E5FF;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-bf-abdomen {
-    width: 3.5px;
-    height: 18px;
-    background: linear-gradient(to bottom, #091b35, #0288d1);
-    border-radius: 1px 1px 3px 3px;
-  }
-
   @media (max-width: 600px) {
     #royal-mascot-section-{{ section.id }} {
       min-height: 480px;
@@ -394,14 +395,13 @@
 
   var config = {
     modelUrl: "{{ 'royal-cartoon-mascot.glb' | asset_url }}",
-    sensitivity: {{ section.settings.sensitivity | default: 26 }},
+    sensitivity: {{ section.settings.sensitivity | default: 28 }},
     enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
     enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %}
   };
 
   // ==========================================================================
-  // 1. THREE.JS 3D MASCOT MANAGER (100% FRONT-FACING RIGGED 3D MESH)
-  // WITH SIGNATURE BOTTOM-SECTION LEANING & INDEPENDENT GOGGLES 3D DEPTH
+  // 1. THREE.JS 3D MASCOT MANAGER (CIRCULAR MOVEMENT & 360° INTERACTIVE SPIN)
   // ==========================================================================
   var ThreeMascotManager = {
     scene: null,
@@ -423,10 +423,19 @@
 
     gogglesMeshes: [],
 
+    // Circular movement & gaze angles
     targetRotY: 0,
     targetRotX: 0,
+    targetRoll: 0,
     currentRotY: 0,
     currentRotX: 0,
+    currentRoll: 0,
+
+    // 360 Drag Orbit variables
+    orbitAngleY: 0,
+    isDragging: false,
+    prevMouseX: 0,
+    dragVelocity: 0,
 
     init: function() {
       if (typeof THREE === "undefined" || typeof THREE.GLTFLoader === "undefined") {
@@ -509,7 +518,7 @@
         this.gltfLoader = new THREE.GLTFLoader();
         this.loadModel(config.modelUrl);
 
-        // Setup Cursor Gaze Events (Strictly Gaze & Lean, NO 360-degree drag orbit)
+        // Setup Circular Gaze & 360 Drag Controls
         this.setupEventListeners();
         requestAnimationFrame(this.renderLoop.bind(this));
 
@@ -587,6 +596,7 @@
     setupEventListeners: function() {
       var self = this;
 
+      // 1. CIRCULAR GAZE TRACKING (Movement Like Circle)
       function updatePointer(clientX, clientY) {
         if (!stageEl) return;
         var rect = stageEl.getBoundingClientRect();
@@ -596,31 +606,70 @@
         var deltaX = (clientX - centerX) / (window.innerWidth * 0.44);
         var deltaY = (clientY - centerY) / (window.innerHeight * 0.44);
 
-        var sens = config.sensitivity || 26;
-        self.targetRotY = Math.max(-sens, Math.min(sens, deltaX * sens));
-        self.targetRotX = Math.max(-15, Math.min(15, -deltaY * 15));
+        // Circular polar coordinate calculation for smooth 360° circular tracking
+        var angle = Math.atan2(deltaY, deltaX);
+        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        var r = Math.min(1.2, dist);
+
+        var sens = config.sensitivity || 28;
+        // Sweeps continuously through 360 degrees when circling around the mascot
+        self.targetRotY = Math.cos(angle) * (r * sens);
+        self.targetRotX = -Math.sin(angle) * (r * 16);
+        self.targetRoll = Math.cos(angle) * (r * 5.8);
       }
 
-      // Mouse tracking (STRICTLY gaze, NO 360-degree drag rotation)
       window.addEventListener("mousemove", function(e) {
-        updatePointer(e.clientX, e.clientY);
+        if (self.isDragging) {
+          var delta = e.clientX - self.prevMouseX;
+          self.orbitAngleY += delta * 0.018;
+          self.dragVelocity = delta * 0.018;
+          self.prevMouseX = e.clientX;
+        } else {
+          updatePointer(e.clientX, e.clientY);
+        }
       }, { passive: true });
 
-      // Return naturally to neutral forward pose when mouse leaves
-      document.addEventListener("mouseleave", function() {
-        self.targetRotY = 0;
-        self.targetRotX = 0;
+      // 2. INTERACTIVE 360° CIRCULAR DRAG CONTROLS
+      canvasEl.addEventListener("mousedown", function(e) {
+        self.isDragging = true;
+        self.prevMouseX = e.clientX;
+        self.dragVelocity = 0;
       });
 
-      // Mobile Touch Drag: Gaze tracking only (NO 360-degree spin)
+      window.addEventListener("mouseup", function() {
+        self.isDragging = false;
+      });
+
+      // Mobile Touch Support for Circular Gaze & Drag
+      canvasEl.addEventListener("touchstart", function(e) {
+        if (e.touches.length === 1) {
+          self.isDragging = true;
+          self.prevMouseX = e.touches[0].clientX;
+          self.dragVelocity = 0;
+        }
+      }, { passive: true });
+
       window.addEventListener("touchmove", function(e) {
         if (!e.touches || e.touches.length === 0) return;
-        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+        var touch = e.touches[0];
+        if (self.isDragging) {
+          var delta = touch.clientX - self.prevMouseX;
+          self.orbitAngleY += delta * 0.018;
+          self.dragVelocity = delta * 0.018;
+          self.prevMouseX = touch.clientX;
+        }
+        updatePointer(touch.clientX, touch.clientY);
       }, { passive: true });
 
       window.addEventListener("touchend", function() {
+        self.isDragging = false;
+      });
+
+      document.addEventListener("mouseleave", function() {
         self.targetRotY = 0;
         self.targetRotX = 0;
+        self.targetRoll = 0;
+        self.isDragging = false;
       });
 
       // Window Resize
@@ -637,32 +686,40 @@
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
 
+      // Damping inertia for circular drag spin
+      if (!this.isDragging && Math.abs(this.dragVelocity) > 0.0002) {
+        this.orbitAngleY += this.dragVelocity;
+        this.dragVelocity *= 0.92;
+      }
+
       // Smooth Spring-Mass Damping (matches bottom section factor: 0.082)
       this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
       this.currentRotX += (this.targetRotX - this.currentRotX) * 0.082;
+      this.currentRoll += (this.targetRoll - this.currentRoll) * 0.082;
 
-      var sens = config.sensitivity || 26;
+      var sens = config.sensitivity || 28;
 
       if (this.isReady && this.characterGroup) {
         // 1. Organic Idle Breathing Wave
         var breathWave = Math.sin(time * 0.0022);
-        this.characterGroup.position.y = breathWave * 0.016;
 
-        // 2. Signature Bottom-Section Leaning Action (Dynamic 3D perspective shift)
+        // 2. Full 360° Circular Orbit + Dynamic Body Leaning Action
         var leanRatio = this.currentRotY / sens;
         this.characterGroup.position.x = leanRatio * 0.07;
-        this.characterGroup.rotation.y = leanRatio * 0.09;
+        this.characterGroup.position.y = breathWave * 0.016;
+        // Group combines 360 circular orbit with subtle lean
+        this.characterGroup.rotation.y = this.orbitAngleY + (leanRatio * 0.10);
 
-        // Ground shadow displacement
+        // Ground shadow reacts dynamically in 3D
         if (this.shadowMesh) {
           this.shadowMesh.position.x = leanRatio * 0.08;
-          this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 15) * 0.05;
+          this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 16) * 0.05;
         }
 
-        // 3. 3D Head & Neck Bone Rotation
+        // 3. 3D Head & Neck in Circular Gaze (Movement Like Circle)
         var radYaw = (this.currentRotY * Math.PI) / 180;
         var radPitch = (this.currentRotX * Math.PI) / 180;
-        var radRoll = radYaw * 0.14; // Natural curious head tilt
+        var radRoll = (this.currentRoll * Math.PI) / 180;
 
         if (this.bones.head) {
           this.bones.head.rotation.y = radYaw * 0.85;
@@ -677,8 +734,7 @@
           this.bones.chest.rotation.y = radYaw * 0.14;
         }
 
-        // 4. "Gogal Moment": 3D Goggles Dynamic Parallax Reaction
-        // Goggles sit on the head, but react with subtle extra spring depth
+        // 4. "Gogal Moment": 3D Goggles Physical Depth & Parallax
         if (this.gogglesMeshes.length > 0) {
           var goggleExtraYaw = radYaw * 0.06;
           var goggleExtraPitch = radPitch * 0.05;
@@ -689,7 +745,7 @@
           }
         }
 
-        // 5. Expressive Eye Tracking Behind Goggles & Procedural Blinking
+        // 5. Expressive Eyes Circular Darting Behind Goggles
         var eyeYaw = radYaw * 1.35;
         var eyePitch = radPitch * 1.40;
 
@@ -717,7 +773,8 @@
   };
 
   // ==========================================================================
-  // 2. CYAN / ELECTRIC BLUE BUTTERFLY & SPARKLE TRAIL
+  // 2. FULL-SECTION CYAN BUTTERFLY & SPARKLE TRAIL
+  // Spanning 100% width and height of the entire section across the screen
   // ==========================================================================
   var SparkleTrail = {
     canvas: sparklesCanvas,
@@ -732,16 +789,17 @@
     },
 
     resize: function() {
-      if (!this.canvas || !stageEl) return;
-      var rect = stageEl.getBoundingClientRect();
+      if (!this.canvas || !sectionEl) return;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
+      var w = sectionEl.offsetWidth || window.innerWidth;
+      var h = sectionEl.offsetHeight || 580;
+      this.canvas.width = w * dpr;
+      this.canvas.height = h * dpr;
       if (this.ctx) this.ctx.scale(dpr, dpr);
     },
 
     addParticle: function(x, y) {
-      if (this.particles.length > 55) return;
+      if (this.particles.length > 60) return;
       var hues = ["#00E5FF", "#80D8FF", "#00B0FF", "#FFE082", "#FFFFFF"];
       this.particles.push({
         x: x + (Math.random() - 0.5) * 8,
@@ -756,9 +814,10 @@
     },
 
     updateAndRender: function() {
-      if (!this.ctx || !stageEl) return;
-      var rect = stageEl.getBoundingClientRect();
-      this.ctx.clearRect(0, 0, rect.width, rect.height);
+      if (!this.ctx || !sectionEl) return;
+      var w = sectionEl.offsetWidth || window.innerWidth;
+      var h = sectionEl.offsetHeight || 580;
+      this.ctx.clearRect(0, 0, w, h);
 
       for (var i = this.particles.length - 1; i >= 0; i--) {
         var p = this.particles[i];
@@ -798,28 +857,39 @@
       if (!this.el || !config.enableButterfly) return;
 
       var self = this;
-      var rect = stageEl.getBoundingClientRect();
-      this.posX = rect.width * 0.72;
-      this.posY = rect.height * 0.32;
+      var w = sectionEl.offsetWidth || window.innerWidth;
+      var h = sectionEl.offsetHeight || 580;
+      this.posX = w * 0.72;
+      this.posY = h * 0.35;
       this.targetX = this.posX;
       this.targetY = this.posY;
 
-      window.addEventListener("mousemove", function(e) {
-        if (!stageEl) return;
-        var sRect = stageEl.getBoundingClientRect();
-        self.targetX = e.clientX - sRect.left + 24;
-        self.targetY = e.clientY - sRect.top - 20;
+      function updateTargetFromEvent(clientX, clientY) {
+        if (!sectionEl) return;
+        var secRect = sectionEl.getBoundingClientRect();
+        // Calculate position relative to the FULL section container
+        self.targetX = clientX - secRect.left + 24;
+        self.targetY = clientY - secRect.top - 20;
         self.isHovering = true;
         self.lastMoveTime = performance.now();
+      }
+
+      // Track cursor anywhere on section or window
+      sectionEl.addEventListener("mousemove", function(e) {
+        updateTargetFromEvent(e.clientX, e.clientY);
       }, { passive: true });
 
-      window.addEventListener("touchmove", function(e) {
-        if (!stageEl || !e.touches || e.touches.length === 0) return;
-        var sRect = stageEl.getBoundingClientRect();
-        self.targetX = e.touches[0].clientX - sRect.left + 20;
-        self.targetY = e.touches[0].clientY - sRect.top - 30;
-        self.isHovering = true;
-        self.lastMoveTime = performance.now();
+      window.addEventListener("mousemove", function(e) {
+        if (!sectionEl) return;
+        var r = sectionEl.getBoundingClientRect();
+        if (e.clientY >= r.top - 60 && e.clientY <= r.bottom + 60) {
+          updateTargetFromEvent(e.clientX, e.clientY);
+        }
+      }, { passive: true });
+
+      sectionEl.addEventListener("touchmove", function(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        updateTargetFromEvent(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
 
       requestAnimationFrame(this.renderLoop.bind(this));
@@ -828,23 +898,30 @@
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
 
-      var rect = stageEl.getBoundingClientRect();
+      var secW = sectionEl.offsetWidth || window.innerWidth;
+      var secH = sectionEl.offsetHeight || 580;
 
-      // Autonomous gentle patrol when mouse is idle
+      // When mouse is idle for > 3.2 seconds, autonomous CIRCULAR flight patrol around mascot
       if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
-        var t = time * 0.0014;
-        this.targetX = (rect.width * 0.5) + Math.cos(t) * (rect.width * 0.32);
-        this.targetY = (rect.height * 0.34) + Math.sin(t * 2) * (rect.height * 0.16);
+        var t = time * 0.0013;
+        var patrolCenterX = secW * 0.5;
+        var patrolCenterY = secH * 0.40;
+        // Circular orbit across full section
+        this.targetX = patrolCenterX + Math.cos(t) * (secW * 0.36);
+        this.targetY = patrolCenterY + Math.sin(t * 2) * (secH * 0.22);
       }
 
+      // Smooth trailing physics
       var dx = this.targetX - this.posX;
       var dy = this.targetY - this.posY;
       this.posX += dx * 0.082;
       this.posY += dy * 0.082;
 
-      var hoverX = Math.sin(time * 0.0036) * 7;
+      // Natural hovering bob
+      var hoverX = Math.sin(time * 0.0036) * 8;
       var hoverY = Math.cos(time * 0.0044) * 6;
 
+      // Banking angle towards flight vector
       var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
       var diff = (targetAngle - this.angle + 540) % 360 - 180;
       this.angle += diff * 0.12;
@@ -852,15 +929,17 @@
       var fx = this.posX + hoverX;
       var fy = this.posY + hoverY;
 
-      fx = Math.max(10, Math.min(rect.width - 70, fx));
-      fy = Math.max(10, Math.min(rect.height - 70, fy));
+      // Restrain within FULL SECTION bounds (Entire Screen Width & Height)
+      fx = Math.max(30, Math.min(secW - 75, fx));
+      fy = Math.max(25, Math.min(secH - 75, fy));
 
       this.el.style.transform =
-        "translate3d(" + fx.toFixed(1) + "px, " + fy.toFixed(1) + "px, 0px) " +
+        "translate3d(" + (fx - 40).toFixed(1) + "px, " + (fy - 32).toFixed(1) + "px, 0px) " +
         "rotate(" + this.angle.toFixed(1) + "deg)";
 
+      // Sparkle emission across full section flight path
       if (config.enableSparkles && Math.random() < 0.65) {
-        SparkleTrail.addParticle(fx + 28, fy + 32);
+        SparkleTrail.addParticle(fx, fy);
       }
 
       SparkleTrail.updateAndRender();
@@ -916,7 +995,7 @@
       "min": 10,
       "max": 40,
       "step": 1,
-      "default": 26
+      "default": 28
     },
     {
       "type": "header",
@@ -954,7 +1033,7 @@
       "type": "text",
       "id": "hint_text",
       "label": "Hint Text",
-      "default": "Interactive 3D Mascot • Move mouse or touch to explore"
+      "default": "Interactive 3D Mascot • Move mouse in circles or drag to rotate"
     }
   ],
   "presets": [
@@ -963,12 +1042,12 @@
       "settings": {
         "bg_color": "#E5A625",
         "mascot_size": 340,
-        "sensitivity": 26,
+        "sensitivity": 28,
         "enable_butterfly": true,
         "butterfly_color": "#00E5FF",
         "enable_sparkles": true,
         "show_hint": true,
-        "hint_text": "Interactive 3D Mascot • Move mouse or touch to explore"
+        "hint_text": "Interactive 3D Mascot • Move mouse in circles or drag to rotate"
       }
     }
   ]

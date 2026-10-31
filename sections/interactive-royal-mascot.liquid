@@ -897,6 +897,22 @@
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.25;
 
+        // Studio 3-Point Lighting for authentic 3D Volumetric Specular Depth & Shading
+        var ambientLight = new THREE.AmbientLight(0xFFF5E4, 1.35);
+        this.scene.add(ambientLight);
+
+        var keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.45);
+        keyLight.position.set(2.8, 3.8, 3.2);
+        this.scene.add(keyLight);
+
+        var fillLight = new THREE.DirectionalLight(0xFFE8D0, 0.75);
+        fillLight.position.set(-2.4, 1.6, 2.2);
+        this.scene.add(fillLight);
+
+        var rimLight = new THREE.DirectionalLight(0xFFFFFF, 0.65);
+        rimLight.position.set(0, 3.2, -2.5);
+        this.scene.add(rimLight);
+
         // Ground Contact Shadow Mesh (Reacts smoothly to character lean & posture)
         var shadowGeo = new THREE.PlaneGeometry(1.65, 0.45);
         var shadowCanvas = document.createElement("canvas");
@@ -962,6 +978,39 @@
       return tex;
     },
 
+    // 3D Volumetric Mesh Constructor: Generates curved 3D geometry with authentic depth
+    createCurvedGeometry: function(width, height, segX, segY, maxDepth, isHead) {
+      var geo = new THREE.PlaneGeometry(width, height, segX, segY);
+      var pos = geo.attributes.position;
+      var halfW = width * 0.5;
+      var halfH = height * 0.5;
+
+      for (var i = 0; i < pos.count; i++) {
+        var x = pos.getX(i);
+        var y = pos.getY(i);
+        var u = x / halfW; // -1 to +1
+        var v = y / halfH; // -1 to +1
+
+        var u2 = u * u;
+        var depth = 0;
+        if (u2 < 1.0) {
+          if (isHead) {
+            // 3D Ellipsoidal Dome for head: cheek volume, nose projection, rounded safa
+            var v2 = (v - 0.12) * (v - 0.12);
+            var r2 = Math.max(0, 1.0 - (u2 * 0.82 + v2 * 0.40));
+            depth = Math.sqrt(r2) * maxDepth;
+          } else {
+            // 3D Cylindrical Curvature for torso & sherwani jacket
+            var r2 = Math.max(0, 1.0 - (u2 * 0.88));
+            depth = Math.sqrt(r2) * maxDepth;
+          }
+        }
+        pos.setZ(i, depth);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    },
+
     buildAvatarRig: function(outfitKey) {
       var urls = config.outfitUrls[outfitKey] || config.outfitUrls.cream;
 
@@ -969,14 +1018,15 @@
       var charWidth = charHeight * (848.0 / 1264.0); // ~1.409
       var neckPivotY = charHeight * (1.0 - (446.0 / 1264.0)); // ~1.359
 
-      // 1. Torso & Body Mesh (Feet, Sherwani, Neck Base)
-      var bodyGeo = new THREE.PlaneGeometry(charWidth, charHeight, 16, 24);
+      // 1. Torso & Body: True 3D Cylindrical Curved Mesh with Specular Lighting
+      var bodyGeo = this.createCurvedGeometry(charWidth, charHeight, 48, 48, 0.12, false);
       var bodyTex = this.loadTexture(urls.body);
-      var bodyMat = new THREE.MeshBasicMaterial({
+      var bodyMat = new THREE.MeshStandardMaterial({
         map: bodyTex,
         transparent: true,
         alphaTest: 0.005,
-        depthWrite: false,
+        roughness: 0.42,
+        metalness: 0.10,
         side: THREE.DoubleSide
       });
       this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
@@ -984,18 +1034,19 @@
       this.bodyMesh.renderOrder = 2;
       this.characterGroup.add(this.bodyMesh);
 
-      // 2. Head Group & Mesh (Turban, Plume, Kalgi Brooch, Face, Gaze Eyes)
+      // 2. Head Group & 3D Ellipsoidal Curved Mesh with 3D Neck Pivot Parallax
       this.headGroup = new THREE.Group();
-      this.headGroup.position.set(0, neckPivotY, 0.025); // Sub-millimeter neck pivot with true 3D parallax depth
+      this.headGroup.position.set(0, neckPivotY, 0.055); // Forward neck pivot in 3D
       this.characterGroup.add(this.headGroup);
 
-      var headGeo = new THREE.PlaneGeometry(charWidth, charHeight, 16, 24);
+      var headGeo = this.createCurvedGeometry(charWidth, charHeight, 48, 48, 0.18, true);
       var headTex = this.loadTexture(urls.head);
-      var headMat = new THREE.MeshBasicMaterial({
+      var headMat = new THREE.MeshStandardMaterial({
         map: headTex,
         transparent: true,
         alphaTest: 0.005,
-        depthWrite: false,
+        roughness: 0.38,
+        metalness: 0.14,
         side: THREE.DoubleSide
       });
       this.headMesh = new THREE.Mesh(headGeo, headMat);
@@ -1042,51 +1093,60 @@
     setupEventListeners: function() {
       var self = this;
 
-      function updateGaze(clientX, clientY) {
+      // Exact Movement Mechanics from the "Chashme" Model:
+      // Cursor Left -> Head & Body turn and lean Left
+      // Cursor Right -> Head & Body turn and lean Right
+      // Cursor Up -> Head tilts Up
+      // Cursor Down -> Head tilts Down
+      function updatePointer(clientX, clientY) {
         if (!stageEl) return;
         var rect = stageEl.getBoundingClientRect();
-        var midX = rect.left + rect.width / 2;
-        var midY = rect.top + rect.height * 0.40;
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height * 0.40;
 
-        // Normalized displacement from character center
-        var relX = (clientX - midX) / (window.innerWidth * 0.42);
-        var relY = (clientY - midY) / (window.innerHeight * 0.42);
+        var deltaX = (clientX - centerX) / (window.innerWidth * 0.42);
+        var deltaY = (clientY - centerY) / (window.innerHeight * 0.42);
 
-        var clampedX = Math.max(-1.15, Math.min(1.15, relX));
-        var clampedY = Math.max(-1.15, Math.min(1.15, relY));
+        // Circular polar coordinate calculation for smooth 360° circular tracking ("moment like circle")
+        var angle = Math.atan2(deltaY, deltaX);
+        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        var r = Math.min(1.20, dist);
 
-        // 1. Natural Head Gaze (Yaw, Pitch, Roll)
-        self.targetHeadYaw = -clampedX * 22;      // Up to ±22° horizontal head turn
-        self.targetHeadPitch = -clampedY * 12;    // Up to ±12° vertical head pitch
-        self.targetHeadRoll = -clampedX * 3.5;    // Subtle lifelike lateral neck roll
+        var sens = config.sensitivity || 24;
+        var maxPitch = 15;
 
-        // 2. Natural Torso Anatomical Follow-Through
-        self.targetTorsoYaw = self.targetHeadYaw * 0.35;    // Torso rotates ~35% of head angle
-        self.targetTorsoPitch = self.targetHeadPitch * 0.25;
-        self.targetTorsoLean = -clampedX * 0.035;          // Subtle shoulder posture lean (radians)
+        // Exact natural direction (left cursor -> left move, right cursor -> right move)
+        self.targetHeadYaw = Math.cos(angle) * (r * sens);
+        self.targetHeadPitch = Math.sin(angle) * (r * maxPitch);
+        self.targetHeadRoll = Math.cos(angle) * (r * 3.8);
 
-        // 3. Weight-Shift Leaning Displacement
-        self.targetLeanX = -clampedX * 0.12;
+        // Natural Torso Anatomical Follow-Through
+        self.targetTorsoYaw = self.targetHeadYaw * 0.32;
+        self.targetTorsoPitch = self.targetHeadPitch * 0.22;
+        self.targetTorsoLean = -self.targetHeadYaw * 0.0018;
+
+        // Weight-shift leaning displacement towards cursor (left on left, right on right)
+        self.targetLeanX = (self.targetHeadYaw / sens) * 0.085;
 
         self.isCursorActive = true;
         self.lastMoveTime = performance.now();
       }
 
       sectionEl.addEventListener("mousemove", function(e) {
-        updateGaze(e.clientX, e.clientY);
+        updatePointer(e.clientX, e.clientY);
       }, { passive: true });
 
       window.addEventListener("mousemove", function(e) {
         if (!sectionEl) return;
         var r = sectionEl.getBoundingClientRect();
         if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
-          updateGaze(e.clientX, e.clientY);
+          updatePointer(e.clientX, e.clientY);
         }
       }, { passive: true });
 
       sectionEl.addEventListener("touchmove", function(e) {
         if (!e.touches || e.touches.length === 0) return;
-        updateGaze(e.touches[0].clientX, e.touches[0].clientY);
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
 
       sectionEl.addEventListener("mouseleave", function() {
@@ -1108,26 +1168,34 @@
 
       // Autonomous circular gaze patrol following the 3D butterfly when cursor is idle
       if ((time - this.lastMoveTime > 3000) && ButterflyFollower.el) {
-        var secW = sectionEl.offsetWidth || window.innerWidth;
-        var charMidX = secW * 0.5;
-        var diffX = (ButterflyFollower.posX - charMidX) / (secW * 0.5);
-        var diffY = (ButterflyFollower.posY - (sectionEl.offsetHeight * 0.36)) / (sectionEl.offsetHeight * 0.36);
+        var bRect = stageEl.getBoundingClientRect();
+        var sCenterX = bRect.left + bRect.width / 2;
+        var sCenterY = bRect.top + bRect.height * 0.40;
+        var secRect = sectionEl.getBoundingClientRect();
 
-        var bClampedX = Math.max(-1.0, Math.min(1.0, diffX));
-        var bClampedY = Math.max(-1.0, Math.min(1.0, diffY));
+        var bClientX = secRect.left + ButterflyFollower.posX;
+        var bClientY = secRect.top + ButterflyFollower.posY;
 
-        this.targetHeadYaw = -bClampedX * 16;
-        this.targetHeadPitch = -bClampedY * 8;
-        this.targetHeadRoll = -bClampedX * 2.5;
+        var bdx = (bClientX - sCenterX) / (window.innerWidth * 0.42);
+        var bdy = (bClientY - sCenterY) / (window.innerHeight * 0.42);
+
+        var bAngle = Math.atan2(bdy, bdx);
+        var bDist = Math.sqrt(bdx * bdx + bdy * bdy);
+        var br = Math.min(1.0, bDist);
+
+        var sens = config.sensitivity || 24;
+        this.targetHeadYaw = Math.cos(bAngle) * (br * sens * 0.85);
+        this.targetHeadPitch = Math.sin(bAngle) * (br * 12);
+        this.targetHeadRoll = Math.cos(bAngle) * (br * 2.8);
 
         this.targetTorsoYaw = this.targetHeadYaw * 0.30;
         this.targetTorsoPitch = this.targetHeadPitch * 0.20;
-        this.targetTorsoLean = -bClampedX * 0.025;
-        this.targetLeanX = -bClampedX * 0.08;
+        this.targetTorsoLean = -this.targetHeadYaw * 0.0015;
+        this.targetLeanX = (this.targetHeadYaw / sens) * 0.065;
       }
 
-      // Smooth Organic Spring Lerp (Natural human biomechanics, no stiffness)
-      var ease = 0.075;
+      // Smooth Organic Spring Lerp (Matching signature chashme damping factor: 0.082)
+      var ease = 0.082;
       this.headYaw += (this.targetHeadYaw - this.headYaw) * ease;
       this.headPitch += (this.targetHeadPitch - this.headPitch) * ease;
       this.headRoll += (this.targetHeadRoll - this.headRoll) * ease;
@@ -1141,13 +1209,13 @@
       var breatheY = Math.sin(time * 0.0018) * 0.012;
       var breathePitch = Math.sin(time * 0.0018) * 0.008;
 
-      // 1. Character Group: Grounded Leaning & Weight Shift
+      // 1. Character Group: Grounded Leaning & Weight Shift (Towards cursor)
       this.characterGroup.position.x = this.leanX;
       this.characterGroup.position.y = breatheY;
       this.characterGroup.rotation.z = this.torsoLean;
       this.characterGroup.rotation.y = 0; // FRONT-FACING ONLY (NO 360 SPIN)
 
-      // 2. Torso / Body: Natural Anatomical Rotation
+      // 2. Torso / Body: True 3D Curved Rotation
       var radTorsoYaw = (this.torsoYaw * Math.PI) / 180;
       var radTorsoPitch = (this.torsoPitch * Math.PI) / 180;
       if (this.bodyMesh) {
@@ -1155,7 +1223,7 @@
         this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
       }
 
-      // 3. Head & Neck: True Circular Gaze & Parallax Depth
+      // 3. Head & Neck: True Circular Gaze & Parallax Depth atop Neck Joint
       var radHeadYaw = (this.headYaw * Math.PI) / 180;
       var radHeadPitch = (this.headPitch * Math.PI) / 180;
       var radHeadRoll = (this.headRoll * Math.PI) / 180;
@@ -1167,7 +1235,7 @@
 
       // 4. Ground Contact Shadow: Dynamic shift reacting to lean
       if (this.shadowMesh) {
-        this.shadowMesh.position.x = this.leanX * 0.70;
+        this.shadowMesh.position.x = this.leanX * 0.90;
         this.shadowMesh.scale.x = 1.0 - Math.abs(this.headPitch / 30) * 0.06;
       }
 

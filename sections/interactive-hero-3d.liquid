@@ -603,6 +603,8 @@
     currentRotX: 0,
     targetRoll: 0,
     currentRoll: 0,
+    lastMoveTime: performance.now(),
+    isMouseLeft: false,
     
     // 360 Drag & Orbit
     isDragging: false,
@@ -727,6 +729,9 @@
       // Natural Circular Gaze & Body Tracking (NO 360 SPIN - FRONT FACING)
       function updatePointer(clientX, clientY) {
         if (!stageEl) return;
+        self.lastMoveTime = performance.now();
+        self.isMouseLeft = false;
+
         var rect = stageEl.getBoundingClientRect();
         var centerX = rect.left + rect.width / 2;
         var centerY = rect.top + rect.height * 0.45;
@@ -758,9 +763,13 @@
       }, { passive: true });
 
       document.addEventListener("mouseleave", function() {
-        self.targetRotY = 0;
-        self.targetRotX = 0;
-        self.targetRoll = 0;
+        self.isMouseLeft = true;
+        self.lastMoveTime = 0; // Switch immediately to tracking the butterfly
+      });
+
+      sectionEl.addEventListener("mouseleave", function() {
+        self.isMouseLeft = true;
+        self.lastMoveTime = 0;
       });
 
       // Window Resize
@@ -780,6 +789,34 @@
 
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
+
+      // Autonomous circular gaze & body tracking: Follow the butterfly when cursor is idle or mouse leaves (Matching Section 1)
+      if ((time - this.lastMoveTime > 2800 || this.isMouseLeft) && typeof ElectricButterflyController !== "undefined" && ElectricButterflyController.el) {
+        var stageRect = stageEl.getBoundingClientRect();
+        var sCenterX = stageRect.left + stageRect.width / 2;
+        var sCenterY = stageRect.top + stageRect.height * 0.45;
+        var secRect = sectionEl.getBoundingClientRect();
+
+        var bX = ElectricButterflyController.currentFx !== undefined ? ElectricButterflyController.currentFx : ElectricButterflyController.posX;
+        var bY = ElectricButterflyController.currentFy !== undefined ? ElectricButterflyController.currentFy : ElectricButterflyController.posY;
+
+        var bClientX = secRect.left + bX;
+        var bClientY = secRect.top + bY;
+
+        var bDeltaX = (bClientX - sCenterX) / (window.innerWidth * 0.44);
+        var bDeltaY = (bClientY - sCenterY) / (window.innerHeight * 0.44);
+
+        var bAngle = Math.atan2(bDeltaY, bDeltaX);
+        var bDist = Math.sqrt(bDeltaX * bDeltaX + bDeltaY * bDeltaY);
+        var br = Math.min(1.20, bDist);
+
+        var sens = this.sens() || 24;
+        var maxPitch = 15;
+
+        this.targetRotY = Math.cos(bAngle) * (br * sens * 0.90);
+        this.targetRotX = Math.sin(bAngle) * (br * maxPitch);
+        this.targetRoll = Math.cos(bAngle) * (br * 3.4);
+      }
 
       // Smooth Spring Interpolation
       this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
@@ -1000,6 +1037,9 @@
       // Restrain within full section boundaries
       fx = Math.max(30, Math.min(secW - 70, fx));
       fy = Math.max(30, Math.min(secH - 70, fy));
+
+      this.currentFx = fx;
+      this.currentFy = fy;
 
       if (dist > 2) {
         var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;

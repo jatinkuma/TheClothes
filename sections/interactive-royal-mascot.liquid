@@ -16,7 +16,7 @@
       - Head and body trace continuous circular loops as cursor circles around
       - Autonomous gaze following the 3D butterfly when idle
   - Instant Dress-Up & Outfit Customizer ("Append the dress we want"):
-    * Imperial Cream & Gold Sherwani
+    * The Royal Owl Mascot (From Video)
     * Sapphire Blue Royal Jodhpuri
     * Heritage Emerald Silk Sherwani
     * Ruby Red Ceremonial Sherwani
@@ -808,22 +808,19 @@
     sensitivity: {{ section.settings.sensitivity | default: 28 }},
     enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
     enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %},
-    outfitUrls: {
-      cream: {
-        head: "{{ 'doll-cream-head.png' | asset_url }}",
-        body: "{{ 'doll-cream-body.png' | asset_url }}"
-      },
-      blue: {
-        head: "{{ 'doll-blue-head.png' | asset_url }}",
-        body: "{{ 'doll-blue-body.png' | asset_url }}"
-      },
-      green: {
-        head: "{{ 'doll-green-head.png' | asset_url }}",
-        body: "{{ 'doll-green-body.png' | asset_url }}"
-      },
-      red: {
-        head: "{{ 'doll-red-head.png' | asset_url }}",
-        body: "{{ 'doll-red-body.png' | asset_url }}"
+    owlAssets: {
+      body: "{{ 'royal-owl-body.png' | asset_url }}",
+      headCenter: "{{ 'royal-owl-head-center.png' | asset_url }}",
+      headLeft: "{{ 'royal-owl-head-left.png' | asset_url }}",
+      headRight: "{{ 'royal-owl-head-right.png' | asset_url }}",
+      headFarLeft: "{{ 'royal-owl-head-far-left.png' | asset_url }}",
+      headFarRight: "{{ 'royal-owl-head-far-right.png' | asset_url }}",
+      headBlink: "{{ 'royal-owl-head-blink.png' | asset_url }}",
+      outfits: {
+        cream: "{{ 'royal-owl-master.png' | asset_url }}",
+        blue: "{{ 'royal-owl-achkan.png' | asset_url }}",
+        green: "{{ 'royal-owl-mojari.png' | asset_url }}",
+        red: "{{ 'royal-owl-dupatta.png' | asset_url }}"
       }
     }
   };
@@ -943,8 +940,19 @@
         this.characterGroup = new THREE.Group();
         this.scene.add(this.characterGroup);
 
-        // Build 3D Articulated Avatar Hierarchy
+        // Build 3D Articulated Avatar Hierarchy & Preload Head Angle Textures
         this.textureLoader = new THREE.TextureLoader();
+
+        // Preload all multi-angle head & outfit textures for 0-latency switching
+        for (var hKey in config.owlAssets) {
+          if (typeof config.owlAssets[hKey] === "string") {
+            this.loadTexture(config.owlAssets[hKey]);
+          }
+        }
+        for (var oKey in config.owlAssets.outfits) {
+          this.loadTexture(config.owlAssets.outfits[oKey]);
+        }
+
         this.buildAvatarRig("cream");
 
         // Setup Event Listeners & Animation Loop
@@ -1012,15 +1020,15 @@
     },
 
     buildAvatarRig: function(outfitKey) {
-      var urls = config.outfitUrls[outfitKey] || config.outfitUrls.cream;
+      // Proportions matching video character (210w x 415h body, 210w x 195h head)
+      var charWidth = 1.35;
+      var bodyHeight = charWidth * (415.0 / 210.0); // ~2.668
+      var headHeight = charWidth * (195.0 / 210.0); // ~1.254
+      var neckPivotY = bodyHeight * ((415.0 - 170.0) / 415.0); // ~1.575
 
-      var charHeight = 2.10;
-      var charWidth = charHeight * (848.0 / 1264.0); // ~1.409
-      var neckPivotY = charHeight * (1.0 - (446.0 / 1264.0)); // ~1.359
-
-      // 1. Torso & Body: True 3D Cylindrical Curved Mesh with Specular Lighting
-      var bodyGeo = this.createCurvedGeometry(charWidth, charHeight, 48, 48, 0.12, false);
-      var bodyTex = this.loadTexture(urls.body);
+      // 1. Torso & Body: Authentic Cartoon Owl Body from Video
+      var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 48, 48, 0.12, false);
+      var bodyTex = this.loadTexture(config.owlAssets.body);
       var bodyMat = new THREE.MeshStandardMaterial({
         map: bodyTex,
         transparent: true,
@@ -1030,17 +1038,17 @@
         side: THREE.DoubleSide
       });
       this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-      this.bodyMesh.position.set(0, charHeight * 0.5, 0);
+      this.bodyMesh.position.set(0, bodyHeight * 0.5, 0);
       this.bodyMesh.renderOrder = 2;
       this.characterGroup.add(this.bodyMesh);
 
-      // 2. Head Group & 3D Ellipsoidal Curved Mesh with 3D Neck Pivot Parallax
+      // 2. Head Group & 3D Ellipsoidal Curved Mesh with Neck Joint Parallax
       this.headGroup = new THREE.Group();
       this.headGroup.position.set(0, neckPivotY, 0.055); // Forward neck pivot in 3D
       this.characterGroup.add(this.headGroup);
 
-      var headGeo = this.createCurvedGeometry(charWidth, charHeight, 48, 48, 0.18, true);
-      var headTex = this.loadTexture(urls.head);
+      var headGeo = this.createCurvedGeometry(charWidth, headHeight, 48, 48, 0.18, true);
+      var headTex = this.loadTexture(config.owlAssets.headCenter);
       var headMat = new THREE.MeshStandardMaterial({
         map: headTex,
         transparent: true,
@@ -1050,8 +1058,8 @@
         side: THREE.DoubleSide
       });
       this.headMesh = new THREE.Mesh(headGeo, headMat);
-      // Offset so the head graphic sits exactly on top of the neck joint
-      this.headMesh.position.set(0, (charHeight * 0.5) - neckPivotY, 0);
+      // Sit atop neck joint seamlessly with zero gap
+      this.headMesh.position.set(0, (headHeight * 0.5) - 0.20, 0);
       this.headMesh.renderOrder = 3;
       this.headGroup.add(this.headMesh);
     },
@@ -1059,33 +1067,21 @@
     equipDress: function(outfitKey, customUrl) {
       var self = this;
       if (customUrl) {
-        var tex = this.loadTexture(customUrl, function(t) {
+        this.loadTexture(customUrl, function(t) {
           if (self.bodyMesh) {
             self.bodyMesh.material.map = t;
             self.bodyMesh.material.needsUpdate = true;
-          }
-          if (self.headMesh) {
-            self.headMesh.visible = false;
           }
         });
         return;
       }
 
-      var urls = config.outfitUrls[outfitKey] || config.outfitUrls.cream;
-
-      if (this.headMesh) this.headMesh.visible = true;
-
-      this.loadTexture(urls.body, function(bodyTex) {
+      // Map to royal owl outfits (Achkan, Dupatta, Mojari, Safa)
+      var outfitUrl = config.owlAssets.outfits[outfitKey] || config.owlAssets.outfits.cream;
+      this.loadTexture(outfitUrl, function(tex) {
         if (self.bodyMesh) {
-          self.bodyMesh.material.map = bodyTex;
+          self.bodyMesh.material.map = tex;
           self.bodyMesh.material.needsUpdate = true;
-        }
-      });
-
-      this.loadTexture(urls.head, function(headTex) {
-        if (self.headMesh) {
-          self.headMesh.material.map = headTex;
-          self.headMesh.material.needsUpdate = true;
         }
       });
     },
@@ -1223,14 +1219,38 @@
         this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
       }
 
-      // 3. Head & Neck: True Circular Gaze & Parallax Depth atop Neck Joint
+      // 3. Dynamic Head Angle Sprite Switching + 3D Gaze Parallax
+      var blinkProgress = (time % 3600) / 3600;
+      this.isBlinking = (blinkProgress > 0.965);
+
+      var activeHeadKey = "headCenter";
+      if (this.isBlinking) {
+        activeHeadKey = "headBlink";
+      } else if (this.headYaw < -13) {
+        activeHeadKey = "headFarLeft";
+      } else if (this.headYaw < -3.5) {
+        activeHeadKey = "headLeft";
+      } else if (this.headYaw > 13) {
+        activeHeadKey = "headFarRight";
+      } else if (this.headYaw > 3.5) {
+        activeHeadKey = "headRight";
+      }
+
+      if (activeHeadKey !== this.currentHeadKey && this.loadedTextures[config.owlAssets[activeHeadKey]]) {
+        this.currentHeadKey = activeHeadKey;
+        if (this.headMesh) {
+          this.headMesh.material.map = this.loadedTextures[config.owlAssets[activeHeadKey]];
+          this.headMesh.material.needsUpdate = true;
+        }
+      }
+
       var radHeadYaw = (this.headYaw * Math.PI) / 180;
       var radHeadPitch = (this.headPitch * Math.PI) / 180;
       var radHeadRoll = (this.headRoll * Math.PI) / 180;
       if (this.headGroup) {
-        this.headGroup.rotation.y = radHeadYaw;
-        this.headGroup.rotation.x = radHeadPitch;
-        this.headGroup.rotation.z = radHeadRoll;
+        this.headGroup.rotation.y = radHeadYaw * 0.70;
+        this.headGroup.rotation.x = radHeadPitch * 0.85;
+        this.headGroup.rotation.z = radHeadRoll * 0.55;
       }
 
       // 4. Ground Contact Shadow: Dynamic shift reacting to lean

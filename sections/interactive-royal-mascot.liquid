@@ -1,27 +1,34 @@
 {% comment %}
   ==============================================================================
-  ROYAL MASCOT — INTERACTIVE DRESS-UP CHARACTER & 3D BUTTERFLY ATELIER
+  ROYAL MASCOT — INTERACTIVE 3D WEBGL DRESS-UP ATELIER & BUTTERFLY
   ------------------------------------------------------------------------------
   Features:
-  - Front-Facing Indian Prince Fashion Doll Character in Royal Regalia
+  - High-Fidelity 3D WebGL Rigged Avatar (Three.js Engine):
+    * Front-facing Royal Prince Doll in authentic handcrafted court regalia
+    * Articulated Head & Body 3D hierarchy with sub-millimeter neck pivot
+    * Circular Gaze Tracking ("Moment Like Circle"): head & body follow cursor
+      in a continuous, fluid circular loop with natural pitch (up/down) and yaw (left/right)
+    * Signature bottom-section leaning displacement physics (position.x & rotation.z)
+    * Dynamic ground contact shadow reacting to lean and gaze in real time
+    * Interactive 360° drag & spin orbit rotation with momentum and smooth inertia
+    * Organic sinusoidal idle floating breathing wave
+    * Autonomous gaze following the 3D butterfly when idle
   - Instant Dress-Up & Outfit Customizer ("Append the dress we want"):
     * Imperial Cream & Gold Sherwani
     * Sapphire Blue Royal Jodhpuri
     * Heritage Emerald Silk Sherwani
     * Ruby Red Ceremonial Sherwani
-    * Custom merchant outfit upload support via Shopify theme blocks
-    * Seamless crossfade transitions with magical fairy dust sparkle burst
-  - Natural Gaze & Circular Tracking Physics (Matching Signature Bottom Section):
-    * Organic yaw (left-right) & vertical pitch (up-down) tracking the cursor
-    * Signature bottom-section leaning displacement physics
-    * Responsive dynamic ground contact shadow that shifts with lean
-    * Gentle idle floating wave and butterfly gaze tracking
-  - Full-Section 3D Royal Butterfly Creature & Live Multi-Hue Fairy Dust Trail:
-    * Exact multi-stop gradient wings, emerald core glow, 3D banking, and speed toggle
-    * Flying across full section width & height without clipping
-  - Responsive across Mobile, Tablet, and Desktop touch displays
+    * Custom merchant outfit upload support via theme blocks
+    * Instant WebGL texture swap with magical fairy dust equip sparkle burst
+  - FULL-SECTION 3D Royal Butterfly Creature & Live Multi-Hue Fairy Dust Trail:
+    * Exact multi-stop gradient wings, emerald core glow, 3D banking, fast/hover flap
+    * Gliding across 100% width and height of the section
+  - Fully responsive across desktop, tablet, and mobile touch devices
   ==============================================================================
 {% endcomment %}
+
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <div
   id="royal-mascot-section-{{ section.id }}"
@@ -159,7 +166,7 @@
     </div>
   {% endif %}
 
-  <!-- Central Stage: Interactive Doll & Wardrobe Atelier -->
+  <!-- Central Stage: Interactive 3D WebGL Avatar & Wardrobe Atelier -->
   <div id="royal-mascot-stage-{{ section.id }}" class="royal-mascot-stage">
 
     <!-- Active Outfit Floating Pill -->
@@ -168,74 +175,13 @@
       <span class="badge-name" id="royal-active-name-{{ section.id }}">Imperial Cream & Gold Sherwani</span>
     </div>
 
-    <!-- Master Interactive Doll Character with Gaze & Leaning Physics -->
-    <div
-      id="royal-mascot-doll-{{ section.id }}"
-      class="royal-doll-character"
-      data-doll-tracking="true"
-      data-idle-float="true"
-    >
-      <!-- Preloaded Built-in Outfits for Instant Seamless Crossfade -->
-      <img
-        id="royal-doll-cream-{{ section.id }}"
-        class="royal-doll-img active"
-        data-outfit="cream"
-        src="{{ 'royal-doll-cream.png' | asset_url }}"
-        alt="Imperial Cream & Gold Sherwani"
-        loading="eager"
-        width="848"
-        height="1264"
-      />
-      <img
-        id="royal-doll-blue-{{ section.id }}"
-        class="royal-doll-img"
-        data-outfit="blue"
-        src="{{ 'royal-doll-blue.png' | asset_url }}"
-        alt="Sapphire Blue Jodhpuri"
-        loading="lazy"
-        width="848"
-        height="1264"
-      />
-      <img
-        id="royal-doll-green-{{ section.id }}"
-        class="royal-doll-img"
-        data-outfit="green"
-        src="{{ 'royal-doll-green.png' | asset_url }}"
-        alt="Heritage Emerald Silk Sherwani"
-        loading="lazy"
-        width="848"
-        height="1264"
-      />
-      <img
-        id="royal-doll-red-{{ section.id }}"
-        class="royal-doll-img"
-        data-outfit="red"
-        src="{{ 'royal-doll-red.png' | asset_url }}"
-        alt="Ruby Red Ceremonial Sherwani"
-        loading="lazy"
-        width="848"
-        height="1264"
-      />
+    <!-- WebGL Canvas for 3D Rigged Avatar (Same Circular Tracking & Leaning Movement) -->
+    <canvas id="royal-mascot-canvas-{{ section.id }}" class="royal-mascot-canvas"></canvas>
 
-      <!-- Custom Merchant Uploaded Outfits (via Blocks) -->
-      {% for block in section.blocks %}
-        {% if block.settings.custom_outfit_image != blank %}
-          <img
-            id="royal-doll-block-{{ block.id }}"
-            class="royal-doll-img"
-            data-outfit="block-{{ block.id }}"
-            src="{{ block.settings.custom_outfit_image | image_url: width: 1000 }}"
-            alt="{{ block.settings.outfit_name }}"
-            loading="lazy"
-            width="848"
-            height="1264"
-            {{ block.shopify_attributes }}
-          />
-        {% endif %}
-      {% endfor %}
-
-      <!-- Dynamic Ground Contact Shadow (Moves & squashes with leaning physics) -->
-      <div id="royal-doll-shadow-{{ section.id }}" class="royal-doll-ground-shadow" aria-hidden="true"></div>
+    <!-- Loading Spinner -->
+    <div id="royal-mascot-spinner-{{ section.id }}" class="royal-mascot-spinner" aria-live="polite">
+      <div class="royal-mascot-spinner-ring"></div>
+      <span class="royal-mascot-spinner-text">Awakening Royal Avatar...</span>
     </div>
 
     <!-- Quick-Dressing Wardrobe Swatches Dock -->
@@ -255,6 +201,9 @@
               data-title="{{ block.settings.outfit_name | escape }}"
               data-price="{{ block.settings.price | default: 'Rs. 48,000' | escape }}"
               data-desc="{{ block.settings.description | default: 'Hand-tailored court sherwani.' | escape }}"
+              {% if block.settings.custom_outfit_image != blank %}
+                data-custom-url="{{ block.settings.custom_outfit_image | image_url: width: 1000 }}"
+              {% endif %}
               aria-label="Dress character in {{ block.settings.outfit_name | escape }}"
               {{ block.shopify_attributes }}
             >
@@ -331,7 +280,7 @@
     {% if section.settings.show_hint %}
       <div class="royal-mascot-hint">
         <span class="royal-mascot-hint-icon">✦</span>
-        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Click any dress to drape the character • Move mouse to track natural gaze in real-time' }}</span>
+        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Click any dress to drape the character • Move mouse in circles or drag to rotate 360°' }}</span>
       </div>
     {% endif %}
 
@@ -340,12 +289,12 @@
 
 <style>
   /* ==========================================================================
-     ROYAL MASCOT & DRESS-UP ATELIER STYLING
+     ROYAL MASCOT & 3D DRESS-UP ATELIER STYLING
      ========================================================================== */
   #royal-mascot-section-{{ section.id }} {
     position: relative;
     width: 100%;
-    min-height: 720px;
+    min-height: 740px;
     background-color: var(--mascot-bg, #E5A625);
     background: radial-gradient(ellipse at 50% 45%, #f7cb67 0%, #e5a625 50%, #c48210 100%);
     overflow: hidden;
@@ -356,14 +305,14 @@
     box-sizing: border-box;
     user-select: none;
     -webkit-user-select: none;
-    padding: 36px 20px 48px 20px;
+    padding: 34px 20px 48px 20px;
   }
 
   /* Subtle Warm Center Glow */
   #royal-mascot-section-{{ section.id }} .royal-mascot-bg-glow {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.22) 0%, rgba(245, 185, 50, 0.10) 45%, transparent 75%);
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.24) 0%, rgba(245, 185, 50, 0.12) 45%, transparent 75%);
     pointer-events: none;
     z-index: 1;
   }
@@ -374,20 +323,20 @@
     z-index: 6;
     text-align: center;
     max-width: 680px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   #royal-mascot-section-{{ section.id }} .royal-mascot-badge {
     display: inline-block;
     padding: 4px 14px;
     background: rgba(30, 20, 10, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 20px;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     color: #3b2207;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     backdrop-filter: blur(4px);
   }
 
@@ -397,7 +346,7 @@
     font-weight: 800;
     color: #2b1704;
     line-height: 1.15;
-    margin: 0 0 6px 0;
+    margin: 0 0 4px 0;
     letter-spacing: -0.01em;
     text-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
   }
@@ -532,7 +481,6 @@
     align-items: center;
     justify-content: center;
     z-index: 5;
-    perspective: 1000px;
   }
 
   /* Active Outfit Pill Badge */
@@ -545,10 +493,10 @@
     box-shadow: 0 4px 18px rgba(90, 50, 10, 0.12);
     border-radius: 30px;
     padding: 6px 18px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
     z-index: 8;
     backdrop-filter: blur(8px);
-    transition: transform 0.25s ease, background 0.25s ease;
+    transition: transform 0.25s ease;
   }
 
   #royal-mascot-section-{{ section.id }} .royal-active-outfit-badge .badge-crown {
@@ -562,60 +510,61 @@
     letter-spacing: 0.02em;
   }
 
-  /* Master Character Container */
-  #royal-mascot-section-{{ section.id }} .royal-doll-character {
-    position: relative;
-    width: 100%;
-    max-width: var(--mascot-width, 440px);
-    height: 520px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform-style: preserve-3d;
-    will-change: transform;
-    pointer-events: auto;
-    cursor: default;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-doll-img {
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) scale(0.96);
-    max-height: 480px;
-    width: auto;
-    object-fit: contain;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.36s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.36s cubic-bezier(0.2, 0.8, 0.2, 1);
-    transform-origin: center bottom;
-    pointer-events: none;
-    filter: drop-shadow(0 14px 26px rgba(50, 25, 5, 0.22));
-    z-index: 3;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-doll-img.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) scale(1);
+  /* WebGL 3D Canvas */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas {
+    width: 100% !important;
+    max-width: 580px;
+    height: 480px !important;
+    display: block;
+    outline: none;
+    cursor: grab;
     z-index: 4;
+    user-select: none;
+    touch-action: none;
   }
 
-  /* Ground Contact Shadow */
-  #royal-mascot-section-{{ section.id }} .royal-doll-ground-shadow {
+  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas:active {
+    cursor: grabbing;
+  }
+
+  /* Spinner */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner {
     position: absolute;
-    bottom: 14px;
+    top: 38%;
     left: 50%;
-    width: 190px;
-    height: 28px;
-    background: radial-gradient(ellipse at 50% 50%, rgba(35, 18, 5, 0.42) 0%, rgba(35, 18, 5, 0.12) 50%, transparent 75%);
-    transform: translateX(-50%);
-    border-radius: 50%;
-    filter: blur(4px);
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
     pointer-events: none;
-    z-index: 2;
-    will-change: transform;
-    transition: transform 0.08s linear;
+    transition: opacity 0.4s ease;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner.loaded {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner-ring {
+    width: 44px;
+    height: 44px;
+    border: 3.5px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #2b1704;
+    border-radius: 50%;
+    animation: rmSpin 0.9s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+  }
+
+  @keyframes rmSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner-text {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #3b2207;
   }
 
   /* Wardrobe Dock */
@@ -630,7 +579,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: -6px;
+    margin-top: -14px;
     margin-bottom: 14px;
     backdrop-filter: blur(10px);
     max-width: 95%;
@@ -816,21 +765,15 @@
     #royal-mascot-section-{{ section.id }} .royal-mascot-sparkles-canvas {
       display: none !important;
     }
-    #royal-mascot-section-{{ section.id }} .royal-doll-character {
-      transform: none !important;
-    }
   }
 
   @media (max-width: 640px) {
     #royal-mascot-section-{{ section.id }} {
-      min-height: 660px;
-      padding: 24px 14px 36px 14px;
+      min-height: 680px;
+      padding: 22px 14px 34px 14px;
     }
-    #royal-mascot-section-{{ section.id }} .royal-doll-character {
-      height: 440px;
-    }
-    #royal-mascot-section-{{ section.id }} .royal-doll-img {
-      max-height: 400px;
+    #royal-mascot-section-{{ section.id }} .royal-mascot-canvas {
+      height: 420px !important;
     }
     #royal-mascot-section-{{ section.id }} .royal-outfit-info-card {
       flex-direction: column;
@@ -852,8 +795,8 @@
   var sectionId = "{{ section.id }}";
   var sectionEl = document.getElementById("royal-mascot-section-" + sectionId);
   var stageEl = document.getElementById("royal-mascot-stage-" + sectionId);
-  var dollViewer = document.getElementById("royal-mascot-doll-" + sectionId);
-  var shadowEl = document.getElementById("royal-doll-shadow-" + sectionId);
+  var canvasEl = document.getElementById("royal-mascot-canvas-" + sectionId);
+  var spinnerEl = document.getElementById("royal-mascot-spinner-" + sectionId);
   var butterflyEl = document.getElementById("royal-mascot-butterfly-" + sectionId);
   var sparklesCanvas = document.getElementById("royal-mascot-sparkles-" + sectionId);
   var badgeNameEl = document.getElementById("royal-active-name-" + sectionId);
@@ -861,18 +804,403 @@
   var cardDescEl = document.getElementById("royal-card-desc-" + sectionId);
   var cardPriceEl = document.getElementById("royal-card-price-" + sectionId);
 
-  if (!sectionEl || !stageEl || !dollViewer) return;
+  if (!sectionEl || !stageEl || !canvasEl) return;
 
   var config = {
+    sensitivity: {{ section.settings.sensitivity | default: 28 }},
     enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
-    enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %}
+    enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %},
+    outfitUrls: {
+      cream: {
+        head: "{{ 'doll-cream-head.png' | asset_url }}",
+        body: "{{ 'doll-cream-body.png' | asset_url }}"
+      },
+      blue: {
+        head: "{{ 'doll-blue-head.png' | asset_url }}",
+        body: "{{ 'doll-blue-body.png' | asset_url }}"
+      },
+      green: {
+        head: "{{ 'doll-green-head.png' | asset_url }}",
+        body: "{{ 'doll-green-body.png' | asset_url }}"
+      },
+      red: {
+        head: "{{ 'doll-red-head.png' | asset_url }}",
+        body: "{{ 'doll-red-body.png' | asset_url }}"
+      }
+    }
   };
 
   // ==========================================================================
-  // 1. DRESS-UP & WARDROBE SYSTEM ("Append the dress we want")
+  // 1. THREE.JS 3D AVATAR MANAGER (CIRCULAR MOVEMENT & 360° INTERACTIVE SPIN)
+  // Exact Three.js movement, gaze tracking, pitch, and leaning physics
+  // ==========================================================================
+  var ThreeAvatarManager = {
+    scene: null,
+    camera: null,
+    renderer: null,
+    characterGroup: null,
+    bodyMesh: null,
+    headGroup: null,
+    headMesh: null,
+    shadowMesh: null,
+    textureLoader: null,
+    loadedTextures: {},
+    isReady: false,
+
+    // Circular movement & gaze angles
+    targetRotY: 0,
+    targetRotX: 0,
+    targetRoll: 0,
+    currentRotY: 0,
+    currentRotX: 0,
+    currentRoll: 0,
+
+    // 360 Drag Orbit variables
+    orbitAngleY: 0,
+    isDragging: false,
+    prevMouseX: 0,
+    dragVelocity: 0,
+    lastMoveTime: performance.now(),
+
+    init: function() {
+      if (typeof THREE === "undefined") {
+        setTimeout(ThreeAvatarManager.init, 120);
+        return;
+      }
+
+      try {
+        var w = stageEl.clientWidth || 580;
+        var h = canvasEl.clientHeight || 480;
+
+        // Scene
+        this.scene = new THREE.Scene();
+
+        // Perspective Camera directly viewing the FRONT of the character
+        this.camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
+        this.camera.position.set(0, 1.15, 3.25);
+        this.camera.lookAt(0, 0.95, 0);
+
+        // WebGL Renderer with High-Fidelity Color & Tone Mapping
+        this.renderer = new THREE.WebGLRenderer({
+          canvas: canvasEl,
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance"
+        });
+        this.renderer.setSize(w, h);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.25;
+
+        // Ground Contact Shadow Mesh
+        var shadowGeo = new THREE.PlaneGeometry(1.65, 0.45);
+        var shadowCanvas = document.createElement("canvas");
+        shadowCanvas.width = 256;
+        shadowCanvas.height = 128;
+        var sctx = shadowCanvas.getContext("2d");
+        var grad = sctx.createRadialGradient(128, 64, 0, 128, 64, 110);
+        grad.addColorStop(0, "rgba(35, 18, 5, 0.50)");
+        grad.addColorStop(0.45, "rgba(35, 18, 5, 0.16)");
+        grad.addColorStop(1, "rgba(35, 18, 5, 0)");
+        sctx.fillStyle = grad;
+        sctx.fillRect(0, 0, 256, 128);
+
+        var shadowTex = new THREE.CanvasTexture(shadowCanvas);
+        var shadowMat = new THREE.MeshBasicMaterial({
+          map: shadowTex,
+          transparent: true,
+          opacity: 0.85,
+          depthWrite: false
+        });
+        var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+        shadowPlane.rotation.x = -Math.PI / 2;
+        shadowPlane.position.set(0, 0.02, 0);
+        this.scene.add(shadowPlane);
+        this.shadowMesh = shadowPlane;
+
+        // Character Group (Pivots, Leans, Spins)
+        this.characterGroup = new THREE.Group();
+        this.scene.add(this.characterGroup);
+
+        // Build 3D Articulated Avatar Hierarchy
+        this.textureLoader = new THREE.TextureLoader();
+        this.buildAvatarRig("cream");
+
+        // Setup Event Listeners & Animation Loop
+        this.setupEventListeners();
+        requestAnimationFrame(this.renderLoop.bind(this));
+
+        // Hide spinner once loaded
+        if (spinnerEl) spinnerEl.classList.add("loaded");
+        this.isReady = true;
+
+      } catch (err) {
+        console.error("Three.js Avatar initialization error:", err);
+      }
+    },
+
+    loadTexture: function(url, callback) {
+      if (this.loadedTextures[url]) {
+        if (callback) callback(this.loadedTextures[url]);
+        return this.loadedTextures[url];
+      }
+      var self = this;
+      var tex = this.textureLoader.load(url, function(loaded) {
+        loaded.generateMipmaps = true;
+        loaded.minFilter = THREE.LinearMipmapLinearFilter;
+        loaded.magFilter = THREE.LinearFilter;
+        loaded.encoding = THREE.sRGBEncoding;
+        if (callback) callback(loaded);
+      });
+      tex.encoding = THREE.sRGBEncoding;
+      this.loadedTextures[url] = tex;
+      return tex;
+    },
+
+    buildAvatarRig: function(outfitKey) {
+      var urls = config.outfitUrls[outfitKey] || config.outfitUrls.cream;
+
+      var charHeight = 2.10;
+      var charWidth = charHeight * (848.0 / 1264.0); // ~1.409
+      var neckPivotY = charHeight * (1.0 - (446.0 / 1264.0)); // ~1.359
+
+      // 1. Body Mesh (Legs, Sherwani, Neck Base)
+      var bodyGeo = new THREE.PlaneGeometry(charWidth, charHeight, 16, 24);
+      var bodyTex = this.loadTexture(urls.body);
+      var bodyMat = new THREE.MeshBasicMaterial({
+        map: bodyTex,
+        transparent: true,
+        alphaTest: 0.005,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+      this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+      this.bodyMesh.position.set(0, charHeight * 0.5, 0);
+      this.bodyMesh.renderOrder = 2;
+      this.characterGroup.add(this.bodyMesh);
+
+      // 2. Head Group & Mesh (Turban, Plume, Kalgi, Face, Eyes)
+      this.headGroup = new THREE.Group();
+      this.headGroup.position.set(0, neckPivotY, 0.025); // Sub-millimeter neck pivot with 3D parallax depth
+      this.characterGroup.add(this.headGroup);
+
+      var headGeo = new THREE.PlaneGeometry(charWidth, charHeight, 16, 24);
+      var headTex = this.loadTexture(urls.head);
+      var headMat = new THREE.MeshBasicMaterial({
+        map: headTex,
+        transparent: true,
+        alphaTest: 0.005,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+      this.headMesh = new THREE.Mesh(headGeo, headMat);
+      // Offset so the neck inside the head image sits exactly on the neck pivot
+      this.headMesh.position.set(0, (charHeight * 0.5) - neckPivotY, 0);
+      this.headMesh.renderOrder = 3;
+      this.headGroup.add(this.headMesh);
+    },
+
+    equipDress: function(outfitKey, customUrl) {
+      var self = this;
+      if (customUrl) {
+        // Custom merchant full-image outfit
+        var tex = this.loadTexture(customUrl, function(t) {
+          if (self.bodyMesh) {
+            self.bodyMesh.material.map = t;
+            self.bodyMesh.material.needsUpdate = true;
+          }
+          if (self.headMesh) {
+            self.headMesh.visible = false;
+          }
+        });
+        return;
+      }
+
+      var urls = config.outfitUrls[outfitKey] || config.outfitUrls.cream;
+
+      if (this.headMesh) this.headMesh.visible = true;
+
+      this.loadTexture(urls.body, function(bodyTex) {
+        if (self.bodyMesh) {
+          self.bodyMesh.material.map = bodyTex;
+          self.bodyMesh.material.needsUpdate = true;
+        }
+      });
+
+      this.loadTexture(urls.head, function(headTex) {
+        if (self.headMesh) {
+          self.headMesh.material.map = headTex;
+          self.headMesh.material.needsUpdate = true;
+        }
+      });
+    },
+
+    setupEventListeners: function() {
+      var self = this;
+
+      function updateGaze(clientX, clientY) {
+        if (!stageEl) return;
+        var rect = stageEl.getBoundingClientRect();
+        var midX = rect.left + rect.width / 2;
+        var midY = rect.top + rect.height * 0.40;
+
+        var relX = (clientX - midX) / (window.innerWidth * 0.42);
+        var relY = (clientY - midY) / (window.innerHeight * 0.42);
+
+        relX = Math.max(-1.15, Math.min(1.15, relX));
+        relY = Math.max(-1.15, Math.min(1.15, relY));
+
+        // Horizontal circular yaw
+        self.targetRotY = -relX * config.sensitivity;
+
+        // Natural vertical pitch (up and down)
+        self.targetRotX = -relY * (config.sensitivity * 0.65);
+
+        // Subtle dynamic roll banking
+        self.targetRoll = -relX * 4.0;
+
+        self.lastMoveTime = performance.now();
+      }
+
+      // Track cursor anywhere on section or window
+      sectionEl.addEventListener("mousemove", function(e) {
+        updateGaze(e.clientX, e.clientY);
+      }, { passive: true });
+
+      window.addEventListener("mousemove", function(e) {
+        if (!sectionEl) return;
+        var r = sectionEl.getBoundingClientRect();
+        if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
+          updateGaze(e.clientX, e.clientY);
+        }
+      }, { passive: true });
+
+      // Interactive 360 Drag & Orbit Controls with Momentum
+      canvasEl.addEventListener("mousedown", function(e) {
+        self.isDragging = true;
+        self.prevMouseX = e.clientX;
+        self.dragVelocity = 0;
+      });
+
+      window.addEventListener("mousemove", function(e) {
+        if (!self.isDragging) return;
+        var deltaX = e.clientX - self.prevMouseX;
+        self.prevMouseX = e.clientX;
+        self.orbitAngleY += deltaX * 0.012;
+        self.dragVelocity = deltaX * 0.012;
+      });
+
+      window.addEventListener("mouseup", function() {
+        self.isDragging = false;
+      });
+
+      // Touch events for mobile
+      canvasEl.addEventListener("touchstart", function(e) {
+        if (e.touches && e.touches.length > 0) {
+          self.isDragging = true;
+          self.prevMouseX = e.touches[0].clientX;
+          self.dragVelocity = 0;
+          updateGaze(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      window.addEventListener("touchmove", function(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        updateGaze(e.touches[0].clientX, e.touches[0].clientY);
+
+        if (self.isDragging) {
+          var deltaX = e.touches[0].clientX - self.prevMouseX;
+          self.prevMouseX = e.touches[0].clientX;
+          self.orbitAngleY += deltaX * 0.012;
+          self.dragVelocity = deltaX * 0.012;
+        }
+      }, { passive: true });
+
+      window.addEventListener("touchend", function() {
+        self.isDragging = false;
+      });
+
+      window.addEventListener("resize", function() {
+        if (!self.renderer || !self.camera || !stageEl) return;
+        var w = stageEl.clientWidth || 580;
+        var h = canvasEl.clientHeight || 480;
+        self.camera.aspect = w / h;
+        self.camera.updateProjectionMatrix();
+        self.renderer.setSize(w, h);
+      });
+    },
+
+    renderLoop: function(time) {
+      requestAnimationFrame(this.renderLoop.bind(this));
+
+      // Autonomous circular gaze patrol following the 3D butterfly when idle
+      if (!this.isDragging && (time - this.lastMoveTime > 3200) && ButterflyFollower.el) {
+        var secW = sectionEl.offsetWidth || window.innerWidth;
+        var charMidX = secW * 0.5;
+        var diffX = (ButterflyFollower.posX - charMidX) / (secW * 0.5);
+        this.targetRotY = Math.max(-14, Math.min(14, -diffX * 18));
+        this.targetRotX = 0;
+        this.targetRoll = -this.targetRotY * 0.15;
+      }
+
+      // 1. Smooth lerp for circular gaze tracking ("Moment Like Circle")
+      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
+      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.082;
+      this.currentRoll += (this.targetRoll - this.currentRoll) * 0.082;
+
+      // 2. 360 Drag Inertia
+      if (!this.isDragging) {
+        this.dragVelocity *= 0.94;
+        this.orbitAngleY += this.dragVelocity;
+      }
+
+      var floatY = Math.sin(time * 0.0018) * 0.015;
+
+      // 3. Signature Bottom-Section Leaning & Displacement Action
+      var leanRatio = this.currentRotY / config.sensitivity;
+      this.characterGroup.position.x = leanRatio * 0.14;
+      this.characterGroup.position.y = -Math.abs(leanRatio) * 0.02 + floatY;
+      this.characterGroup.rotation.z = -leanRatio * 0.035;
+
+      // Ground contact shadow reacting dynamically in 360°
+      if (this.shadowMesh) {
+        this.shadowMesh.position.x = leanRatio * 0.09;
+        this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 20) * 0.05;
+      }
+
+      // 4. Circular Gaze & Head Articulation
+      var radYaw = (this.currentRotY * Math.PI) / 180;
+      var radPitch = (this.currentRotX * Math.PI) / 180;
+      var radRoll = (this.currentRoll * Math.PI) / 180;
+
+      // Head turns with full circular gaze orientation & 3D parallax depth
+      if (this.headGroup) {
+        this.headGroup.rotation.y = radYaw * 0.90;
+        this.headGroup.rotation.x = radPitch * 0.85;
+        this.headGroup.rotation.z = radRoll;
+      }
+
+      // Body follows with realistic torso turn
+      if (this.bodyMesh) {
+        this.bodyMesh.rotation.y = radYaw * 0.35;
+        this.bodyMesh.rotation.x = radPitch * 0.25;
+      }
+
+      // Global 360 orbit rotation
+      this.characterGroup.rotation.y = this.orbitAngleY;
+
+      // Render WebGL frame
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.render(this.scene, this.camera);
+      }
+    }
+  };
+
+  // ==========================================================================
+  // 2. DRESS-UP & WARDROBE SYSTEM ("Append the dress we want")
   // ==========================================================================
   var WardrobeManager = {
-    outfitImgs: dollViewer.querySelectorAll(".royal-doll-img"),
     swatchBtns: sectionEl.querySelectorAll(".dock-swatch-btn"),
 
     init: function() {
@@ -889,6 +1217,7 @@
       var title = btn.getAttribute("data-title");
       var price = btn.getAttribute("data-price");
       var desc = btn.getAttribute("data-desc");
+      var customUrl = btn.getAttribute("data-custom-url");
 
       // Update active swatch state
       this.swatchBtns.forEach(function(b) { b.classList.remove("active"); });
@@ -900,37 +1229,27 @@
       if (cardPriceEl && price) cardPriceEl.textContent = price;
       if (cardDescEl && desc) cardDescEl.textContent = desc;
 
-      // Crossfade doll outfit
-      var targetImg = null;
-      this.outfitImgs.forEach(function(img) {
-        if (img.getAttribute("data-outfit") === outfitKey) {
-          targetImg = img;
-        }
-      });
+      // Equip dress in Three.js WebGL
+      ThreeAvatarManager.equipDress(outfitKey, customUrl);
 
-      if (targetImg) {
-        this.outfitImgs.forEach(function(img) { img.classList.remove("active"); });
-        targetImg.classList.add("active");
-
-        // Magical equip sparkle burst around the character
-        if (config.enableSparkles && SparkleTrail.ctx) {
-          var stageRect = stageEl.getBoundingClientRect();
-          var secRect = sectionEl.getBoundingClientRect();
-          var cx = (stageRect.left + stageRect.width / 2) - secRect.left;
-          var cy = (stageRect.top + stageRect.height * 0.45) - secRect.top;
-          for (var i = 0; i < 28; i++) {
-            SparkleTrail.addParticle(
-              cx + (Math.random() - 0.5) * 160,
-              cy + (Math.random() - 0.5) * 220
-            );
-          }
+      // Magical fairy dust equip sparkle burst around the character
+      if (config.enableSparkles && SparkleTrail.ctx) {
+        var stageRect = stageEl.getBoundingClientRect();
+        var secRect = sectionEl.getBoundingClientRect();
+        var cx = (stageRect.left + stageRect.width / 2) - secRect.left;
+        var cy = (stageRect.top + stageRect.height * 0.42) - secRect.top;
+        for (var i = 0; i < 28; i++) {
+          SparkleTrail.addParticle(
+            cx + (Math.random() - 0.5) * 160,
+            cy + (Math.random() - 0.5) * 220
+          );
         }
       }
     }
   };
 
   // ==========================================================================
-  // 2. FULL-SECTION 3D ROYAL BUTTERFLY & SPARKLE TRAIL
+  // 3. FULL-SECTION 3D ROYAL BUTTERFLY & SPARKLE TRAIL
   // ==========================================================================
   var SparkleTrail = {
     canvas: sparklesCanvas,
@@ -948,7 +1267,7 @@
       if (!this.canvas || !sectionEl) return;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 720;
+      var h = sectionEl.offsetHeight || 740;
       this.canvas.width = w * dpr;
       this.canvas.height = h * dpr;
       if (this.ctx) this.ctx.scale(dpr, dpr);
@@ -972,7 +1291,7 @@
     updateAndRender: function() {
       if (!this.ctx || !sectionEl) return;
       var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 720;
+      var h = sectionEl.offsetHeight || 740;
       this.ctx.clearRect(0, 0, w, h);
 
       for (var i = this.particles.length - 1; i >= 0; i--) {
@@ -1014,7 +1333,7 @@
 
       var self = this;
       var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 720;
+      var h = sectionEl.offsetHeight || 740;
       this.posX = w * 0.28;
       this.posY = h * 0.36;
       this.targetX = this.posX;
@@ -1049,13 +1368,17 @@
       sectionEl.addEventListener("mouseleave", function() {
         self.isHovering = false;
       });
+
+      requestAnimationFrame(this.renderLoop.bind(this));
     },
 
-    update: function(time) {
+    renderLoop: function(time) {
+      requestAnimationFrame(this.renderLoop.bind(this));
+
       if (!this.el || !config.enableButterfly) return;
 
       var secW = sectionEl.offsetWidth || window.innerWidth;
-      var secH = sectionEl.offsetHeight || 720;
+      var secH = sectionEl.offsetHeight || 740;
 
       // Autonomous circular flight patrol around character when idle
       if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
@@ -1109,127 +1432,16 @@
       if (config.enableSparkles && Math.random() < 0.45) {
         SparkleTrail.addParticle(fx, fy);
       }
+
+      SparkleTrail.updateAndRender();
     }
   };
-
-  // ==========================================================================
-  // 3. NATURAL 3D GAZE & CIRCULAR LEANING TRACKING PHYSICS
-  // Signature bottom-section leaning, vertical pitch & circular movement (No 360 spin)
-  // ==========================================================================
-  var DollMotionTracker = {
-    currentRotY: 0,
-    currentRotX: 0,
-    currentTransX: 0,
-    targetRotY: 0,
-    targetRotX: 0,
-    targetTransX: 0,
-    isCursorInside: false,
-    currentClientX: 0,
-    currentClientY: 0,
-    lastMoveTime: performance.now(),
-
-    init: function() {
-      var self = this;
-
-      function updateGaze(clientX, clientY) {
-        self.currentClientX = clientX;
-        self.currentClientY = clientY;
-        self.isCursorInside = true;
-        self.lastMoveTime = performance.now();
-      }
-
-      sectionEl.addEventListener("mousemove", function(e) {
-        updateGaze(e.clientX, e.clientY);
-      }, { passive: true });
-
-      window.addEventListener("mousemove", function(e) {
-        if (!sectionEl) return;
-        var r = sectionEl.getBoundingClientRect();
-        if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
-          updateGaze(e.clientX, e.clientY);
-        }
-      }, { passive: true });
-
-      sectionEl.addEventListener("mouseleave", function() {
-        self.isCursorInside = false;
-      });
-
-      sectionEl.addEventListener("touchmove", function(e) {
-        if (!e.touches || e.touches.length === 0) return;
-        updateGaze(e.touches[0].clientX, e.touches[0].clientY);
-      }, { passive: true });
-    },
-
-    update: function(time) {
-      if (!dollViewer) return;
-
-      var secW = sectionEl.offsetWidth || window.innerWidth;
-      var secH = sectionEl.offsetHeight || 720;
-
-      if (this.isCursorInside) {
-        var dollRect = dollViewer.getBoundingClientRect();
-        var dollMidX = dollRect.left + dollRect.width / 2;
-        var dollMidY = dollRect.top + dollRect.height * 0.42;
-
-        var relX = (this.currentClientX - dollMidX) / (window.innerWidth * 0.45);
-        var relY = (this.currentClientY - dollMidY) / (window.innerHeight * 0.45);
-
-        relX = Math.max(-1.15, Math.min(1.15, relX));
-        relY = Math.max(-1.15, Math.min(1.15, relY));
-
-        // Horizontal yaw, vertical pitch, and leaning displacement
-        this.targetRotY = relX * 18;
-        this.targetRotX = -relY * 8;
-        this.targetTransX = relX * 14;
-      } else if (ButterflyFollower.el && (!this.isCursorInside || (time - this.lastMoveTime > 3000))) {
-        // When mouse is idle, doll follows the autonomous circular butterfly patrol
-        var dollLocalX = secW * 0.5;
-        var diffX = (ButterflyFollower.posX - dollLocalX) / (secW * 0.5);
-        this.targetRotY = Math.max(-10, Math.min(10, diffX * 12));
-        this.targetRotX = 0;
-        this.targetTransX = this.targetRotY * 0.6;
-      }
-
-      // Smooth silky lerp interpolation
-      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.08;
-      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.08;
-      this.currentTransX += (this.targetTransX - this.currentTransX) * 0.08;
-
-      // Gentle organic idle vertical floating wave
-      var idleY = Math.sin(time * 0.0016) * 6;
-
-      dollViewer.style.transform =
-        "translate3d(" + this.currentTransX.toFixed(2) + "px, " + idleY.toFixed(2) + "px, 0px) " +
-        "rotateY(" + this.currentRotY.toFixed(2) + "deg) " +
-        "rotateX(" + this.currentRotX.toFixed(2) + "deg)";
-
-      // Dynamic ground contact shadow shifting with character lean
-      if (shadowEl) {
-        var shadowShift = this.currentTransX * 0.65;
-        var shadowScale = 1.0 - Math.abs(this.currentRotX / 30);
-        shadowEl.style.transform =
-          "translateX(calc(-50% + " + shadowShift.toFixed(1) + "px)) " +
-          "scaleX(" + shadowScale.toFixed(2) + ")";
-      }
-    }
-  };
-
-  // ==========================================================================
-  // UNIFIED 60FPS RAF ANIMATION LOOP
-  // ==========================================================================
-  function animateFrame(time) {
-    requestAnimationFrame(animateFrame);
-    ButterflyFollower.update(time);
-    DollMotionTracker.update(time);
-    SparkleTrail.updateAndRender();
-  }
 
   function boot() {
+    ThreeAvatarManager.init();
     WardrobeManager.init();
     SparkleTrail.init();
     ButterflyFollower.init();
-    DollMotionTracker.init();
-    requestAnimationFrame(animateFrame);
   }
 
   if (document.readyState === "loading") {
@@ -1287,6 +1499,15 @@
       "default": 440
     },
     {
+      "type": "range",
+      "id": "sensitivity",
+      "label": "Gaze Tracking Sensitivity (°)",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "default": 28
+    },
+    {
       "type": "header",
       "content": "Butterfly & Fairy Dust"
     },
@@ -1325,7 +1546,7 @@
       "type": "text",
       "id": "hint_text",
       "label": "Hint Text",
-      "default": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
+      "default": "Click any dress to drape the character • Move mouse in circles or drag to rotate 360°"
     }
   ],
   "blocks": [
@@ -1386,10 +1607,11 @@
         "subheading": "ROYAL COURT ATELIER",
         "description": "Select any royal regalia below to instantly drape the character in handcrafted court attire.",
         "mascot_size": 440,
+        "sensitivity": 28,
         "enable_butterfly": true,
         "enable_sparkles": true,
         "show_hint": true,
-        "hint_text": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
+        "hint_text": "Click any dress to drape the character • Move mouse in circles or drag to rotate 360°"
       },
       "blocks": [
         {

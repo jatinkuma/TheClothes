@@ -436,7 +436,7 @@
         "butterfly_color": "#00E5FF",
         "enable_sparkles": true,
         "show_hint": true,
-        "hint_text": "Interactive 3D Mascot • Move mouse or drag to explore"
+        "hint_text": "Interactive 3D Mascot • Move mouse or touch to explore"
       }
     }
   },

@@ -1,37 +1,38 @@
 {% comment %}
   ==============================================================================
-  ROYAL MASCOT — 3D WEBGL CARTOON MASCOT & BUTTERFLY SECTION
-  Built with Three.js WebGL Engine (Same as 3D Mascot Section)
+  ROYAL MASCOT — FRONT-FACING INTERACTIVE 3D MASCOT SECTION
   ------------------------------------------------------------------------------
   Features:
-  - Central 3D Rigged Royal Mascot matching the uploaded reference image:
-    * Chipmunk mascot face, snout, button nose & fluffy cheeks
-    * Round gold wireframe goggles/glasses
-    * Multicolored Rajasthani royal safa with jewel Kalgi brooch & feather plume
-    * Cream brocade Sherwani with gold placket buttons
-    * Royal red embroidered stole (angavastram) with gold borders
+  - 100% FRONT-FACING view of the Royal Indian Mascot matching user's image:
+    * Rajasthani multicolored royal safa with jewel Kalgi brooch & white plume
+    * Round gold wireframe goggles/glasses with 3D stereoscopic parallax pop
+    * Fluffy cartoon chipmunk face, snout, button nose & cute smile
+    * Cream brocade Sherwani with gold buttons & royal red zardozi stole
     * Gold medallion necklace, churidar & curled royal mojari shoes
-    * Fluffy tail
-  - Three.js WebGL 3D Rigged Bone Gaze Engine:
-    * Head, neck & chest bone rotation following cursor in real-time
-    * Eye.L & Eye.R bone darting towards cursor & butterfly
-    * Procedural blinking & idle organic breathing
-    * Studio 3-point lighting & soft shadows
-  - 360-DEGREE ROTATION COMPLETELY REMOVED (Strictly natural gaze tracking)
-  - Autonomous Cyan / Electric Blue Butterfly with 3D wing fluttering & banking
+  - Signature "Momentable Action" matching the bottom section:
+    * Dynamic 3D perspective body leaning towards cursor (yaw + pitch tilt)
+    * Smooth spring-damped lerp physics (damping 0.08)
+    * Organic idle breathing & vertical floating wave
+    * Ground contact shadow reacting dynamically to character movement
+  - Perfect "Gogal Moment" (3D Goggles Parallax & Head Gaze):
+    * Head turns in 3D perspective with natural yaw, pitch, and curious roll tilt
+    * Gold wireframe goggles float in front on the nose bridge with 3D depth
+    * Expressive dark eye pupils dart smoothly behind the lenses
+    * Procedural eyelid blinking every ~3.5 seconds
+  - ZERO 360-degree rotation (No drag-to-spin; strictly natural gaze & posture tracking)
+  - Cyan / Electric Blue Butterfly with 3D wing fluttering & cursor trailing physics
   - Live Canvas Fairy Dust Sparkle Trail
-  - Single-finger mobile touch gaze tracking
+  - Single-finger mobile touch gaze tracking with smooth return to center
   ==============================================================================
 {% endcomment %}
-
-<!-- Three.js & GLTF Loader CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <div
   id="royal-mascot-section-{{ section.id }}"
   class="royal-mascot-section"
-  style="--mascot-bg: {{ section.settings.bg_color | default: '#E5A625' }};"
+  style="
+    --mascot-bg: {{ section.settings.bg_color | default: '#E5A625' }};
+    --mascot-size: {{ section.settings.mascot_size | default: 340 }}px;
+  "
 >
   <!-- Background Radiant Center Glow -->
   <div class="royal-mascot-bg-glow" aria-hidden="true"></div>
@@ -39,31 +40,81 @@
   <!-- Stage Container -->
   <div id="royal-mascot-stage-{{ section.id }}" class="royal-mascot-stage">
 
-    <!-- Fairy Dust Sparkle Canvas -->
+    <!-- Fairy Dust Sparkle Particle Canvas -->
     {% if section.settings.enable_sparkles %}
       <canvas id="royal-mascot-sparkles-{{ section.id }}" class="royal-mascot-sparkles-canvas"></canvas>
     {% endif %}
 
-    <!-- Loading Spinner -->
-    <div id="royal-mascot-spinner-{{ section.id }}" class="royal-mascot-spinner" aria-live="polite">
-      <div class="royal-mascot-spinner-ring"></div>
-      <span class="royal-mascot-spinner-text">Awakening Royal Mascot...</span>
-    </div>
+    <!-- Dynamic Ground Contact Shadow -->
+    <div id="royal-mascot-shadow-{{ section.id }}" class="royal-mascot-shadow" aria-hidden="true"></div>
 
-    <!-- WebGL Canvas for 3D Mascot Character -->
-    <canvas id="royal-mascot-canvas-{{ section.id }}" class="royal-mascot-canvas"></canvas>
+    <!-- Mascot 3D Leaning Container (Matches Bottom Section Motion) -->
+    <div id="royal-mascot-viewer-{{ section.id }}" class="royal-mascot-viewer">
+      
+      <!-- Body Layer (Brocade Sherwani, Red Stole, Necklace, Churidar, Curled Mojari Shoes, Fluffy Tail) -->
+      <div id="royal-mascot-body-{{ section.id }}" class="royal-mascot-layer royal-mascot-body">
+        <img
+          src="{{ 'royal-mascot-body.png' | asset_url }}"
+          alt="Royal Indian Mascot Body"
+          width="228"
+          height="312"
+          loading="eager"
+          decoding="async"
+        >
+      </div>
+
+      <!-- Head Layer (Turban, Kalgi Brooch, Feather Plume, Furry Cheeks, Snout) -->
+      <div id="royal-mascot-head-{{ section.id }}" class="royal-mascot-layer royal-mascot-head">
+        <img
+          src="{{ 'royal-mascot-head.png' | asset_url }}"
+          alt="Royal Indian Mascot Head with Rajasthani Safa"
+          width="228"
+          height="312"
+          loading="eager"
+          decoding="async"
+        >
+
+        <!-- Expressive Darting Eye Pupils Behind Goggles -->
+        <div class="royal-mascot-eyes" aria-hidden="true">
+          <!-- Left Eye Pupil -->
+          <div class="royal-eye royal-eye-left">
+            <div id="royal-pupil-left-{{ section.id }}" class="royal-pupil"></div>
+            <div id="royal-eyelid-left-{{ section.id }}" class="royal-eyelid"></div>
+          </div>
+          <!-- Right Eye Pupil -->
+          <div class="royal-eye royal-eye-right">
+            <div id="royal-pupil-right-{{ section.id }}" class="royal-pupil"></div>
+            <div id="royal-eyelid-right-{{ section.id }}" class="royal-eyelid"></div>
+          </div>
+        </div>
+
+        <!-- 3D Goggles Layer (Parallax Pop Effect / Perfect Goggle Movement) -->
+        <div id="royal-mascot-goggles-{{ section.id }}" class="royal-mascot-layer royal-mascot-goggles" aria-hidden="true">
+          <img
+            src="{{ 'royal-mascot-goggles.png' | asset_url }}"
+            alt="Gold Wireframe Goggles"
+            width="228"
+            height="312"
+            loading="eager"
+            decoding="async"
+          >
+        </div>
+
+      </div>
+
+    </div>
 
     <!-- Interactive Hint Pill Matching Reference Image -->
     {% if section.settings.show_hint %}
       <div class="royal-mascot-hint">
         <span class="royal-mascot-hint-icon">✦</span>
-        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Interactive 3D Mascot • Move mouse or drag to explore' }}</span>
+        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Interactive 3D Mascot • Move mouse or touch to explore' }}</span>
       </div>
     {% endif %}
 
   </div>
 
-  <!-- Electric Blue Butterfly Cursor -->
+  <!-- Cyan / Electric Blue Butterfly Cursor Follower -->
   {% if section.settings.enable_butterfly %}
     <div
       id="royal-mascot-butterfly-{{ section.id }}"
@@ -145,7 +196,7 @@
     box-sizing: border-box;
     user-select: none;
     -webkit-user-select: none;
-    padding: 20px 20px 36px 20px;
+    padding: 24px 20px 36px 20px;
   }
 
   /* Subtle Warm Center Glow */
@@ -157,7 +208,7 @@
     z-index: 1;
   }
 
-  /* Stage Container */
+  /* Stage Container (Perspective Stage matching bottom section) */
   #royal-mascot-section-{{ section.id }} .royal-mascot-stage {
     position: relative;
     width: 100%;
@@ -166,17 +217,150 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    perspective: 1100px;
+    transform-style: preserve-3d;
     z-index: 5;
   }
 
-  /* WebGL Canvas */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-    outline: none;
+  /* Dynamic Ground Contact Shadow */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-shadow {
+    position: absolute;
+    bottom: 24px;
+    width: 220px;
+    height: 28px;
+    background: radial-gradient(ellipse at center, rgba(60, 30, 8, 0.48) 0%, rgba(60, 30, 8, 0.18) 50%, transparent 75%);
+    border-radius: 50%;
+    filter: blur(6px);
+    z-index: 2;
+    transform-origin: 50% 50%;
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  /* Mascot 3D Leaning Viewer (Matches Bottom Section dollViewer) */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-viewer {
+    position: relative;
+    width: var(--mascot-size, 340px);
+    height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: center 85%;
+    transform-style: preserve-3d;
+    will-change: transform;
+    filter: drop-shadow(0 14px 26px rgba(45, 22, 6, 0.16));
+    z-index: 3;
     cursor: default;
+  }
+
+  /* Mascot Layers */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    backface-visibility: hidden;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Body Layer */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-body {
+    z-index: 2;
+    transform-origin: 52% 80%;
+    will-change: transform;
+  }
+
+  /* Head Layer (3D Perspective Turning on Neck Pivot) */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-head {
+    z-index: 3;
+    transform-origin: 52% 48.7%; /* Base of neck */
+    will-change: transform;
+    transform-style: preserve-3d;
+  }
+
+  /* Goggles 3D Parallax Pop (The "Gogal Moment" Feature) */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-goggles {
+    z-index: 6;
+    pointer-events: none;
+    transform-origin: 52% 48.7%;
+    will-change: transform;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.22));
+  }
+
+  /* Eyes Container Behind Goggles */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-eyes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
     z-index: 4;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-eye {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-eye-left {
+    left: 49.8%;
+    top: 27.2%;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-eye-right {
+    left: 75.6%;
+    top: 24.0%;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-pupil {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    left: 4px;
+    top: 4px;
+    background: radial-gradient(circle at 35% 35%, #24130c 0%, #110703 80%, #000000 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0,0,0,0.8);
+    transition: transform 0.05s ease-out;
+    will-change: transform;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-pupil::after {
+    content: '';
+    position: absolute;
+    width: 3.5px;
+    height: 3.5px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-eyelid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #c98836;
+    border-radius: 50%;
+    transform-origin: top center;
+    transform: scaleY(0);
+    z-index: 5;
+    pointer-events: none;
   }
 
   /* Fairy Dust Canvas */
@@ -189,41 +373,6 @@
     z-index: 15;
   }
 
-  /* Loading Spinner */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    z-index: 12;
-    background: transparent;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner-ring {
-    width: 44px;
-    height: 44px;
-    border: 3.5px solid rgba(42, 21, 8, 0.15);
-    border-top-color: #241105;
-    border-radius: 50%;
-    animation: rmSpin 0.85s linear infinite;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner-text {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #241105;
-    letter-spacing: 0.04em;
-  }
-
-  @keyframes rmSpin {
-    to { transform: rotate(360deg); }
-  }
-
   /* Hint Pill Matching Reference */
   #royal-mascot-section-{{ section.id }} .royal-mascot-hint {
     position: absolute;
@@ -231,10 +380,10 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 235, 192, 0.74);
+    background: rgba(255, 235, 192, 0.76);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.68);
     padding: 7px 18px;
     border-radius: 22px;
     font-size: 0.82rem;
@@ -350,6 +499,19 @@
       padding: 6px 14px;
     }
   }
+
+  /* Accessibility: Respect Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    #royal-mascot-section-{{ section.id }} .royal-bf-wing {
+      animation: none !important;
+    }
+    #royal-mascot-section-{{ section.id }} .royal-mascot-butterfly {
+      display: none !important;
+    }
+    #royal-mascot-section-{{ section.id }} .royal-mascot-sparkles-canvas {
+      display: none !important;
+    }
+  }
 </style>
 
 <script>
@@ -359,267 +521,190 @@
   var sectionId = "{{ section.id }}";
   var sectionEl = document.getElementById("royal-mascot-section-" + sectionId);
   var stageEl = document.getElementById("royal-mascot-stage-" + sectionId);
-  var canvasEl = document.getElementById("royal-mascot-canvas-" + sectionId);
-  var spinnerEl = document.getElementById("royal-mascot-spinner-" + sectionId);
+  var viewerEl = document.getElementById("royal-mascot-viewer-" + sectionId);
+  var headEl = document.getElementById("royal-mascot-head-" + sectionId);
+  var gogglesEl = document.getElementById("royal-mascot-goggles-" + sectionId);
+  var bodyEl = document.getElementById("royal-mascot-body-" + sectionId);
+  var shadowEl = document.getElementById("royal-mascot-shadow-" + sectionId);
+  var pupilLEl = document.getElementById("royal-pupil-left-" + sectionId);
+  var pupilREl = document.getElementById("royal-pupil-right-" + sectionId);
+  var eyelidLEl = document.getElementById("royal-eyelid-left-" + sectionId);
+  var eyelidREl = document.getElementById("royal-eyelid-right-" + sectionId);
   var butterflyEl = document.getElementById("royal-mascot-butterfly-" + sectionId);
   var sparklesCanvas = document.getElementById("royal-mascot-sparkles-" + sectionId);
 
-  if (!sectionEl || !canvasEl) return;
+  if (!sectionEl || !stageEl || !viewerEl) return;
 
-  var config = {
-    modelUrl: "{{ 'royal-cartoon-mascot.glb' | asset_url }}",
-    sensitivity: {{ section.settings.sensitivity | default: 26 }},
-    enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
-    enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %}
-  };
+  var sensitivity = {{ section.settings.sensitivity | default: 24 }};
+  var enableButterfly = {% if section.settings.enable_butterfly %}true{% else %}false{% endif %};
+  var enableSparkles = {% if section.settings.enable_sparkles %}true{% else %}false{% endif %};
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ==========================================================================
-  // 1. THREE.JS 3D MASCOT MANAGER (SAME ARCHITECTURE AS 3D MASCOT SECTION)
-  // NO 360-DEGREE DRAG ROTATION
+  // 1. CHARACTER GAZE & GOGGLES TRACKING ENGINE
+  // Combining Bottom-Section Full-Body Leaning Physics with Independent Goggles 3D Depth
   // ==========================================================================
-  var ThreeMascotManager = {
-    scene: null,
-    camera: null,
-    renderer: null,
-    characterGroup: null,
-    gltfLoader: null,
-    isReady: false,
+  var MascotGazeEngine = {
+    targetX: 0,
+    targetY: 0,
+    currentX: 0,
+    currentY: 0,
+    isHovering: false,
+    lastMoveTime: performance.now(),
 
-    bones: {
-      head: null,
-      neck: null,
-      chest: null,
-      spine: null,
-      root: null,
-      eyeLeft: null,
-      eyeRight: null
-    },
-
-    targetRotY: 0,
-    targetRotX: 0,
-    currentRotY: 0,
-    currentRotX: 0,
+    // Whole body leaning state (matches interactive-royal-doll)
+    dollRotY: 0,
+    dollRotX: 0,
+    dollTransX: 0,
 
     init: function() {
-      if (typeof THREE === "undefined" || typeof THREE.GLTFLoader === "undefined") {
-        setTimeout(ThreeMascotManager.init, 120);
-        return;
-      }
-
-      try {
-        var w = stageEl.clientWidth || 640;
-        var h = stageEl.clientHeight || 520;
-
-        // Scene & Camera
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-        this.camera.position.set(0, 1.18, 3.25);
-        this.camera.lookAt(0, 0.98, 0);
-
-        // WebGL Renderer
-        this.renderer = new THREE.WebGLRenderer({
-          canvas: canvasEl,
-          alpha: true,
-          antialias: true,
-          powerPreference: "high-performance"
-        });
-        this.renderer.setSize(w, h);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
-
-        // Studio 3-Point Lighting
-        var ambientLight = new THREE.AmbientLight(0xFFF6E5, 1.45);
-        this.scene.add(ambientLight);
-
-        var keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.85);
-        keyLight.position.set(3.5, 4.5, 4.0);
-        this.scene.add(keyLight);
-
-        var fillLight = new THREE.DirectionalLight(0xE0F2FE, 1.15);
-        fillLight.position.set(-3.5, 2.5, 3.0);
-        this.scene.add(fillLight);
-
-        var rimLight = new THREE.DirectionalLight(0xFFD700, 1.55);
-        rimLight.position.set(0, 3.5, -3.5);
-        this.scene.add(rimLight);
-
-        // Character Group
-        this.characterGroup = new THREE.Group();
-        this.scene.add(this.characterGroup);
-
-        // Load Rigged 3D GLB Model
-        this.gltfLoader = new THREE.GLTFLoader();
-        this.loadModel(config.modelUrl);
-
-        // Setup Cursor Gaze Events (STRICTLY gaze, NO 360-degree drag rotation)
-        this.setupEventListeners();
-        requestAnimationFrame(this.renderLoop.bind(this));
-
-      } catch (err) {
-        console.error("3D Mascot WebGL initialization error:", err);
-      }
-    },
-
-    loadModel: function(url) {
-      if (!this.gltfLoader) return;
-      if (spinnerEl) spinnerEl.style.display = "flex";
-
-      var self = this;
-      this.gltfLoader.load(url, function(gltf) {
-        while (self.characterGroup.children.length > 0) {
-          self.characterGroup.remove(self.characterGroup.children[0]);
-        }
-
-        var model = gltf.scene;
-        model.position.set(0, 0, 0);
-        self.characterGroup.add(model);
-
-        self.bones = {
-          head: null, neck: null, chest: null, spine: null, root: null,
-          eyeLeft: null, eyeRight: null
-        };
-
-        model.traverse(function(node) {
-          if (node.isBone || node.type === "Bone") {
-            var name = (node.name || "").toLowerCase();
-            if (name.indexOf("head") !== -1 && !self.bones.head) self.bones.head = node;
-            else if (name.indexOf("neck") !== -1 && !self.bones.neck) self.bones.neck = node;
-            else if (name.indexOf("chest") !== -1 && !self.bones.chest) self.bones.chest = node;
-            else if (name.indexOf("spine") !== -1 && !self.bones.spine) self.bones.spine = node;
-            else if (name.indexOf("root") !== -1 && !self.bones.root) self.bones.root = node;
-            else if ((name.indexOf("eye.l") !== -1 || name === "eye_l" || name === "eyel") && !self.bones.eyeLeft) self.bones.eyeLeft = node;
-            else if ((name.indexOf("eye.r") !== -1 || name === "eye_r" || name === "eyer") && !self.bones.eyeRight) self.bones.eyeRight = node;
-          }
-          if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-          }
-        });
-
-        if (spinnerEl) spinnerEl.style.display = "none";
-        self.isReady = true;
-
-      }, undefined, function(err) {
-        console.warn("Could not load 3D mascot from " + url, err);
-        if (spinnerEl) spinnerEl.style.display = "none";
-      });
-    },
-
-    setupEventListeners: function() {
       var self = this;
 
-      // Mouse Move: Calculate Natural Gaze Angles (NO 360-degree rotation)
-      window.addEventListener("mousemove", function(e) {
+      function updatePointer(clientX, clientY) {
         if (!stageEl) return;
         var rect = stageEl.getBoundingClientRect();
-        var centerX = rect.left + rect.width / 2;
-        var centerY = rect.top + rect.height * 0.44;
+        var midX = rect.left + rect.width / 2;
+        var midY = rect.top + rect.height * 0.44;
 
-        var deltaX = (e.clientX - centerX) / (window.innerWidth * 0.48);
-        var deltaY = (e.clientY - centerY) / (window.innerHeight * 0.48);
+        // Normalized relative displacement
+        var dx = (clientX - midX) / (window.innerWidth * 0.44);
+        var dy = (clientY - midY) / (window.innerHeight * 0.44);
 
-        var sens = config.sensitivity || 26;
-        self.targetRotY = Math.max(-sens, Math.min(sens, deltaX * sens));
-        self.targetRotX = Math.max(-15, Math.min(15, -deltaY * 15));
+        self.targetX = Math.max(-1.15, Math.min(1.15, dx));
+        self.targetY = Math.max(-1.15, Math.min(1.15, dy));
+        self.isHovering = true;
+        self.lastMoveTime = performance.now();
+      }
+
+      // Mouse tracking (Strictly natural gaze, ZERO 360-degree drag rotation)
+      window.addEventListener("mousemove", function(e) {
+        updatePointer(e.clientX, e.clientY);
       }, { passive: true });
 
-      // Return naturally to neutral forward pose when mouse leaves
       document.addEventListener("mouseleave", function() {
-        self.targetRotY = 0;
-        self.targetRotX = 0;
+        self.targetX = 0;
+        self.targetY = 0;
+        self.isHovering = false;
       });
 
-      // Mobile Touch Drag: Gaze tracking only (NO 360 spin)
+      // Mobile Touch Drag Tracking
       window.addEventListener("touchmove", function(e) {
-        if (!stageEl || !e.touches || e.touches.length === 0) return;
-        var touch = e.touches[0];
-        var rect = stageEl.getBoundingClientRect();
-        var centerX = rect.left + rect.width / 2;
-        var centerY = rect.top + rect.height * 0.44;
-
-        var deltaX = (touch.clientX - centerX) / (window.innerWidth * 0.48);
-        var deltaY = (touch.clientY - centerY) / (window.innerHeight * 0.48);
-
-        var sens = config.sensitivity || 26;
-        self.targetRotY = Math.max(-sens, Math.min(sens, deltaX * sens));
-        self.targetRotX = Math.max(-15, Math.min(15, -deltaY * 15));
+        if (!e.touches || e.touches.length === 0) return;
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
 
       window.addEventListener("touchend", function() {
-        self.targetRotY = 0;
-        self.targetRotX = 0;
+        self.targetX = 0;
+        self.targetY = 0;
+        self.isHovering = false;
       });
 
-      // Window Resize
-      window.addEventListener("resize", function() {
-        if (!self.renderer || !self.camera || !stageEl) return;
-        var rw = stageEl.clientWidth || 640;
-        var rh = stageEl.clientHeight || 520;
-        self.camera.aspect = rw / rh;
-        self.camera.updateProjectionMatrix();
-        self.renderer.setSize(rw, rh);
-      });
+      requestAnimationFrame(this.tick.bind(this));
     },
 
-    renderLoop: function(time) {
-      requestAnimationFrame(this.renderLoop.bind(this));
+    tick: function(time) {
+      requestAnimationFrame(this.tick.bind(this));
+      if (prefersReducedMotion) return;
 
-      // Smooth Easing Interpolation
-      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.088;
-      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.088;
+      // Spring-mass smoothing (damping: 0.08 matches bottom section)
+      this.currentX += (this.targetX - this.currentX) * 0.082;
+      this.currentY += (this.targetY - this.currentY) * 0.082;
 
-      if (this.isReady && this.characterGroup) {
-        // Idle Organic Breathing
-        var breathWave = Math.sin(time * 0.0024);
-        this.characterGroup.position.y = breathWave * 0.016;
+      // ----------------------------------------------------------------------
+      // A. SIGNATURE BOTTOM-SECTION LEANING & DISPLACEMENT ACTION
+      // Whole mascot statue leans and shifts in 3D perspective towards cursor
+      // ----------------------------------------------------------------------
+      var targetDollRotY = this.currentX * 18;
+      var targetDollRotX = -this.currentY * 8;
+      var targetDollTransX = this.currentX * 14;
 
-        // 3D Head & Neck Bone Rotation (Goggles & Turban follow Head Bone in 3D)
-        var radYaw = (this.currentRotY * Math.PI) / 180;
-        var radPitch = (this.currentRotX * Math.PI) / 180;
-        var radRoll = radYaw * 0.14; // Curious head tilt
+      this.dollRotY += (targetDollRotY - this.dollRotY) * 0.08;
+      this.dollRotX += (targetDollRotX - this.dollRotX) * 0.08;
+      this.dollTransX += (targetDollTransX - this.dollTransX) * 0.08;
 
-        if (this.bones.head) {
-          this.bones.head.rotation.y = radYaw * 0.78;
-          this.bones.head.rotation.x = radPitch * 0.88;
-          this.bones.head.rotation.z = radRoll;
-        }
-        if (this.bones.neck) {
-          this.bones.neck.rotation.y = radYaw * 0.42;
-          this.bones.neck.rotation.x = radPitch * 0.36;
-        }
-        if (this.bones.chest) {
-          this.bones.chest.rotation.y = radYaw * 0.12;
-        }
+      // Gentle organic idle breathing float
+      var idleY = Math.sin(time * 0.0018) * 6;
 
-        // Expressive Eye Tracking Behind Goggles & Procedural Blinking
-        var eyeYaw = radYaw * 1.30;
-        var eyePitch = radPitch * 1.40;
+      if (viewerEl) {
+        viewerEl.style.transform =
+          "translate3d(" + this.dollTransX.toFixed(2) + "px, " + idleY.toFixed(2) + "px, 0px) " +
+          "rotateY(" + this.dollRotY.toFixed(2) + "deg) " +
+          "rotateX(" + this.dollRotX.toFixed(2) + "deg)";
+      }
 
-        var blinkCycle = (time % 3500) / 3500;
-        var blinkScale = 1.0;
-        if (blinkCycle > 0.955) {
-          var bt = (blinkCycle - 0.955) / 0.045;
-          blinkScale = 1.0 - Math.sin(bt * Math.PI) * 0.90;
-        }
+      // ----------------------------------------------------------------------
+      // B. PERFECT GOGGLE MOVEMENT ("GOGAL MOMENT") & 3D HEAD ROTATION
+      // Head rotates on neck pivot, with goggles sitting proud with stereoscopic pop
+      // ----------------------------------------------------------------------
+      var headYaw = this.currentX * (sensitivity * 0.85);
+      var headPitch = -this.currentY * 13;
+      var headRoll = this.currentX * 4.8; // Curious natural head tilt
+      var parallaxX = this.currentX * 8.5;
+      var parallaxY = this.currentY * 5.5;
 
-        if (this.bones.eyeLeft) {
-          this.bones.eyeLeft.rotation.y = eyeYaw;
-          this.bones.eyeLeft.rotation.x = eyePitch;
-          this.bones.eyeLeft.scale.z = blinkScale;
-        }
-        if (this.bones.eyeRight) {
-          this.bones.eyeRight.rotation.y = eyeYaw;
-          this.bones.eyeRight.rotation.x = eyePitch;
-          this.bones.eyeRight.scale.z = blinkScale;
-        }
+      // 1. Move Head in 3D Perspective
+      if (headEl) {
+        headEl.style.transform =
+          "translate3d(" + parallaxX.toFixed(2) + "px, " + parallaxY.toFixed(2) + "px, 12px) " +
+          "rotateY(" + headYaw.toFixed(2) + "deg) " +
+          "rotateX(" + headPitch.toFixed(2) + "deg) " +
+          "rotateZ(" + headRoll.toFixed(2) + "deg)";
+      }
 
-        this.renderer.render(this.scene, this.camera);
+      // 2. Goggles Parallax Pop (Moves gold wireframe goggles in 3D over face)
+      if (gogglesEl) {
+        // Goggles sit in front (20px translateZ) and rotate with extra depth
+        var gogglePopX = parallaxX * 0.32;
+        var gogglePopY = parallaxY * 0.30;
+        var goggleYaw = headYaw * 0.12;
+        gogglesEl.style.transform =
+          "translate3d(" + gogglePopX.toFixed(2) + "px, " + gogglePopY.toFixed(2) + "px, 20px) " +
+          "rotateY(" + goggleYaw.toFixed(2) + "deg)";
+      }
+
+      // 3. Subtle Body Counter-Posture
+      if (bodyEl) {
+        var bodyYaw = this.currentX * 2.8;
+        var bodyX = this.currentX * 1.8;
+        bodyEl.style.transform =
+          "translate3d(" + bodyX.toFixed(2) + "px, 0px, 0px) " +
+          "rotateY(" + bodyYaw.toFixed(2) + "deg)";
+      }
+
+      // 4. Ground Contact Shadow (Reacts and skews with character leaning)
+      if (shadowEl) {
+        var shadowX = this.currentX * 15;
+        var shadowSkew = -this.currentX * 6.0;
+        var shadowScale = 1.0 - Math.abs(this.currentY) * 0.05;
+        shadowEl.style.transform =
+          "translateX(" + shadowX.toFixed(1) + "px) " +
+          "skewX(" + shadowSkew.toFixed(1) + "deg) " +
+          "scale(" + shadowScale.toFixed(2) + ")";
+      }
+
+      // 5. Eye Pupil Darting (Eyes actively look through lenses at cursor)
+      var eyeX = this.currentX * 4.4;
+      var eyeY = this.currentY * 3.6;
+      if (pupilLEl) {
+        pupilLEl.style.transform = "translate(" + eyeX.toFixed(1) + "px, " + eyeY.toFixed(1) + "px)";
+      }
+      if (pupilREl) {
+        pupilREl.style.transform = "translate(" + eyeX.toFixed(1) + "px, " + eyeY.toFixed(1) + "px)";
+      }
+
+      // 6. Procedural Eyelid Blinking
+      var blinkCycle = (time % 3600) / 3600;
+      var isBlinking = blinkCycle > 0.955;
+      var blinkScale = isBlinking ? (1.0 - Math.sin(((blinkCycle - 0.955) / 0.045) * Math.PI)) : 0;
+      if (eyelidLEl && eyelidREl) {
+        eyelidLEl.style.transform = "scaleY(" + (1 - blinkScale).toFixed(2) + ")";
+        eyelidREl.style.transform = "scaleY(" + (1 - blinkScale).toFixed(2) + ")";
       }
     }
   };
 
   // ==========================================================================
-  // 2. BUTTERFLY & FAIRY DUST SPARKLE TRAIL
+  // 2. CYAN / ELECTRIC BLUE BUTTERFLY & SPARKLE TRAIL
   // ==========================================================================
   var SparkleTrail = {
     canvas: sparklesCanvas,
@@ -627,7 +712,7 @@
     particles: [],
 
     init: function() {
-      if (!this.canvas || !config.enableSparkles) return;
+      if (!this.canvas || !enableSparkles) return;
       this.ctx = this.canvas.getContext("2d");
       this.resize();
       window.addEventListener("resize", this.resize.bind(this));
@@ -642,23 +727,22 @@
       if (this.ctx) this.ctx.scale(dpr, dpr);
     },
 
-    spawn: function(x, y, vx, vy) {
-      if (!config.enableSparkles || this.particles.length > 80) return;
-      var colors = ["#00E5FF", "#B2EBF2", "#FFFFFF", "#FFD54F"];
+    addParticle: function(x, y) {
+      if (this.particles.length > 55) return;
+      var hues = ["#00E5FF", "#80D8FF", "#00B0FF", "#FFE082", "#FFFFFF"];
       this.particles.push({
-        x: x + (Math.random() - 0.5) * 10,
-        y: y + (Math.random() - 0.5) * 10,
-        vx: (Math.random() - 0.5) * 1.1 - vx * 0.1,
-        vy: (Math.random() - 0.5) * 1.1 + 0.6,
-        size: Math.random() * 2.6 + 1.2,
+        x: x + (Math.random() - 0.5) * 8,
+        y: y + (Math.random() - 0.5) * 8,
+        vx: (Math.random() - 0.5) * 0.9,
+        vy: Math.random() * 0.8 + 0.3,
+        size: Math.random() * 2.8 + 1.0,
         alpha: 1.0,
-        decay: Math.random() * 0.022 + 0.016,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        phase: Math.random() * Math.PI * 2
+        decay: Math.random() * 0.022 + 0.015,
+        color: hues[Math.floor(Math.random() * hues.length)]
       });
     },
 
-    render: function(time) {
+    updateAndRender: function() {
       if (!this.ctx || !stageEl) return;
       var rect = stageEl.getBoundingClientRect();
       this.ctx.clearRect(0, 0, rect.width, rect.height);
@@ -674,136 +758,113 @@
           continue;
         }
 
-        var twinkle = Math.sin(time * 0.015 + p.phase) * 0.3 + 0.7;
-        var drawAlpha = Math.max(0, Math.min(1, p.alpha * twinkle));
-
         this.ctx.save();
-        this.ctx.globalAlpha = drawAlpha;
+        this.ctx.globalAlpha = Math.max(0, p.alpha);
         this.ctx.fillStyle = p.color;
         this.ctx.shadowColor = p.color;
         this.ctx.shadowBlur = 6;
-
-        var s = p.size;
         this.ctx.beginPath();
-        this.ctx.moveTo(p.x, p.y - s * 1.5);
-        this.ctx.lineTo(p.x + s * 0.35, p.y - s * 0.35);
-        this.ctx.lineTo(p.x + s * 1.5, p.y);
-        this.ctx.lineTo(p.x + s * 0.35, p.y + s * 0.35);
-        this.ctx.lineTo(p.x, p.y + s * 1.5);
-        this.ctx.lineTo(p.x - s * 0.35, p.y + s * 0.35);
-        this.ctx.lineTo(p.x - s * 1.5, p.y);
-        this.ctx.lineTo(p.x - s * 0.35, p.y - s * 0.35);
-        this.ctx.closePath();
+        this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         this.ctx.fill();
-
         this.ctx.restore();
       }
     }
   };
 
-  var ButterflyEngine = {
+  var ButterflyFollower = {
+    el: butterflyEl,
     posX: 0,
     posY: 0,
     targetX: 0,
     targetY: 0,
-    currentAngle: 0,
-    isActive: false,
+    angle: 0,
+    isHovering: false,
+    lastMoveTime: performance.now(),
 
     init: function() {
-      if (!butterflyEl || !config.enableButterfly) return;
+      if (!this.el || !enableButterfly) return;
 
-      var secRect = sectionEl.getBoundingClientRect();
-      this.posX = secRect.width * 0.65;
-      this.posY = secRect.height * 0.38;
+      var self = this;
+      var rect = stageEl.getBoundingClientRect();
+      this.posX = rect.width * 0.72;
+      this.posY = rect.height * 0.32;
       this.targetX = this.posX;
       this.targetY = this.posY;
 
-      var self = this;
       window.addEventListener("mousemove", function(e) {
-        if (!sectionEl) return;
-        var rect = sectionEl.getBoundingClientRect();
-        self.targetX = e.clientX - rect.left;
-        self.targetY = e.clientY - rect.top;
-        self.isActive = true;
+        if (!stageEl) return;
+        var sRect = stageEl.getBoundingClientRect();
+        // Hover slightly offset to the top-right of cursor
+        self.targetX = e.clientX - sRect.left + 24;
+        self.targetY = e.clientY - sRect.top - 20;
+        self.isHovering = true;
+        self.lastMoveTime = performance.now();
       }, { passive: true });
 
-      requestAnimationFrame(this.flightLoop.bind(this));
+      window.addEventListener("touchmove", function(e) {
+        if (!stageEl || !e.touches || e.touches.length === 0) return;
+        var sRect = stageEl.getBoundingClientRect();
+        self.targetX = e.touches[0].clientX - sRect.left + 20;
+        self.targetY = e.touches[0].clientY - sRect.top - 30;
+        self.isHovering = true;
+        self.lastMoveTime = performance.now();
+      }, { passive: true });
+
+      requestAnimationFrame(this.renderLoop.bind(this));
     },
 
-    flightLoop: function(time) {
-      requestAnimationFrame(this.flightLoop.bind(this));
+    renderLoop: function(time) {
+      requestAnimationFrame(this.renderLoop.bind(this));
+      if (prefersReducedMotion) return;
 
-      if (!butterflyEl || !config.enableButterfly) return;
+      var rect = stageEl.getBoundingClientRect();
 
-      var secW = sectionEl.offsetWidth || window.innerWidth;
-      var secH = sectionEl.offsetHeight || 560;
-
-      // Autonomous gentle hovering if idle
-      if (!this.isActive) {
-        var t = time * 0.0016;
-        this.targetX = secW * 0.60 + Math.cos(t) * (secW * 0.16);
-        this.targetY = secH * 0.38 + Math.sin(t * 1.8) * (secH * 0.12);
+      // If mouse is idle for > 3.2 seconds, gentle autonomous patrol around mascot
+      if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
+        var t = time * 0.0014;
+        this.targetX = (rect.width * 0.5) + Math.cos(t) * (rect.width * 0.32);
+        this.targetY = (rect.height * 0.34) + Math.sin(t * 2) * (rect.height * 0.16);
       }
 
+      // Smooth trailing physics
       var dx = this.targetX - this.posX;
       var dy = this.targetY - this.posY;
-      var dist = Math.sqrt(dx * dx + dy * dy);
+      this.posX += dx * 0.082;
+      this.posY += dy * 0.082;
 
-      this.posX += dx * 0.092;
-      this.posY += dy * 0.092;
+      // Natural hovering bob
+      var hoverX = Math.sin(time * 0.0036) * 7;
+      var hoverY = Math.cos(time * 0.0044) * 6;
 
-      var hoverX = Math.sin(time * 0.0036) * 6;
-      var hoverY = Math.cos(time * 0.0042) * 5;
-      var finalX = this.posX + hoverX;
-      var finalY = this.posY + hoverY;
+      // Banking angle towards flight vector
+      var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+      var diff = (targetAngle - this.angle + 540) % 360 - 180;
+      this.angle += diff * 0.12;
 
-      finalX = Math.max(20, Math.min(secW - 85, finalX));
-      finalY = Math.max(20, Math.min(secH - 75, finalY));
+      var fx = this.posX + hoverX;
+      var fy = this.posY + hoverY;
 
-      if (dist > 3) {
-        var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
-        var diff = (targetAngle - this.currentAngle + 540) % 360 - 180;
-        this.currentAngle += diff * 0.12;
-      }
-      var bankTilt = Math.max(-28, Math.min(28, (dx * 0.092) * 2.2));
+      // Restrain within stage bounds
+      fx = Math.max(10, Math.min(rect.width - 70, fx));
+      fy = Math.max(10, Math.min(rect.height - 70, fy));
 
-      butterflyEl.style.transform =
-        "translate3d(" + (finalX - 30).toFixed(1) + "px, " + (finalY - 25).toFixed(1) + "px, 0px) " +
-        "rotate(" + this.currentAngle.toFixed(1) + "deg) " +
-        "rotateY(" + bankTilt.toFixed(1) + "deg)";
+      this.el.style.transform =
+        "translate3d(" + fx.toFixed(1) + "px, " + fy.toFixed(1) + "px, 0px) " +
+        "rotate(" + this.angle.toFixed(1) + "deg)";
 
-      if (stageEl && SparkleTrail.ctx) {
-        var stageRect = stageEl.getBoundingClientRect();
-        var secRect = sectionEl.getBoundingClientRect();
-        var relX = finalX - (stageRect.left - secRect.left);
-        var relY = finalY - (stageRect.top - secRect.top);
-
-        if (dist > 2 || Math.random() < 0.25) {
-          SparkleTrail.spawn(relX, relY, dx * 0.04, dy * 0.04);
-        }
+      // Sparkle emission from butterfly wings
+      if (enableSparkles && Math.random() < 0.65) {
+        SparkleTrail.addParticle(fx + 28, fy + 32);
       }
 
-      SparkleTrail.render(time);
+      SparkleTrail.updateAndRender();
     }
   };
 
-  function boot() {
-    ThreeMascotManager.init();
-    SparkleTrail.init();
-    ButterflyEngine.init();
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-
-  document.addEventListener("shopify:section:load", function(e) {
-    if (e.detail && e.detail.sectionId === sectionId) {
-      boot();
-    }
-  });
+  // Initialize all engines
+  MascotGazeEngine.init();
+  SparkleTrail.init();
+  ButterflyFollower.init();
 
 })();
 </script>
@@ -822,50 +883,59 @@
     },
     {
       "type": "range",
+      "id": "mascot_size",
+      "label": "Mascot Max Width (px)",
+      "min": 240,
+      "max": 480,
+      "step": 10,
+      "default": 340
+    },
+    {
+      "type": "range",
       "id": "sensitivity",
-      "label": "Gaze Sensitivity (°)",
+      "label": "Goggles Gaze Sensitivity (°)",
       "min": 10,
       "max": 40,
       "step": 1,
-      "default": 26
+      "default": 24
     },
     {
       "type": "header",
-      "content": "Butterfly Cursor"
+      "content": "Butterfly & Fairy Dust"
     },
     {
       "type": "checkbox",
       "id": "enable_butterfly",
-      "label": "Enable Butterfly Cursor",
+      "label": "Enable Electric Blue Butterfly",
       "default": true
     },
     {
       "type": "color",
       "id": "butterfly_color",
-      "label": "Butterfly Wing Color",
+      "label": "Butterfly Wing Cyan Accent",
       "default": "#00E5FF"
     },
     {
       "type": "checkbox",
       "id": "enable_sparkles",
-      "label": "Enable Fairy Dust Trail",
+      "label": "Enable Fairy Dust Sparkles",
       "default": true
     },
     {
       "type": "header",
-      "content": "Interactive Pill"
+      "content": "Interactive Hint Pill"
     },
     {
       "type": "checkbox",
       "id": "show_hint",
-      "label": "Show Hint Pill",
+      "label": "Show Interaction Hint Pill",
       "default": true
     },
     {
       "type": "text",
       "id": "hint_text",
       "label": "Hint Text",
-      "default": "Interactive 3D Mascot • Move mouse or drag to explore"
+      "default": "Interactive 3D Mascot • Move mouse or touch to explore"
     }
   ],
   "presets": [
@@ -873,11 +943,13 @@
       "name": "Royal Mascot",
       "settings": {
         "bg_color": "#E5A625",
-        "sensitivity": 26,
+        "mascot_size": 340,
+        "sensitivity": 24,
         "enable_butterfly": true,
         "butterfly_color": "#00E5FF",
         "enable_sparkles": true,
-        "show_hint": true
+        "show_hint": true,
+        "hint_text": "Interactive 3D Mascot • Move mouse or touch to explore"
       }
     }
   ]

@@ -428,15 +428,64 @@
     },
     "interactive_royal_mascot": {
       "type": "interactive-royal-mascot",
+      "blocks": {
+        "outfit_cream": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Imperial Cream & Gold",
+            "outfit_key": "cream",
+            "swatch_color": "#F5E5C9",
+            "price": "Rs. 48,000",
+            "description": "Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping."
+          }
+        },
+        "outfit_blue": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Sapphire Blue Jodhpuri",
+            "outfit_key": "blue",
+            "swatch_color": "#1B3B6F",
+            "price": "Rs. 52,000",
+            "description": "Celestial lapis blue brocade adorned with real silver and gold thread floral booti motifs and mandarin collar."
+          }
+        },
+        "outfit_green": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Heritage Emerald Silk",
+            "outfit_key": "green",
+            "swatch_color": "#1E4A38",
+            "price": "Rs. 54,000",
+            "description": "Rich forest emerald raw silk sherwani featuring heritage paisleys, antique gold placket, and emerald buttons."
+          }
+        },
+        "outfit_red": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Ruby Red Ceremonial",
+            "outfit_key": "red",
+            "swatch_color": "#8B1E1E",
+            "price": "Rs. 56,000",
+            "description": "Ceremonial state regalia in deep ruby velvet enriched with dense antique gold zardozi placket embroidery."
+          }
+        }
+      },
+      "block_order": [
+        "outfit_cream",
+        "outfit_blue",
+        "outfit_green",
+        "outfit_red"
+      ],
       "settings": {
         "bg_color": "#E5A625",
-        "mascot_size": 340,
-        "sensitivity": 24,
+        "heading": "Interactive Royal Wardrobe",
+        "subheading": "ROYAL COURT ATELIER",
+        "description": "Select any royal regalia below to instantly drape the character in handcrafted court attire.",
+        "mascot_size": 440,
         "enable_butterfly": true,
-        "butterfly_color": "#00E5FF",
         "enable_sparkles": true,
         "show_hint": true,
-        "hint_text": "Interactive 3D Mascot • Move mouse or touch to explore"
+        "hint_text": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
       }
     }
   },

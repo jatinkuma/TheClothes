@@ -1,46 +1,45 @@
 {% comment %}
   ==============================================================================
-  ROYAL MASCOT — INTERACTIVE 3D WEBGL CARTOON MASCOT & BUTTERFLY SECTION
+  ROYAL MASCOT — INTERACTIVE DRESS-UP CHARACTER & 3D BUTTERFLY ATELIER
   ------------------------------------------------------------------------------
   Features:
-  - 100% FRONT-FACING Rigged 3D Polygonal Model (GLB via Three.js WebGL):
-    * Cute cartoon chipmunk head with chubby cream cheeks & dark button nose
-    * Round gold wireframe goggles with physical 3D depth resting on snout bridge
-    * Multicolored Rajasthani royal safa with jewel Kalgi brooch & upright white plume
-    * Cream brocade Sherwani with gold buttons & royal red zardozi embroidered stole
-    * Gold medallion necklace, churidar & curled royal mojari shoes
-    * Bushy tail curled at back
-  - Continuous Circular 360° Movement ("Moment Like Circle"):
-    * Smooth circular 360° gaze tracking: as cursor circles around the mascot,
-      the head, goggles, and eyes follow in a fluid, continuous 360° circular loop
-    * Interactive 360° drag & spin orbit rotation with smooth momentum/inertia
-    * Signature bottom-section leaning & displacement action
-    * Organic idle breathing & vertical floating wave
-    * Soft ground contact shadow reacting dynamically in 360°
-  - FULL-SECTION Butterfly Flight & Live Canvas Fairy Dust Trail:
-    * Butterfly flies across the FULL 100% width and height of the entire section
-      from screen edge to screen edge without any half-section boundary clipping
-    * Smooth spring-damped flight physics with 3D wing fluttering & banking
-    * Live canvas fairy dust sparkle trail spanning the entire section width
-    * Autonomous circular flight patrol when mouse is idle
-  - Responsive Desktop, Tablet & Mobile touch support
+  - Front-Facing Indian Prince Fashion Doll Character in Royal Regalia
+  - Instant Dress-Up & Outfit Customizer ("Append the dress we want"):
+    * Imperial Cream & Gold Sherwani
+    * Sapphire Blue Royal Jodhpuri
+    * Heritage Emerald Silk Sherwani
+    * Ruby Red Ceremonial Sherwani
+    * Custom merchant outfit upload support via Shopify theme blocks
+    * Seamless crossfade transitions with magical fairy dust sparkle burst
+  - Natural Gaze & Circular Tracking Physics (Matching Signature Bottom Section):
+    * Organic yaw (left-right) & vertical pitch (up-down) tracking the cursor
+    * Signature bottom-section leaning displacement physics
+    * Responsive dynamic ground contact shadow that shifts with lean
+    * Gentle idle floating wave and butterfly gaze tracking
+  - Full-Section 3D Royal Butterfly Creature & Live Multi-Hue Fairy Dust Trail:
+    * Exact multi-stop gradient wings, emerald core glow, 3D banking, and speed toggle
+    * Flying across full section width & height without clipping
+  - Responsive across Mobile, Tablet, and Desktop touch displays
   ==============================================================================
 {% endcomment %}
-
-<!-- Three.js & GLTF Loader CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <div
   id="royal-mascot-section-{{ section.id }}"
   class="royal-mascot-section"
   style="
     --mascot-bg: {{ section.settings.bg_color | default: '#E5A625' }};
-    --mascot-width: {{ section.settings.mascot_size | default: 340 }}px;
+    --mascot-width: {{ section.settings.mascot_size | default: 440 }}px;
   "
 >
   <!-- Background Radiant Center Glow -->
   <div class="royal-mascot-bg-glow" aria-hidden="true"></div>
+
+  <!-- Section Header / Brand Title -->
+  <header class="royal-mascot-header">
+    <span class="royal-mascot-badge">{{ section.settings.subheading | default: 'ROYAL COURT ATELIER' }}</span>
+    <h2 class="royal-mascot-title">{{ section.settings.heading | default: 'Interactive Royal Wardrobe' }}</h2>
+    <p class="royal-mascot-subtitle">{{ section.settings.description | default: 'Select any royal regalia below to instantly drape the character in handcrafted court attire.' }}</p>
+  </header>
 
   <!-- FULL-SECTION Fairy Dust Sparkle Particle Canvas -->
   {% if section.settings.enable_sparkles %}
@@ -160,23 +159,179 @@
     </div>
   {% endif %}
 
-  <!-- Central 3D Mascot Stage -->
+  <!-- Central Stage: Interactive Doll & Wardrobe Atelier -->
   <div id="royal-mascot-stage-{{ section.id }}" class="royal-mascot-stage">
 
-    <!-- Loading Spinner -->
-    <div id="royal-mascot-spinner-{{ section.id }}" class="royal-mascot-spinner" aria-live="polite">
-      <div class="royal-mascot-spinner-ring"></div>
-      <span class="royal-mascot-spinner-text">Awakening 3D Royal Mascot...</span>
+    <!-- Active Outfit Floating Pill -->
+    <div class="royal-active-outfit-badge" id="royal-outfit-badge-{{ section.id }}">
+      <span class="badge-crown">👑</span>
+      <span class="badge-name" id="royal-active-name-{{ section.id }}">Imperial Cream & Gold Sherwani</span>
     </div>
 
-    <!-- WebGL Canvas for 3D Mascot Character -->
-    <canvas id="royal-mascot-canvas-{{ section.id }}" class="royal-mascot-canvas"></canvas>
+    <!-- Master Interactive Doll Character with Gaze & Leaning Physics -->
+    <div
+      id="royal-mascot-doll-{{ section.id }}"
+      class="royal-doll-character"
+      data-doll-tracking="true"
+      data-idle-float="true"
+    >
+      <!-- Preloaded Built-in Outfits for Instant Seamless Crossfade -->
+      <img
+        id="royal-doll-cream-{{ section.id }}"
+        class="royal-doll-img active"
+        data-outfit="cream"
+        src="{{ 'royal-doll-cream.png' | asset_url }}"
+        alt="Imperial Cream & Gold Sherwani"
+        loading="eager"
+        width="848"
+        height="1264"
+      />
+      <img
+        id="royal-doll-blue-{{ section.id }}"
+        class="royal-doll-img"
+        data-outfit="blue"
+        src="{{ 'royal-doll-blue.png' | asset_url }}"
+        alt="Sapphire Blue Jodhpuri"
+        loading="lazy"
+        width="848"
+        height="1264"
+      />
+      <img
+        id="royal-doll-green-{{ section.id }}"
+        class="royal-doll-img"
+        data-outfit="green"
+        src="{{ 'royal-doll-green.png' | asset_url }}"
+        alt="Heritage Emerald Silk Sherwani"
+        loading="lazy"
+        width="848"
+        height="1264"
+      />
+      <img
+        id="royal-doll-red-{{ section.id }}"
+        class="royal-doll-img"
+        data-outfit="red"
+        src="{{ 'royal-doll-red.png' | asset_url }}"
+        alt="Ruby Red Ceremonial Sherwani"
+        loading="lazy"
+        width="848"
+        height="1264"
+      />
 
-    <!-- Interactive Hint Pill Matching Reference Image -->
+      <!-- Custom Merchant Uploaded Outfits (via Blocks) -->
+      {% for block in section.blocks %}
+        {% if block.settings.custom_outfit_image != blank %}
+          <img
+            id="royal-doll-block-{{ block.id }}"
+            class="royal-doll-img"
+            data-outfit="block-{{ block.id }}"
+            src="{{ block.settings.custom_outfit_image | image_url: width: 1000 }}"
+            alt="{{ block.settings.outfit_name }}"
+            loading="lazy"
+            width="848"
+            height="1264"
+            {{ block.shopify_attributes }}
+          />
+        {% endif %}
+      {% endfor %}
+
+      <!-- Dynamic Ground Contact Shadow (Moves & squashes with leaning physics) -->
+      <div id="royal-doll-shadow-{{ section.id }}" class="royal-doll-ground-shadow" aria-hidden="true"></div>
+    </div>
+
+    <!-- Quick-Dressing Wardrobe Swatches Dock -->
+    <div class="royal-wardrobe-dock" id="royal-wardrobe-dock-{{ section.id }}">
+      <span class="dock-label">✨ DRAPE DRESS:</span>
+      <div class="dock-swatches">
+        {% if section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% assign block_outfit_key = block.settings.outfit_key %}
+            {% if block.settings.custom_outfit_image != blank %}
+              {% assign block_outfit_key = 'block-' | append: block.id %}
+            {% endif %}
+            <button
+              type="button"
+              class="dock-swatch-btn {% if forloop.first %}active{% endif %}"
+              data-outfit="{{ block_outfit_key }}"
+              data-title="{{ block.settings.outfit_name | escape }}"
+              data-price="{{ block.settings.price | default: 'Rs. 48,000' | escape }}"
+              data-desc="{{ block.settings.description | default: 'Hand-tailored court sherwani.' | escape }}"
+              aria-label="Dress character in {{ block.settings.outfit_name | escape }}"
+              {{ block.shopify_attributes }}
+            >
+              <span class="swatch-ring" style="--swatch-color: {{ block.settings.swatch_color | default: '#F5E5C9' }};"></span>
+              <span class="swatch-text">{{ block.settings.outfit_name }}</span>
+            </button>
+          {% endfor %}
+        {% else %}
+          <button
+            type="button"
+            class="dock-swatch-btn active"
+            data-outfit="cream"
+            data-title="Imperial Cream & Gold"
+            data-price="Rs. 48,000"
+            data-desc="Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping."
+          >
+            <span class="swatch-ring" style="--swatch-color: #F5E5C9;"></span>
+            <span class="swatch-text">Cream & Gold</span>
+          </button>
+          <button
+            type="button"
+            class="dock-swatch-btn"
+            data-outfit="blue"
+            data-title="Sapphire Blue Jodhpuri"
+            data-price="Rs. 52,000"
+            data-desc="Celestial lapis blue brocade adorned with real silver and gold thread floral booti motifs and mandarin collar."
+          >
+            <span class="swatch-ring" style="--swatch-color: #1B3B6F;"></span>
+            <span class="swatch-text">Sapphire Blue</span>
+          </button>
+          <button
+            type="button"
+            class="dock-swatch-btn"
+            data-outfit="green"
+            data-title="Heritage Emerald Silk"
+            data-price="Rs. 54,000"
+            data-desc="Rich forest emerald raw silk sherwani featuring heritage paisleys, antique gold placket, and emerald buttons."
+          >
+            <span class="swatch-ring" style="--swatch-color: #1E4A38;"></span>
+            <span class="swatch-text">Emerald Green</span>
+          </button>
+          <button
+            type="button"
+            class="dock-swatch-btn"
+            data-outfit="red"
+            data-title="Ruby Red Ceremonial"
+            data-price="Rs. 56,000"
+            data-desc="Ceremonial state regalia in deep ruby velvet enriched with dense antique gold zardozi placket embroidery."
+          >
+            <span class="swatch-ring" style="--swatch-color: #8B1E1E;"></span>
+            <span class="swatch-text">Ruby Red</span>
+          </button>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Active Outfit Info Card / Atelier Drawer -->
+    <div class="royal-outfit-info-card" id="royal-info-card-{{ section.id }}">
+      <div class="info-card-left">
+        <span class="info-card-tag">AUTHENTIC COURT REGALIA</span>
+        <h4 class="info-card-title" id="royal-card-title-{{ section.id }}">Imperial Cream & Gold</h4>
+        <p class="info-card-desc" id="royal-card-desc-{{ section.id }}">Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping.</p>
+      </div>
+      <div class="info-card-right">
+        <span class="info-card-price" id="royal-card-price-{{ section.id }}">Rs. 48,000</span>
+        <a href="#the-collection" class="info-card-btn">
+          <span>Add to Wardrobe</span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Interaction Hint Pill -->
     {% if section.settings.show_hint %}
       <div class="royal-mascot-hint">
         <span class="royal-mascot-hint-icon">✦</span>
-        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Interactive 3D Mascot • Move mouse in circles or drag to rotate' }}</span>
+        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Click any dress to drape the character • Move mouse to track natural gaze in real-time' }}</span>
       </div>
     {% endif %}
 
@@ -185,45 +340,88 @@
 
 <style>
   /* ==========================================================================
-     ROYAL MASCOT SECTION STYLING (Scoped & Responsive)
+     ROYAL MASCOT & DRESS-UP ATELIER STYLING
      ========================================================================== */
   #royal-mascot-section-{{ section.id }} {
     position: relative;
     width: 100%;
-    min-height: 580px;
+    min-height: 720px;
     background-color: var(--mascot-bg, #E5A625);
-    background: radial-gradient(ellipse at 50% 50%, #f4c45a 0%, #e2a022 55%, #c98818 100%);
+    background: radial-gradient(ellipse at 50% 45%, #f7cb67 0%, #e5a625 50%, #c48210 100%);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     box-sizing: border-box;
     user-select: none;
     -webkit-user-select: none;
-    padding: 20px 20px 36px 20px;
+    padding: 36px 20px 48px 20px;
   }
 
   /* Subtle Warm Center Glow */
   #royal-mascot-section-{{ section.id }} .royal-mascot-bg-glow {
     position: absolute;
     inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.22) 0%, rgba(245, 185, 50, 0.10) 45%, transparent 75%);
     pointer-events: none;
-    background: radial-gradient(circle at 50% 48%, rgba(255, 235, 175, 0.45) 0%, transparent 65%);
     z-index: 1;
   }
 
-  /* FULL-SECTION Fairy Dust Canvas (Covers Entire Section Width & Height) */
+  /* Section Header */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-header {
+    position: relative;
+    z-index: 6;
+    text-align: center;
+    max-width: 680px;
+    margin-bottom: 12px;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: rgba(30, 20, 10, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #3b2207;
+    margin-bottom: 8px;
+    backdrop-filter: blur(4px);
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-title {
+    font-family: inherit;
+    font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+    font-weight: 800;
+    color: #2b1704;
+    line-height: 1.15;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-mascot-subtitle {
+    font-size: clamp(0.85rem, 1.4vw, 0.98rem);
+    color: #4e300d;
+    margin: 0 auto;
+    max-width: 540px;
+    line-height: 1.45;
+  }
+
+  /* Full-Section Canvas for Sparkles */
   #royal-mascot-section-{{ section.id }} .royal-mascot-sparkles-canvas {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100% !important;
     height: 100% !important;
     pointer-events: none;
     z-index: 15;
   }
 
-  /* FULL-SECTION 3D Royal Butterfly Creature (Matching Royal Fashion Doll) */
+  /* FULL-SECTION 3D Royal Butterfly Creature */
   #royal-mascot-section-{{ section.id }} .royal-butterfly-creature {
     position: absolute;
     top: 0;
@@ -264,7 +462,7 @@
     filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.7));
   }
 
-  /* Left Wing */
+  /* Butterfly Wings */
   #royal-mascot-section-{{ section.id }} .butterfly-wing.wing-left {
     position: absolute;
     right: 50%;
@@ -279,7 +477,6 @@
     z-index: 2;
   }
 
-  /* Right Wing */
   #royal-mascot-section-{{ section.id }} .butterfly-wing.wing-right {
     position: absolute;
     left: 50%;
@@ -300,40 +497,24 @@
     display: block;
   }
 
-  /* Continuous 3D Wing Flapping Between Open and Folded */
   @keyframes flapLeftWing {
-    0% {
-      transform: rotateY(0deg) rotateZ(0deg);
-    }
-    50% {
-      transform: rotateY(52deg) rotateZ(-6deg);
-    }
-    100% {
-      transform: rotateY(78deg) rotateZ(-12deg);
-    }
+    0% { transform: rotateY(0deg) rotateZ(0deg); }
+    50% { transform: rotateY(52deg) rotateZ(-6deg); }
+    100% { transform: rotateY(78deg) rotateZ(-12deg); }
   }
 
   @keyframes flapRightWing {
-    0% {
-      transform: rotateY(0deg) rotateZ(0deg);
-    }
-    50% {
-      transform: rotateY(-52deg) rotateZ(6deg);
-    }
-    100% {
-      transform: rotateY(-78deg) rotateZ(12deg);
-    }
+    0% { transform: rotateY(0deg) rotateZ(0deg); }
+    50% { transform: rotateY(-52deg) rotateZ(6deg); }
+    100% { transform: rotateY(-78deg) rotateZ(12deg); }
   }
 
-  /* Rapid Flap State when accelerating */
   #royal-mascot-section-{{ section.id }} .royal-butterfly-creature.fast-flap .wing-left {
     animation-duration: 0.11s;
   }
   #royal-mascot-section-{{ section.id }} .royal-butterfly-creature.fast-flap .wing-right {
     animation-duration: 0.11s;
   }
-
-  /* Hover gentle flutter */
   #royal-mascot-section-{{ section.id }} .royal-butterfly-creature.hover-flap .wing-left {
     animation-duration: 0.22s;
   }
@@ -346,106 +527,282 @@
     position: relative;
     width: 100%;
     max-width: 680px;
-    height: 520px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 5;
-  }
-
-  /* WebGL Canvas */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-    outline: none;
-    cursor: grab;
-    z-index: 4;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas:active {
-    cursor: grabbing;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas.active {
-    opacity: 1;
-  }
-
-  /* Loading Spinner */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner {
-    position: absolute;
-    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    z-index: 12;
-    background: transparent;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
+    z-index: 5;
+    perspective: 1000px;
   }
 
-  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner-ring {
-    width: 44px;
-    height: 44px;
-    border: 3.5px solid rgba(42, 21, 8, 0.15);
-    border-top-color: #241105;
-    border-radius: 50%;
-    animation: rmSpin 0.85s linear infinite;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-mascot-spinner-text {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #241105;
-    letter-spacing: 0.04em;
-  }
-
-  @keyframes rmSpin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* Hint Pill Matching Reference */
-  #royal-mascot-section-{{ section.id }} .royal-mascot-hint {
-    position: absolute;
-    bottom: 12px;
+  /* Active Outfit Pill Badge */
+  #royal-mascot-section-{{ section.id }} .royal-active-outfit-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255, 235, 192, 0.76);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(229, 166, 37, 0.6);
+    box-shadow: 0 4px 18px rgba(90, 50, 10, 0.12);
+    border-radius: 30px;
+    padding: 6px 18px;
+    margin-bottom: 6px;
+    z-index: 8;
     backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.68);
-    padding: 7px 18px;
-    border-radius: 22px;
+    transition: transform 0.25s ease, background 0.25s ease;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-active-outfit-badge .badge-crown {
+    font-size: 1.05rem;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-active-outfit-badge .badge-name {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #2b1704;
+    letter-spacing: 0.02em;
+  }
+
+  /* Master Character Container */
+  #royal-mascot-section-{{ section.id }} .royal-doll-character {
+    position: relative;
+    width: 100%;
+    max-width: var(--mascot-width, 440px);
+    height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+    will-change: transform;
+    pointer-events: auto;
+    cursor: default;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-doll-img {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.96);
+    max-height: 480px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.36s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.36s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform-origin: center bottom;
+    pointer-events: none;
+    filter: drop-shadow(0 14px 26px rgba(50, 25, 5, 0.22));
+    z-index: 3;
+  }
+
+  #royal-mascot-section-{{ section.id }} .royal-doll-img.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+    z-index: 4;
+  }
+
+  /* Ground Contact Shadow */
+  #royal-mascot-section-{{ section.id }} .royal-doll-ground-shadow {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    width: 190px;
+    height: 28px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(35, 18, 5, 0.42) 0%, rgba(35, 18, 5, 0.12) 50%, transparent 75%);
+    transform: translateX(-50%);
+    border-radius: 50%;
+    filter: blur(4px);
+    pointer-events: none;
+    z-index: 2;
+    will-change: transform;
+    transition: transform 0.08s linear;
+  }
+
+  /* Wardrobe Dock */
+  #royal-mascot-section-{{ section.id }} .royal-wardrobe-dock {
+    position: relative;
+    z-index: 8;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(229, 166, 37, 0.5);
+    border-radius: 40px;
+    box-shadow: 0 8px 30px rgba(70, 40, 10, 0.16);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: -6px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(10px);
+    max-width: 95%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #royal-mascot-section-{{ section.id }} .dock-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #5a350c;
+    letter-spacing: 0.08em;
+    padding-left: 6px;
+    white-space: nowrap;
+  }
+
+  #royal-mascot-section-{{ section.id }} .dock-swatches {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #royal-mascot-section-{{ section.id }} .dock-swatch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 8px;
+    border-radius: 24px;
+    border: 1.5px solid rgba(210, 160, 40, 0.35);
+    background: rgba(250, 245, 235, 0.85);
+    color: #3b2207;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #241105;
-    box-shadow: 0 4px 16px rgba(40, 20, 5, 0.08);
-    pointer-events: none;
-    z-index: 10;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    white-space: nowrap;
+    outline: none;
+  }
+
+  #royal-mascot-section-{{ section.id }} .dock-swatch-btn:hover {
+    border-color: #c48210;
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(80, 45, 10, 0.14);
+  }
+
+  #royal-mascot-section-{{ section.id }} .dock-swatch-btn.active {
+    border-color: #8a5700;
+    background: #2b1704;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(43, 23, 4, 0.35);
+    transform: translateY(-1px);
+  }
+
+  #royal-mascot-section-{{ section.id }} .dock-swatch-btn .swatch-ring {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--swatch-color, #F5E5C9);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+  }
+
+  /* Active Outfit Info Card / Drawer */
+  #royal-mascot-section-{{ section.id }} .royal-outfit-info-card {
+    position: relative;
+    z-index: 7;
+    width: 100%;
+    max-width: 580px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(70, 40, 10, 0.12);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    backdrop-filter: blur(8px);
+    margin-bottom: 12px;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-tag {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #8a5700;
+    margin-bottom: 2px;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #2b1704;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-desc {
+    font-size: 0.78rem;
+    color: #553510;
+    margin: 0;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-price {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #2b1704;
+    letter-spacing: -0.01em;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #2b1704;
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  #royal-mascot-section-{{ section.id }} .info-card-btn:hover {
+    background: #000000;
+    transform: translateY(-1px);
+  }
+
+  /* Interaction Hint Pill */
+  #royal-mascot-section-{{ section.id }} .royal-mascot-hint {
+    position: relative;
+    z-index: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(30, 20, 10, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 30px;
+    padding: 6px 16px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #4a2c0c;
+    backdrop-filter: blur(4px);
   }
 
   #royal-mascot-section-{{ section.id }} .royal-mascot-hint-icon {
-    font-size: 0.95rem;
-    color: #241105;
-  }
-
-  @media (max-width: 600px) {
-    #royal-mascot-section-{{ section.id }} {
-      min-height: 480px;
-      padding: 16px 8px;
-    }
-    #royal-mascot-section-{{ section.id }} .royal-mascot-stage {
-      height: 450px;
-    }
-    #royal-mascot-section-{{ section.id }} .royal-mascot-hint {
-      font-size: 0.74rem;
-      padding: 6px 14px;
-    }
+    color: #8a5700;
+    font-size: 0.85rem;
   }
 
   /* Accessibility */
@@ -453,11 +810,37 @@
     #royal-mascot-section-{{ section.id }} .butterfly-wing {
       animation: none !important;
     }
-    #royal-mascot-section-{{ section.id }} .royal-mascot-butterfly {
+    #royal-mascot-section-{{ section.id }} .royal-butterfly-creature {
       display: none !important;
     }
     #royal-mascot-section-{{ section.id }} .royal-mascot-sparkles-canvas {
       display: none !important;
+    }
+    #royal-mascot-section-{{ section.id }} .royal-doll-character {
+      transform: none !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    #royal-mascot-section-{{ section.id }} {
+      min-height: 660px;
+      padding: 24px 14px 36px 14px;
+    }
+    #royal-mascot-section-{{ section.id }} .royal-doll-character {
+      height: 440px;
+    }
+    #royal-mascot-section-{{ section.id }} .royal-doll-img {
+      max-height: 400px;
+    }
+    #royal-mascot-section-{{ section.id }} .royal-outfit-info-card {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    #royal-mascot-section-{{ section.id }} .info-card-right {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
     }
   }
 </style>
@@ -469,426 +852,85 @@
   var sectionId = "{{ section.id }}";
   var sectionEl = document.getElementById("royal-mascot-section-" + sectionId);
   var stageEl = document.getElementById("royal-mascot-stage-" + sectionId);
-  var canvasEl = document.getElementById("royal-mascot-canvas-" + sectionId);
-  var spinnerEl = document.getElementById("royal-mascot-spinner-" + sectionId);
+  var dollViewer = document.getElementById("royal-mascot-doll-" + sectionId);
+  var shadowEl = document.getElementById("royal-doll-shadow-" + sectionId);
   var butterflyEl = document.getElementById("royal-mascot-butterfly-" + sectionId);
   var sparklesCanvas = document.getElementById("royal-mascot-sparkles-" + sectionId);
+  var badgeNameEl = document.getElementById("royal-active-name-" + sectionId);
+  var cardTitleEl = document.getElementById("royal-card-title-" + sectionId);
+  var cardDescEl = document.getElementById("royal-card-desc-" + sectionId);
+  var cardPriceEl = document.getElementById("royal-card-price-" + sectionId);
 
-  if (!sectionEl || !canvasEl || !stageEl) return;
+  if (!sectionEl || !stageEl || !dollViewer) return;
 
   var config = {
-    modelUrl: "{{ 'royal-cartoon-mascot.glb' | asset_url }}",
-    sensitivity: {{ section.settings.sensitivity | default: 28 }},
     enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
     enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %}
   };
 
   // ==========================================================================
-  // 1. THREE.JS 3D MASCOT MANAGER (CIRCULAR MOVEMENT & 360° INTERACTIVE SPIN)
+  // 1. DRESS-UP & WARDROBE SYSTEM ("Append the dress we want")
   // ==========================================================================
-  var ThreeMascotManager = {
-    scene: null,
-    camera: null,
-    renderer: null,
-    characterGroup: null,
-    gltfLoader: null,
-    isReady: false,
-
-    bones: {
-      head: null,
-      neck: null,
-      chest: null,
-      spine: null,
-      root: null,
-      eyeLeft: null,
-      eyeRight: null
-    },
-
-    gogglesMeshes: [],
-
-    // Circular movement & gaze angles
-    targetRotY: 0,
-    targetRotX: 0,
-    targetRoll: 0,
-    currentRotY: 0,
-    currentRotX: 0,
-    currentRoll: 0,
-
-    // 360 Drag Orbit variables
-    orbitAngleY: 0,
-    isDragging: false,
-    prevMouseX: 0,
-    dragVelocity: 0,
+  var WardrobeManager = {
+    outfitImgs: dollViewer.querySelectorAll(".royal-doll-img"),
+    swatchBtns: sectionEl.querySelectorAll(".dock-swatch-btn"),
 
     init: function() {
-      if (typeof THREE === "undefined" || typeof THREE.GLTFLoader === "undefined") {
-        setTimeout(ThreeMascotManager.init, 120);
-        return;
-      }
-
-      try {
-        var w = stageEl.clientWidth || 640;
-        var h = stageEl.clientHeight || 520;
-
-        // Scene
-        this.scene = new THREE.Scene();
-
-        // Camera directly viewing the FRONT of the character
-        this.camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-        this.camera.position.set(0, 1.15, 3.25);
-        this.camera.lookAt(0, 0.95, 0);
-
-        // WebGL Renderer with High-Fidelity Color & Tone Mapping
-        this.renderer = new THREE.WebGLRenderer({
-          canvas: canvasEl,
-          alpha: true,
-          antialias: true,
-          powerPreference: "high-performance"
-        });
-        this.renderer.setSize(w, h);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.25;
-
-        // Studio 3-Point Lighting
-        var ambientLight = new THREE.AmbientLight(0xFFF5E4, 1.55);
-        this.scene.add(ambientLight);
-
-        var keyLight = new THREE.DirectionalLight(0xFFFFFF, 1.85);
-        keyLight.position.set(3.2, 4.2, 3.8);
-        this.scene.add(keyLight);
-
-        var fillLight = new THREE.DirectionalLight(0xD6EAFF, 1.15);
-        fillLight.position.set(-3.2, 2.4, 2.8);
-        this.scene.add(fillLight);
-
-        var rimLight = new THREE.DirectionalLight(0xFFD54F, 1.65);
-        rimLight.position.set(0, 3.2, -3.2);
-        this.scene.add(rimLight);
-
-        // Soft Radial Ground Contact Shadow
-        var shadowGeo = new THREE.PlaneGeometry(1.6, 1.0);
-        var shadowCanvas = document.createElement("canvas");
-        shadowCanvas.width = 128;
-        shadowCanvas.height = 128;
-        var sCtx = shadowCanvas.getContext("2d");
-        var sGrad = sCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
-        sGrad.addColorStop(0, "rgba(40, 20, 5, 0.52)");
-        sGrad.addColorStop(0.5, "rgba(40, 20, 5, 0.20)");
-        sGrad.addColorStop(1, "rgba(40, 20, 5, 0.0)");
-        sCtx.fillStyle = sGrad;
-        sCtx.fillRect(0, 0, 128, 128);
-
-        var shadowTex = new THREE.CanvasTexture(shadowCanvas);
-        var shadowMat = new THREE.MeshBasicMaterial({
-          map: shadowTex,
-          transparent: true,
-          opacity: 0.75,
-          depthWrite: false
-        });
-        var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
-        shadowPlane.rotation.x = -Math.PI / 2;
-        shadowPlane.position.set(0, 0.02, 0);
-        this.scene.add(shadowPlane);
-        this.shadowMesh = shadowPlane;
-
-        // Character Group
-        this.characterGroup = new THREE.Group();
-        this.scene.add(this.characterGroup);
-
-        // Load 100% FRONT-FACING 3D GLB Model
-        this.gltfLoader = new THREE.GLTFLoader();
-        this.loadModel(config.modelUrl);
-
-        // Setup Circular Gaze & 360 Drag Controls
-        this.setupEventListeners();
-        requestAnimationFrame(this.renderLoop.bind(this));
-
-      } catch (err) {
-        console.error("3D Mascot WebGL initialization error:", err);
-      }
-    },
-
-    loadModel: function(url) {
-      if (!this.gltfLoader) return;
       var self = this;
-      this.gltfLoader.load(url, function(gltf) {
-        while (self.characterGroup.children.length > 0) {
-          self.characterGroup.remove(self.characterGroup.children[0]);
-        }
-
-        var model = gltf.scene;
-        model.position.set(0, 0, 0);
-        model.rotation.set(0, 0, 0); // 100% Front-Facing View
-        self.characterGroup.add(model);
-
-        self.bones = {
-          head: null, neck: null, chest: null, spine: null, root: null,
-          eyeLeft: null, eyeRight: null
-        };
-        self.gogglesMeshes = [];
-
-        model.traverse(function(node) {
-          if (node.isBone || node.type === "Bone") {
-            var name = (node.name || "").toLowerCase();
-            if (name.indexOf("head") !== -1 && !self.bones.head) self.bones.head = node;
-            else if (name.indexOf("neck") !== -1 && !self.bones.neck) self.bones.neck = node;
-            else if (name.indexOf("chest") !== -1 && !self.bones.chest) self.bones.chest = node;
-            else if (name.indexOf("spine") !== -1 && !self.bones.spine) self.bones.spine = node;
-            else if (name.indexOf("root") !== -1 && !self.bones.root) self.bones.root = node;
-            else if ((name.indexOf("eye.l") !== -1 || name === "eye_l" || name === "eyel") && !self.bones.eyeLeft) self.bones.eyeLeft = node;
-            else if ((name.indexOf("eye.r") !== -1 || name === "eye_r" || name === "eyer") && !self.bones.eyeRight) self.bones.eyeRight = node;
-          }
-          if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-
-            // Collect goggles meshes for dedicated 3D parallax depth
-            if (node.name && node.name.indexOf("Goggles_") !== -1) {
-              self.gogglesMeshes.push(node);
-            }
-
-            // Material tuning
-            if (node.material) {
-              node.material.side = THREE.DoubleSide;
-              if (node.name.indexOf("Lens") !== -1) {
-                node.material.transparent = true;
-                node.material.opacity = 0.42;
-                node.material.roughness = 0.05;
-              }
-              if (node.name.indexOf("Rim") !== -1 || node.name.indexOf("Bridge") !== -1 || node.name.indexOf("Temple") !== -1) {
-                node.material.metalness = 0.95;
-                node.material.roughness = 0.16;
-              }
-            }
-          }
+      this.swatchBtns.forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          self.selectOutfit(btn);
         });
-
-        // Hide spinner & fade in WebGL canvas
-        if (spinnerEl) spinnerEl.style.display = "none";
-        canvasEl.classList.add("active");
-        self.isReady = true;
-
-      }, undefined, function(err) {
-        console.warn("Could not load 3D mascot from " + url, err);
-        if (spinnerEl) spinnerEl.style.display = "none";
       });
     },
 
-    setupEventListeners: function() {
-      var self = this;
+    selectOutfit: function(btn) {
+      var outfitKey = btn.getAttribute("data-outfit");
+      var title = btn.getAttribute("data-title");
+      var price = btn.getAttribute("data-price");
+      var desc = btn.getAttribute("data-desc");
 
-      // 1. CIRCULAR GAZE TRACKING (Movement Like Circle)
-      function updatePointer(clientX, clientY) {
-        if (!stageEl) return;
-        var rect = stageEl.getBoundingClientRect();
-        var centerX = rect.left + rect.width / 2;
-        var centerY = rect.top + rect.height * 0.44;
+      // Update active swatch state
+      this.swatchBtns.forEach(function(b) { b.classList.remove("active"); });
+      btn.classList.add("active");
 
-        var deltaX = (clientX - centerX) / (window.innerWidth * 0.44);
-        var deltaY = (clientY - centerY) / (window.innerHeight * 0.44);
+      // Update badge & info card
+      if (badgeNameEl && title) badgeNameEl.textContent = title + " Sherwani";
+      if (cardTitleEl && title) cardTitleEl.textContent = title;
+      if (cardPriceEl && price) cardPriceEl.textContent = price;
+      if (cardDescEl && desc) cardDescEl.textContent = desc;
 
-        // Circular polar coordinate calculation for smooth 360° circular tracking
-        var angle = Math.atan2(deltaY, deltaX);
-        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        var r = Math.min(1.25, dist);
-
-        var sens = config.sensitivity || 28;
-        var maxPitch = 20;
-
-        // Horizontal: Cursor Left -> Look Left, Cursor Right -> Look Right
-        // Vertical: Cursor UP (deltaY < 0) -> targetRotX is negative -> Head Tilts UP
-        //           Cursor DOWN (deltaY > 0) -> targetRotX is positive -> Head Tilts DOWN
-        self.targetRotY = Math.cos(angle) * (r * sens);
-        self.targetRotX = Math.sin(angle) * (r * maxPitch);
-        self.targetRoll = Math.cos(angle) * (r * 5.8);
-        self.isHovering = true;
-        self.lastMoveTime = performance.now();
-      }
-
-      window.addEventListener("mousemove", function(e) {
-        if (self.isDragging) {
-          var delta = e.clientX - self.prevMouseX;
-          self.orbitAngleY += delta * 0.018;
-          self.dragVelocity = delta * 0.018;
-          self.prevMouseX = e.clientX;
-        } else {
-          updatePointer(e.clientX, e.clientY);
+      // Crossfade doll outfit
+      var targetImg = null;
+      this.outfitImgs.forEach(function(img) {
+        if (img.getAttribute("data-outfit") === outfitKey) {
+          targetImg = img;
         }
-      }, { passive: true });
-
-      // 2. INTERACTIVE 360° CIRCULAR DRAG CONTROLS
-      canvasEl.addEventListener("mousedown", function(e) {
-        self.isDragging = true;
-        self.prevMouseX = e.clientX;
-        self.dragVelocity = 0;
       });
 
-      window.addEventListener("mouseup", function() {
-        self.isDragging = false;
-      });
+      if (targetImg) {
+        this.outfitImgs.forEach(function(img) { img.classList.remove("active"); });
+        targetImg.classList.add("active");
 
-      // Mobile Touch Support for Circular Gaze & Drag
-      canvasEl.addEventListener("touchstart", function(e) {
-        if (e.touches.length === 1) {
-          self.isDragging = true;
-          self.prevMouseX = e.touches[0].clientX;
-          self.dragVelocity = 0;
-        }
-      }, { passive: true });
-
-      window.addEventListener("touchmove", function(e) {
-        if (!e.touches || e.touches.length === 0) return;
-        var touch = e.touches[0];
-        if (self.isDragging) {
-          var delta = touch.clientX - self.prevMouseX;
-          self.orbitAngleY += delta * 0.018;
-          self.dragVelocity = delta * 0.018;
-          self.prevMouseX = touch.clientX;
-        }
-        updatePointer(touch.clientX, touch.clientY);
-      }, { passive: true });
-
-      window.addEventListener("touchend", function() {
-        self.isDragging = false;
-      });
-
-      document.addEventListener("mouseleave", function() {
-        self.targetRotY = 0;
-        self.targetRotX = 0;
-        self.targetRoll = 0;
-        self.isDragging = false;
-      });
-
-      // Window Resize
-      window.addEventListener("resize", function() {
-        if (!self.renderer || !self.camera || !stageEl) return;
-        var rw = stageEl.clientWidth || 640;
-        var rh = stageEl.clientHeight || 520;
-        self.camera.aspect = rw / rh;
-        self.camera.updateProjectionMatrix();
-        self.renderer.setSize(rw, rh);
-      });
-    },
-
-    renderLoop: function(time) {
-      requestAnimationFrame(this.renderLoop.bind(this));
-
-      // Damping inertia for circular drag spin
-      if (!this.isDragging && Math.abs(this.dragVelocity) > 0.0002) {
-        this.orbitAngleY += this.dragVelocity;
-        this.dragVelocity *= 0.92;
-      }
-
-      var sens = config.sensitivity || 28;
-
-      // When mouse is idle, mascot smoothly tracks the flying butterfly in circular flight
-      if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
-        if (typeof ButterflyFollower !== "undefined" && ButterflyFollower.posX) {
-          var bRect = stageEl.getBoundingClientRect();
-          var sCenterX = bRect.left + bRect.width / 2;
-          var sCenterY = bRect.top + bRect.height * 0.44;
+        // Magical equip sparkle burst around the character
+        if (config.enableSparkles && SparkleTrail.ctx) {
+          var stageRect = stageEl.getBoundingClientRect();
           var secRect = sectionEl.getBoundingClientRect();
-
-          var bClientX = secRect.left + ButterflyFollower.posX;
-          var bClientY = secRect.top + ButterflyFollower.posY;
-
-          var bdx = (bClientX - sCenterX) / (window.innerWidth * 0.44);
-          var bdy = (bClientY - sCenterY) / (window.innerHeight * 0.44);
-
-          var bAngle = Math.atan2(bdy, bdx);
-          var bDist = Math.sqrt(bdx * bdx + bdy * bdy);
-          var br = Math.min(1.0, bDist);
-
-          this.targetRotY = Math.cos(bAngle) * (br * sens);
-          this.targetRotX = Math.sin(bAngle) * (br * 18);
-          this.targetRoll = Math.cos(bAngle) * (br * 4.5);
-        }
-      }
-
-      // Smooth Spring-Mass Damping (matches bottom section factor: 0.082)
-      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
-      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.082;
-      this.currentRoll += (this.targetRoll - this.currentRoll) * 0.082;
-
-      if (this.isReady && this.characterGroup) {
-        // 1. Organic Idle Breathing Wave
-        var breathWave = Math.sin(time * 0.0022);
-
-        // 2. Full 360° Circular Orbit + Dynamic Body Leaning Action
-        var leanRatio = this.currentRotY / sens;
-        this.characterGroup.position.x = leanRatio * 0.07;
-        this.characterGroup.position.y = breathWave * 0.016;
-        // Group combines 360 circular orbit with subtle lean
-        this.characterGroup.rotation.y = this.orbitAngleY + (leanRatio * 0.10);
-
-        // Ground shadow reacts dynamically in 3D
-        if (this.shadowMesh) {
-          this.shadowMesh.position.x = leanRatio * 0.08;
-          this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 20) * 0.05;
-        }
-
-        // 3. 3D Head & Neck in Circular Gaze (Movement Like Circle)
-        var radYaw = (this.currentRotY * Math.PI) / 180;
-        var radPitch = (this.currentRotX * Math.PI) / 180;
-        var radRoll = (this.currentRoll * Math.PI) / 180;
-
-        if (this.bones.head) {
-          this.bones.head.rotation.y = radYaw * 0.85;
-          this.bones.head.rotation.x = radPitch * 0.90;
-          this.bones.head.rotation.z = radRoll;
-        }
-        if (this.bones.neck) {
-          this.bones.neck.rotation.y = radYaw * 0.44;
-          this.bones.neck.rotation.x = radPitch * 0.38;
-        }
-        if (this.bones.chest) {
-          this.bones.chest.rotation.y = radYaw * 0.14;
-          this.bones.chest.rotation.x = radPitch * 0.12;
-        }
-
-        // 4. "Gogal Moment": 3D Goggles Physical Depth & Parallax
-        if (this.gogglesMeshes.length > 0) {
-          var goggleExtraYaw = radYaw * 0.06;
-          var goggleExtraPitch = radPitch * 0.05;
-          for (var gi = 0; gi < this.gogglesMeshes.length; gi++) {
-            var gm = this.gogglesMeshes[gi];
-            gm.rotation.y = goggleExtraYaw;
-            gm.rotation.x = goggleExtraPitch;
+          var cx = (stageRect.left + stageRect.width / 2) - secRect.left;
+          var cy = (stageRect.top + stageRect.height * 0.45) - secRect.top;
+          for (var i = 0; i < 28; i++) {
+            SparkleTrail.addParticle(
+              cx + (Math.random() - 0.5) * 160,
+              cy + (Math.random() - 0.5) * 220
+            );
           }
         }
-
-        // 5. Expressive Eyes Circular Darting Behind Goggles
-        var eyeYaw = radYaw * 1.35;
-        var eyePitch = radPitch * 1.40;
-
-        var blinkCycle = (time % 3600) / 3600;
-        var blinkScale = 1.0;
-        if (blinkCycle > 0.955) {
-          var bt = (blinkCycle - 0.955) / 0.045;
-          blinkScale = 1.0 - Math.sin(bt * Math.PI) * 0.92;
-        }
-
-        if (this.bones.eyeLeft) {
-          this.bones.eyeLeft.rotation.y = eyeYaw;
-          this.bones.eyeLeft.rotation.x = eyePitch;
-          this.bones.eyeLeft.scale.z = blinkScale;
-        }
-        if (this.bones.eyeRight) {
-          this.bones.eyeRight.rotation.y = eyeYaw;
-          this.bones.eyeRight.rotation.x = eyePitch;
-          this.bones.eyeRight.scale.z = blinkScale;
-        }
-
-        this.renderer.render(this.scene, this.camera);
       }
     }
   };
 
   // ==========================================================================
   // 2. FULL-SECTION 3D ROYAL BUTTERFLY & SPARKLE TRAIL
-  // Exact 3D Royal Creature physics & multi-hue stardust matching Royal Fashion Doll
   // ==========================================================================
   var SparkleTrail = {
     canvas: sparklesCanvas,
@@ -906,21 +948,21 @@
       if (!this.canvas || !sectionEl) return;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 580;
+      var h = sectionEl.offsetHeight || 720;
       this.canvas.width = w * dpr;
       this.canvas.height = h * dpr;
       if (this.ctx) this.ctx.scale(dpr, dpr);
     },
 
     addParticle: function(x, y) {
-      if (this.particles.length > 50) return;
+      if (this.particles.length > 55) return;
       var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
       this.particles.push({
         x: x + (Math.random() - 0.5) * 8,
         y: y + (Math.random() - 0.5) * 8,
         radius: Math.random() * 2.2 + 0.8,
         alpha: 1.0,
-        decay: Math.random() * 0.025 + 0.015,
+        decay: Math.random() * 0.024 + 0.014,
         vx: (Math.random() - 0.5) * 0.8,
         vy: Math.random() * 0.5 + 0.3,
         color: hues[Math.floor(Math.random() * hues.length)]
@@ -930,7 +972,7 @@
     updateAndRender: function() {
       if (!this.ctx || !sectionEl) return;
       var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 580;
+      var h = sectionEl.offsetHeight || 720;
       this.ctx.clearRect(0, 0, w, h);
 
       for (var i = this.particles.length - 1; i >= 0; i--) {
@@ -972,13 +1014,13 @@
 
       var self = this;
       var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 580;
-      this.posX = w * 0.72;
-      this.posY = h * 0.35;
+      var h = sectionEl.offsetHeight || 720;
+      this.posX = w * 0.28;
+      this.posY = h * 0.36;
       this.targetX = this.posX;
       this.targetY = this.posY;
 
-      function updateTargetFromEvent(clientX, clientY) {
+      function updateTarget(clientX, clientY) {
         if (!sectionEl) return;
         var secRect = sectionEl.getBoundingClientRect();
         self.targetX = clientX - secRect.left;
@@ -987,39 +1029,40 @@
         self.lastMoveTime = performance.now();
       }
 
-      // Track cursor anywhere on section or window
       sectionEl.addEventListener("mousemove", function(e) {
-        updateTargetFromEvent(e.clientX, e.clientY);
+        updateTarget(e.clientX, e.clientY);
       }, { passive: true });
 
       window.addEventListener("mousemove", function(e) {
         if (!sectionEl) return;
         var r = sectionEl.getBoundingClientRect();
-        if (e.clientY >= r.top - 60 && e.clientY <= r.bottom + 60) {
-          updateTargetFromEvent(e.clientX, e.clientY);
+        if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
+          updateTarget(e.clientX, e.clientY);
         }
       }, { passive: true });
 
       sectionEl.addEventListener("touchmove", function(e) {
         if (!e.touches || e.touches.length === 0) return;
-        updateTargetFromEvent(e.touches[0].clientX, e.touches[0].clientY);
+        updateTarget(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
 
-      requestAnimationFrame(this.renderLoop.bind(this));
+      sectionEl.addEventListener("mouseleave", function() {
+        self.isHovering = false;
+      });
     },
 
-    renderLoop: function(time) {
-      requestAnimationFrame(this.renderLoop.bind(this));
+    update: function(time) {
+      if (!this.el || !config.enableButterfly) return;
 
       var secW = sectionEl.offsetWidth || window.innerWidth;
-      var secH = sectionEl.offsetHeight || 580;
+      var secH = sectionEl.offsetHeight || 720;
 
-      // Autonomous circular flight patrol around mascot when idle
+      // Autonomous circular flight patrol around character when idle
       if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
-        var t = time * 0.0013;
+        var t = time * 0.0012;
         var patrolCenterX = secW * 0.5;
-        var patrolCenterY = secH * 0.38;
-        this.targetX = patrolCenterX + Math.cos(t) * (secW * 0.34);
+        var patrolCenterY = secH * 0.36;
+        this.targetX = patrolCenterX + Math.cos(t) * (secW * 0.35);
         this.targetY = patrolCenterY + Math.sin(t * 2) * (secH * 0.20);
       }
 
@@ -1038,7 +1081,7 @@
       var fx = this.posX + hoverX;
       var fy = this.posY + hoverY;
 
-      // Restrain within FULL SECTION bounds (Entire Screen Width & Height)
+      // Restrain within full section boundaries
       fx = Math.max(30, Math.min(secW - 70, fx));
       fy = Math.max(30, Math.min(secH - 70, fy));
 
@@ -1050,7 +1093,6 @@
 
       var tilt = Math.max(-25, Math.min(25, vx * 1.8));
 
-      // Velocity-based flapping speed toggle matching Royal Doll
       if (dist > 40) {
         this.el.classList.add("fast-flap");
         this.el.classList.remove("hover-flap");
@@ -1064,19 +1106,130 @@
         "rotate(" + this.angle.toFixed(1) + "deg) " +
         "rotateY(" + tilt.toFixed(1) + "deg)";
 
-      // Sparkle emission across flight path
       if (config.enableSparkles && Math.random() < 0.45) {
         SparkleTrail.addParticle(fx, fy);
       }
-
-      SparkleTrail.updateAndRender();
     }
   };
 
+  // ==========================================================================
+  // 3. NATURAL 3D GAZE & CIRCULAR LEANING TRACKING PHYSICS
+  // Signature bottom-section leaning, vertical pitch & circular movement (No 360 spin)
+  // ==========================================================================
+  var DollMotionTracker = {
+    currentRotY: 0,
+    currentRotX: 0,
+    currentTransX: 0,
+    targetRotY: 0,
+    targetRotX: 0,
+    targetTransX: 0,
+    isCursorInside: false,
+    currentClientX: 0,
+    currentClientY: 0,
+    lastMoveTime: performance.now(),
+
+    init: function() {
+      var self = this;
+
+      function updateGaze(clientX, clientY) {
+        self.currentClientX = clientX;
+        self.currentClientY = clientY;
+        self.isCursorInside = true;
+        self.lastMoveTime = performance.now();
+      }
+
+      sectionEl.addEventListener("mousemove", function(e) {
+        updateGaze(e.clientX, e.clientY);
+      }, { passive: true });
+
+      window.addEventListener("mousemove", function(e) {
+        if (!sectionEl) return;
+        var r = sectionEl.getBoundingClientRect();
+        if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
+          updateGaze(e.clientX, e.clientY);
+        }
+      }, { passive: true });
+
+      sectionEl.addEventListener("mouseleave", function() {
+        self.isCursorInside = false;
+      });
+
+      sectionEl.addEventListener("touchmove", function(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        updateGaze(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+    },
+
+    update: function(time) {
+      if (!dollViewer) return;
+
+      var secW = sectionEl.offsetWidth || window.innerWidth;
+      var secH = sectionEl.offsetHeight || 720;
+
+      if (this.isCursorInside) {
+        var dollRect = dollViewer.getBoundingClientRect();
+        var dollMidX = dollRect.left + dollRect.width / 2;
+        var dollMidY = dollRect.top + dollRect.height * 0.42;
+
+        var relX = (this.currentClientX - dollMidX) / (window.innerWidth * 0.45);
+        var relY = (this.currentClientY - dollMidY) / (window.innerHeight * 0.45);
+
+        relX = Math.max(-1.15, Math.min(1.15, relX));
+        relY = Math.max(-1.15, Math.min(1.15, relY));
+
+        // Horizontal yaw, vertical pitch, and leaning displacement
+        this.targetRotY = relX * 18;
+        this.targetRotX = -relY * 8;
+        this.targetTransX = relX * 14;
+      } else if (ButterflyFollower.el && (!this.isCursorInside || (time - this.lastMoveTime > 3000))) {
+        // When mouse is idle, doll follows the autonomous circular butterfly patrol
+        var dollLocalX = secW * 0.5;
+        var diffX = (ButterflyFollower.posX - dollLocalX) / (secW * 0.5);
+        this.targetRotY = Math.max(-10, Math.min(10, diffX * 12));
+        this.targetRotX = 0;
+        this.targetTransX = this.targetRotY * 0.6;
+      }
+
+      // Smooth silky lerp interpolation
+      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.08;
+      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.08;
+      this.currentTransX += (this.targetTransX - this.currentTransX) * 0.08;
+
+      // Gentle organic idle vertical floating wave
+      var idleY = Math.sin(time * 0.0016) * 6;
+
+      dollViewer.style.transform =
+        "translate3d(" + this.currentTransX.toFixed(2) + "px, " + idleY.toFixed(2) + "px, 0px) " +
+        "rotateY(" + this.currentRotY.toFixed(2) + "deg) " +
+        "rotateX(" + this.currentRotX.toFixed(2) + "deg)";
+
+      // Dynamic ground contact shadow shifting with character lean
+      if (shadowEl) {
+        var shadowShift = this.currentTransX * 0.65;
+        var shadowScale = 1.0 - Math.abs(this.currentRotX / 30);
+        shadowEl.style.transform =
+          "translateX(calc(-50% + " + shadowShift.toFixed(1) + "px)) " +
+          "scaleX(" + shadowScale.toFixed(2) + ")";
+      }
+    }
+  };
+
+  // ==========================================================================
+  // UNIFIED 60FPS RAF ANIMATION LOOP
+  // ==========================================================================
+  function animateFrame(time) {
+    requestAnimationFrame(animateFrame);
+    ButterflyFollower.update(time);
+    DollMotionTracker.update(time);
+    SparkleTrail.updateAndRender();
+  }
+
   function boot() {
-    ThreeMascotManager.init();
+    WardrobeManager.init();
     SparkleTrail.init();
     ButterflyFollower.init();
+    DollMotionTracker.init();
+    requestAnimationFrame(animateFrame);
   }
 
   if (document.readyState === "loading") {
@@ -1107,22 +1260,31 @@
       "default": "#E5A625"
     },
     {
-      "type": "range",
-      "id": "mascot_size",
-      "label": "Mascot Max Width (px)",
-      "min": 240,
-      "max": 480,
-      "step": 10,
-      "default": 340
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Interactive Royal Wardrobe"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Section Subheading Badge",
+      "default": "ROYAL COURT ATELIER"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Select any royal regalia below to instantly drape the character in handcrafted court attire."
     },
     {
       "type": "range",
-      "id": "sensitivity",
-      "label": "Goggles Gaze Sensitivity (°)",
-      "min": 10,
-      "max": 40,
-      "step": 1,
-      "default": 28
+      "id": "mascot_size",
+      "label": "Character Max Width (px)",
+      "min": 280,
+      "max": 540,
+      "step": 10,
+      "default": 440
     },
     {
       "type": "header",
@@ -1131,14 +1293,17 @@
     {
       "type": "checkbox",
       "id": "enable_butterfly",
-      "label": "Enable Electric Blue Butterfly",
+      "label": "Enable 3D Royal Butterfly",
       "default": true
     },
     {
-      "type": "color",
-      "id": "butterfly_color",
-      "label": "Butterfly Wing Cyan Accent",
-      "default": "#00E5FF"
+      "type": "range",
+      "id": "butterfly_speed",
+      "label": "Butterfly Speed",
+      "min": 4,
+      "max": 14,
+      "step": 1,
+      "default": 8
     },
     {
       "type": "checkbox",
@@ -1160,7 +1325,56 @@
       "type": "text",
       "id": "hint_text",
       "label": "Hint Text",
-      "default": "Interactive 3D Mascot • Move mouse in circles or drag to rotate"
+      "default": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "outfit",
+      "name": "Wardrobe Outfit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "outfit_name",
+          "label": "Outfit Name",
+          "default": "Royal Sherwani"
+        },
+        {
+          "type": "select",
+          "id": "outfit_key",
+          "label": "Built-in Doll Outfit",
+          "options": [
+            { "value": "cream", "label": "Imperial Cream & Gold" },
+            { "value": "blue", "label": "Sapphire Blue Jodhpuri" },
+            { "value": "green", "label": "Heritage Emerald Silk" },
+            { "value": "red", "label": "Ruby Red Ceremonial" }
+          ],
+          "default": "cream"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_outfit_image",
+          "label": "Custom Outfit Image (Transparent PNG)"
+        },
+        {
+          "type": "color",
+          "id": "swatch_color",
+          "label": "Color Swatch",
+          "default": "#F5E5C9"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "Rs. 48,000"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Hand-tailored mulberry silk sherwani enriched with antique gold zardozi embroidery."
+        }
+      ]
     }
   ],
   "presets": [
@@ -1168,14 +1382,57 @@
       "name": "Royal Mascot",
       "settings": {
         "bg_color": "#E5A625",
-        "mascot_size": 340,
-        "sensitivity": 28,
+        "heading": "Interactive Royal Wardrobe",
+        "subheading": "ROYAL COURT ATELIER",
+        "description": "Select any royal regalia below to instantly drape the character in handcrafted court attire.",
+        "mascot_size": 440,
         "enable_butterfly": true,
-        "butterfly_color": "#00E5FF",
         "enable_sparkles": true,
         "show_hint": true,
-        "hint_text": "Interactive 3D Mascot • Move mouse in circles or drag to rotate"
-      }
+        "hint_text": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
+      },
+      "blocks": [
+        {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Imperial Cream & Gold",
+            "outfit_key": "cream",
+            "swatch_color": "#F5E5C9",
+            "price": "Rs. 48,000",
+            "description": "Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping."
+          }
+        },
+        {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Sapphire Blue Jodhpuri",
+            "outfit_key": "blue",
+            "swatch_color": "#1B3B6F",
+            "price": "Rs. 52,000",
+            "description": "Celestial lapis blue brocade adorned with real silver and gold thread floral booti motifs and mandarin collar."
+          }
+        },
+        {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Heritage Emerald Silk",
+            "outfit_key": "green",
+            "swatch_color": "#1E4A38",
+            "price": "Rs. 54,000",
+            "description": "Rich forest emerald raw silk sherwani featuring heritage paisleys, antique gold placket, and emerald buttons."
+          }
+        },
+        {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Ruby Red Ceremonial",
+            "outfit_key": "red",
+            "swatch_color": "#8B1E1E",
+            "price": "Rs. 56,000",
+            "description": "Ceremonial state regalia in deep ruby velvet enriched with dense antique gold zardozi placket embroidery."
+          }
+        }
+      ]
     }
   ]
 }

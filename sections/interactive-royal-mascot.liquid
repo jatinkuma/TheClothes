@@ -6,13 +6,15 @@
   - High-Fidelity 3D WebGL Rigged Avatar (Three.js Engine):
     * Front-facing Royal Prince Doll in authentic handcrafted court regalia
     * Articulated Head & Body 3D hierarchy with sub-millimeter neck pivot
-    * Circular Gaze Tracking ("Moment Like Circle"): head & body follow cursor
-      in a continuous, fluid circular loop with natural pitch (up/down) and yaw (left/right)
-    * Signature bottom-section leaning displacement physics (position.x & rotation.z)
-    * Dynamic ground contact shadow reacting to lean and gaze in real time
-    * Interactive 360° drag & spin orbit rotation with momentum and smooth inertia
-    * Organic sinusoidal idle floating breathing wave
-    * Autonomous gaze following the 3D butterfly when idle
+    * Natural Human Body Movement (NO 360° spin):
+      - Head rotates up to ±22° horizontal yaw, ±12° vertical pitch, ±3.5° dynamic roll
+      - Torso follows naturally with ~35% of head yaw and ~25% pitch
+      - Signature weight-shift leaning physics (position.x and subtle lateral banking)
+      - Ground contact shadow stretches and shifts smoothly beneath feet
+      - Gentle sinusoidal breathing wave and posture sway
+    * Smooth Continuous Circular Movement ("Moment Like Circle"):
+      - Head and body trace continuous circular loops as cursor circles around
+      - Autonomous gaze following the 3D butterfly when idle
   - Instant Dress-Up & Outfit Customizer ("Append the dress we want"):
     * Imperial Cream & Gold Sherwani
     * Sapphire Blue Royal Jodhpuri
@@ -175,7 +177,7 @@
       <span class="badge-name" id="royal-active-name-{{ section.id }}">Imperial Cream & Gold Sherwani</span>
     </div>
 
-    <!-- WebGL Canvas for 3D Rigged Avatar (Same Circular Tracking & Leaning Movement) -->
+    <!-- WebGL Canvas for 3D Rigged Avatar (Natural Body Movement & Circular Gaze) -->
     <canvas id="royal-mascot-canvas-{{ section.id }}" class="royal-mascot-canvas"></canvas>
 
     <!-- Loading Spinner -->
@@ -280,7 +282,7 @@
     {% if section.settings.show_hint %}
       <div class="royal-mascot-hint">
         <span class="royal-mascot-hint-icon">✦</span>
-        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Click any dress to drape the character • Move mouse in circles or drag to rotate 360°' }}</span>
+        <span class="royal-mascot-hint-text">{{ section.settings.hint_text | default: 'Click any dress to drape the character • Natural gaze & body movement in real-time' }}</span>
       </div>
     {% endif %}
 
@@ -510,21 +512,17 @@
     letter-spacing: 0.02em;
   }
 
-  /* WebGL 3D Canvas */
+  /* WebGL 3D Canvas (Natural tracking cursor) */
   #royal-mascot-section-{{ section.id }} .royal-mascot-canvas {
     width: 100% !important;
     max-width: 580px;
     height: 480px !important;
     display: block;
     outline: none;
-    cursor: grab;
+    cursor: default;
     z-index: 4;
     user-select: none;
     touch-action: none;
-  }
-
-  #royal-mascot-section-{{ section.id }} .royal-mascot-canvas:active {
-    cursor: grabbing;
   }
 
   /* Spinner */
@@ -831,8 +829,8 @@
   };
 
   // ==========================================================================
-  // 1. THREE.JS 3D AVATAR MANAGER (CIRCULAR MOVEMENT & 360° INTERACTIVE SPIN)
-  // Exact Three.js movement, gaze tracking, pitch, and leaning physics
+  // 1. THREE.JS 3D AVATAR MANAGER (NATURAL BODY MOVEMENT & CIRCULAR GAZE)
+  // No 360° spin: authentic human biomechanics, head & torso tracking, weight shift
   // ==========================================================================
   var ThreeAvatarManager = {
     scene: null,
@@ -847,19 +845,25 @@
     loadedTextures: {},
     isReady: false,
 
-    // Circular movement & gaze angles
-    targetRotY: 0,
-    targetRotX: 0,
-    targetRoll: 0,
-    currentRotY: 0,
-    currentRotX: 0,
-    currentRoll: 0,
+    // Smooth Biomechanical Angles
+    headYaw: 0,
+    headPitch: 0,
+    headRoll: 0,
+    targetHeadYaw: 0,
+    targetHeadPitch: 0,
+    targetHeadRoll: 0,
 
-    // 360 Drag Orbit variables
-    orbitAngleY: 0,
-    isDragging: false,
-    prevMouseX: 0,
-    dragVelocity: 0,
+    torsoYaw: 0,
+    torsoPitch: 0,
+    torsoLean: 0,
+    targetTorsoYaw: 0,
+    targetTorsoPitch: 0,
+    targetTorsoLean: 0,
+
+    leanX: 0,
+    targetLeanX: 0,
+
+    isCursorActive: false,
     lastMoveTime: performance.now(),
 
     init: function() {
@@ -893,7 +897,7 @@
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.25;
 
-        // Ground Contact Shadow Mesh
+        // Ground Contact Shadow Mesh (Reacts smoothly to character lean & posture)
         var shadowGeo = new THREE.PlaneGeometry(1.65, 0.45);
         var shadowCanvas = document.createElement("canvas");
         shadowCanvas.width = 256;
@@ -919,7 +923,7 @@
         this.scene.add(shadowPlane);
         this.shadowMesh = shadowPlane;
 
-        // Character Group (Pivots, Leans, Spins)
+        // Character Group (Anchored naturally on floor)
         this.characterGroup = new THREE.Group();
         this.scene.add(this.characterGroup);
 
@@ -965,7 +969,7 @@
       var charWidth = charHeight * (848.0 / 1264.0); // ~1.409
       var neckPivotY = charHeight * (1.0 - (446.0 / 1264.0)); // ~1.359
 
-      // 1. Body Mesh (Legs, Sherwani, Neck Base)
+      // 1. Torso & Body Mesh (Feet, Sherwani, Neck Base)
       var bodyGeo = new THREE.PlaneGeometry(charWidth, charHeight, 16, 24);
       var bodyTex = this.loadTexture(urls.body);
       var bodyMat = new THREE.MeshBasicMaterial({
@@ -980,9 +984,9 @@
       this.bodyMesh.renderOrder = 2;
       this.characterGroup.add(this.bodyMesh);
 
-      // 2. Head Group & Mesh (Turban, Plume, Kalgi, Face, Eyes)
+      // 2. Head Group & Mesh (Turban, Plume, Kalgi Brooch, Face, Gaze Eyes)
       this.headGroup = new THREE.Group();
-      this.headGroup.position.set(0, neckPivotY, 0.025); // Sub-millimeter neck pivot with 3D parallax depth
+      this.headGroup.position.set(0, neckPivotY, 0.025); // Sub-millimeter neck pivot with true 3D parallax depth
       this.characterGroup.add(this.headGroup);
 
       var headGeo = new THREE.PlaneGeometry(charWidth, charHeight, 16, 24);
@@ -995,7 +999,7 @@
         side: THREE.DoubleSide
       });
       this.headMesh = new THREE.Mesh(headGeo, headMat);
-      // Offset so the neck inside the head image sits exactly on the neck pivot
+      // Offset so the head graphic sits exactly on top of the neck joint
       this.headMesh.position.set(0, (charHeight * 0.5) - neckPivotY, 0);
       this.headMesh.renderOrder = 3;
       this.headGroup.add(this.headMesh);
@@ -1004,7 +1008,6 @@
     equipDress: function(outfitKey, customUrl) {
       var self = this;
       if (customUrl) {
-        // Custom merchant full-image outfit
         var tex = this.loadTexture(customUrl, function(t) {
           if (self.bodyMesh) {
             self.bodyMesh.material.map = t;
@@ -1045,25 +1048,30 @@
         var midX = rect.left + rect.width / 2;
         var midY = rect.top + rect.height * 0.40;
 
+        // Normalized displacement from character center
         var relX = (clientX - midX) / (window.innerWidth * 0.42);
         var relY = (clientY - midY) / (window.innerHeight * 0.42);
 
-        relX = Math.max(-1.15, Math.min(1.15, relX));
-        relY = Math.max(-1.15, Math.min(1.15, relY));
+        var clampedX = Math.max(-1.15, Math.min(1.15, relX));
+        var clampedY = Math.max(-1.15, Math.min(1.15, relY));
 
-        // Horizontal circular yaw
-        self.targetRotY = -relX * config.sensitivity;
+        // 1. Natural Head Gaze (Yaw, Pitch, Roll)
+        self.targetHeadYaw = -clampedX * 22;      // Up to ±22° horizontal head turn
+        self.targetHeadPitch = -clampedY * 12;    // Up to ±12° vertical head pitch
+        self.targetHeadRoll = -clampedX * 3.5;    // Subtle lifelike lateral neck roll
 
-        // Natural vertical pitch (up and down)
-        self.targetRotX = -relY * (config.sensitivity * 0.65);
+        // 2. Natural Torso Anatomical Follow-Through
+        self.targetTorsoYaw = self.targetHeadYaw * 0.35;    // Torso rotates ~35% of head angle
+        self.targetTorsoPitch = self.targetHeadPitch * 0.25;
+        self.targetTorsoLean = -clampedX * 0.035;          // Subtle shoulder posture lean (radians)
 
-        // Subtle dynamic roll banking
-        self.targetRoll = -relX * 4.0;
+        // 3. Weight-Shift Leaning Displacement
+        self.targetLeanX = -clampedX * 0.12;
 
+        self.isCursorActive = true;
         self.lastMoveTime = performance.now();
       }
 
-      // Track cursor anywhere on section or window
       sectionEl.addEventListener("mousemove", function(e) {
         updateGaze(e.clientX, e.clientY);
       }, { passive: true });
@@ -1076,49 +1084,13 @@
         }
       }, { passive: true });
 
-      // Interactive 360 Drag & Orbit Controls with Momentum
-      canvasEl.addEventListener("mousedown", function(e) {
-        self.isDragging = true;
-        self.prevMouseX = e.clientX;
-        self.dragVelocity = 0;
-      });
-
-      window.addEventListener("mousemove", function(e) {
-        if (!self.isDragging) return;
-        var deltaX = e.clientX - self.prevMouseX;
-        self.prevMouseX = e.clientX;
-        self.orbitAngleY += deltaX * 0.012;
-        self.dragVelocity = deltaX * 0.012;
-      });
-
-      window.addEventListener("mouseup", function() {
-        self.isDragging = false;
-      });
-
-      // Touch events for mobile
-      canvasEl.addEventListener("touchstart", function(e) {
-        if (e.touches && e.touches.length > 0) {
-          self.isDragging = true;
-          self.prevMouseX = e.touches[0].clientX;
-          self.dragVelocity = 0;
-          updateGaze(e.touches[0].clientX, e.touches[0].clientY);
-        }
-      }, { passive: true });
-
-      window.addEventListener("touchmove", function(e) {
+      sectionEl.addEventListener("touchmove", function(e) {
         if (!e.touches || e.touches.length === 0) return;
         updateGaze(e.touches[0].clientX, e.touches[0].clientY);
-
-        if (self.isDragging) {
-          var deltaX = e.touches[0].clientX - self.prevMouseX;
-          self.prevMouseX = e.touches[0].clientX;
-          self.orbitAngleY += deltaX * 0.012;
-          self.dragVelocity = deltaX * 0.012;
-        }
       }, { passive: true });
 
-      window.addEventListener("touchend", function() {
-        self.isDragging = false;
+      sectionEl.addEventListener("mouseleave", function() {
+        self.isCursorActive = false;
       });
 
       window.addEventListener("resize", function() {
@@ -1134,61 +1106,70 @@
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
 
-      // Autonomous circular gaze patrol following the 3D butterfly when idle
-      if (!this.isDragging && (time - this.lastMoveTime > 3200) && ButterflyFollower.el) {
+      // Autonomous circular gaze patrol following the 3D butterfly when cursor is idle
+      if ((time - this.lastMoveTime > 3000) && ButterflyFollower.el) {
         var secW = sectionEl.offsetWidth || window.innerWidth;
         var charMidX = secW * 0.5;
         var diffX = (ButterflyFollower.posX - charMidX) / (secW * 0.5);
-        this.targetRotY = Math.max(-14, Math.min(14, -diffX * 18));
-        this.targetRotX = 0;
-        this.targetRoll = -this.targetRotY * 0.15;
+        var diffY = (ButterflyFollower.posY - (sectionEl.offsetHeight * 0.36)) / (sectionEl.offsetHeight * 0.36);
+
+        var bClampedX = Math.max(-1.0, Math.min(1.0, diffX));
+        var bClampedY = Math.max(-1.0, Math.min(1.0, diffY));
+
+        this.targetHeadYaw = -bClampedX * 16;
+        this.targetHeadPitch = -bClampedY * 8;
+        this.targetHeadRoll = -bClampedX * 2.5;
+
+        this.targetTorsoYaw = this.targetHeadYaw * 0.30;
+        this.targetTorsoPitch = this.targetHeadPitch * 0.20;
+        this.targetTorsoLean = -bClampedX * 0.025;
+        this.targetLeanX = -bClampedX * 0.08;
       }
 
-      // 1. Smooth lerp for circular gaze tracking ("Moment Like Circle")
-      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
-      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.082;
-      this.currentRoll += (this.targetRoll - this.currentRoll) * 0.082;
+      // Smooth Organic Spring Lerp (Natural human biomechanics, no stiffness)
+      var ease = 0.075;
+      this.headYaw += (this.targetHeadYaw - this.headYaw) * ease;
+      this.headPitch += (this.targetHeadPitch - this.headPitch) * ease;
+      this.headRoll += (this.targetHeadRoll - this.headRoll) * ease;
 
-      // 2. 360 Drag Inertia
-      if (!this.isDragging) {
-        this.dragVelocity *= 0.94;
-        this.orbitAngleY += this.dragVelocity;
-      }
+      this.torsoYaw += (this.targetTorsoYaw - this.torsoYaw) * ease;
+      this.torsoPitch += (this.targetTorsoPitch - this.torsoPitch) * ease;
+      this.torsoLean += (this.targetTorsoLean - this.torsoLean) * ease;
+      this.leanX += (this.targetLeanX - this.leanX) * ease;
 
-      var floatY = Math.sin(time * 0.0018) * 0.015;
+      // Gentle organic sinusoidal breathing float
+      var breatheY = Math.sin(time * 0.0018) * 0.012;
+      var breathePitch = Math.sin(time * 0.0018) * 0.008;
 
-      // 3. Signature Bottom-Section Leaning & Displacement Action
-      var leanRatio = this.currentRotY / config.sensitivity;
-      this.characterGroup.position.x = leanRatio * 0.14;
-      this.characterGroup.position.y = -Math.abs(leanRatio) * 0.02 + floatY;
-      this.characterGroup.rotation.z = -leanRatio * 0.035;
+      // 1. Character Group: Grounded Leaning & Weight Shift
+      this.characterGroup.position.x = this.leanX;
+      this.characterGroup.position.y = breatheY;
+      this.characterGroup.rotation.z = this.torsoLean;
+      this.characterGroup.rotation.y = 0; // FRONT-FACING ONLY (NO 360 SPIN)
 
-      // Ground contact shadow reacting dynamically in 360°
-      if (this.shadowMesh) {
-        this.shadowMesh.position.x = leanRatio * 0.09;
-        this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 20) * 0.05;
-      }
-
-      // 4. Circular Gaze & Head Articulation
-      var radYaw = (this.currentRotY * Math.PI) / 180;
-      var radPitch = (this.currentRotX * Math.PI) / 180;
-      var radRoll = (this.currentRoll * Math.PI) / 180;
-
-      // Head turns with full circular gaze orientation & 3D parallax depth
-      if (this.headGroup) {
-        this.headGroup.rotation.y = radYaw * 0.90;
-        this.headGroup.rotation.x = radPitch * 0.85;
-        this.headGroup.rotation.z = radRoll;
-      }
-
-      // Body follows with realistic torso turn
+      // 2. Torso / Body: Natural Anatomical Rotation
+      var radTorsoYaw = (this.torsoYaw * Math.PI) / 180;
+      var radTorsoPitch = (this.torsoPitch * Math.PI) / 180;
       if (this.bodyMesh) {
-        this.bodyMesh.rotation.y = radYaw * 0.35;
-        this.bodyMesh.rotation.x = radPitch * 0.25;
+        this.bodyMesh.rotation.y = radTorsoYaw;
+        this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
       }
 
-      // Global 360 orbit rotation
-      this.characterGroup.rotation.y = this.orbitAngleY;
+      // 3. Head & Neck: True Circular Gaze & Parallax Depth
+      var radHeadYaw = (this.headYaw * Math.PI) / 180;
+      var radHeadPitch = (this.headPitch * Math.PI) / 180;
+      var radHeadRoll = (this.headRoll * Math.PI) / 180;
+      if (this.headGroup) {
+        this.headGroup.rotation.y = radHeadYaw;
+        this.headGroup.rotation.x = radHeadPitch;
+        this.headGroup.rotation.z = radHeadRoll;
+      }
+
+      // 4. Ground Contact Shadow: Dynamic shift reacting to lean
+      if (this.shadowMesh) {
+        this.shadowMesh.position.x = this.leanX * 0.70;
+        this.shadowMesh.scale.x = 1.0 - Math.abs(this.headPitch / 30) * 0.06;
+      }
 
       // Render WebGL frame
       if (this.renderer && this.scene && this.camera) {
@@ -1546,7 +1527,7 @@
       "type": "text",
       "id": "hint_text",
       "label": "Hint Text",
-      "default": "Click any dress to drape the character • Move mouse in circles or drag to rotate 360°"
+      "default": "Click any dress to drape the character • Natural gaze & body movement in real-time"
     }
   ],
   "blocks": [
@@ -1611,7 +1592,7 @@
         "enable_butterfly": true,
         "enable_sparkles": true,
         "show_hint": true,
-        "hint_text": "Click any dress to drape the character • Move mouse in circles or drag to rotate 360°"
+        "hint_text": "Click any dress to drape the character • Natural gaze & body movement in real-time"
       },
       "blocks": [
         {

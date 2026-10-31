@@ -78,65 +78,117 @@
     </div>
   </div>
 
-  <!-- 4. AUTONOMOUS CYAN/ELECTRIC BLUE 3D BUTTERFLY -->
+  <!-- FULL-SECTION Fairy Dust Sparkle Particle Canvas -->
+  {% if section.settings.enable_butterfly %}
+    <canvas id="hero-3d-sparkles-{{ section.id }}" class="hero-3d-sparkles-canvas"></canvas>
+  {% endif %}
+
+  <!-- 4. FULL-SECTION 3D ROYAL BUTTERFLY CREATURE (Matching Section 1 & Royal Fashion Doll) -->
   {% if section.settings.enable_butterfly %}
     <div
       id="hero-3d-butterfly-{{ section.id }}"
-      class="hero-3d-butterfly"
+      class="hero-3d-butterfly royal-butterfly-creature"
       aria-hidden="true"
-      style="--bf-cyan: {{ section.settings.butterfly_color | default: '#00E5FF' }};"
     >
-      <div class="hero-3d-butterfly-wings">
+      <div class="butterfly-3d-rig">
         <!-- Left Wing -->
-        <div class="hero-bf-wing hero-bf-wing-left">
-          <svg viewBox="0 0 64 74" width="58" height="68">
+        <div class="butterfly-wing wing-left">
+          <svg viewBox="0 0 70 80" width="70" height="80">
             <defs>
-              <linearGradient id="heroBfWingL-{{ section.id }}" x1="100%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stop-color="#0a1d37" />
-                <stop offset="25%" stop-color="#0d47a1" />
-                <stop offset="55%" stop-color="#0288d1" />
-                <stop offset="85%" stop-color="{{ section.settings.butterfly_color | default: '#00E5FF' }}" />
-                <stop offset="100%" stop-color="#b3e5fc" />
+              <linearGradient id="heroBfWingL-{{ section.id }}" x1="0%" y1="30%" x2="100%" y2="70%">
+                <stop offset="0%" stop-color="#140742" />
+                <stop offset="25%" stop-color="#4a148c" />
+                <stop offset="55%" stop-color="#2979ff" />
+                <stop offset="85%" stop-color="#00e5ff" />
+                <stop offset="100%" stop-color="#80d8ff" />
               </linearGradient>
+              <radialGradient id="heroBfGlowL-{{ section.id }}" cx="60%" cy="45%" r="50%">
+                <stop offset="0%" stop-color="#69f0ae" stop-opacity="0.75" />
+                <stop offset="60%" stop-color="#00e5ff" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="#2979ff" stop-opacity="0" />
+              </radialGradient>
+              <filter id="heroBfShadowL-{{ section.id }}" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00e5ff" flood-opacity="0.6"/>
+              </filter>
             </defs>
-            <path d="M 60 52 C 50 36, 24 16, 6 2 C -2 -4, -2 8, 5 22 C 10 32, 28 46, 60 56 Z"
-                  fill="url(#heroBfWingL-{{ section.id }})" stroke="#00E5FF" stroke-width="0.8"/>
-            <path d="M 60 52 C 44 48, 18 42, 10 32 C 2 20, -2 32, 6 44 C 14 56, 32 64, 60 54 Z"
-                  fill="url(#heroBfWingL-{{ section.id }})" opacity="0.9" stroke="#00E5FF" stroke-width="0.8"/>
-            <!-- Electric Vein Radiance -->
-            <path d="M 58 50 Q 34 32 14 14 M 50 48 Q 28 34 16 26" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="0.75"/>
-            <circle cx="8" cy="18" r="1.3" fill="#ffffff" />
-            <circle cx="16" cy="32" r="1.2" fill="#ffffff" />
+            <path d="M 68 36 C 60 18, 42 2, 18 2 C 8 2, 2 10, 4 20 C 6 30, 22 42, 38 46 C 54 50, 64 45, 68 36 Z"
+                  fill="url(#heroBfWingL-{{ section.id }})" filter="url(#heroBfShadowL-{{ section.id }})" stroke="#0d47a1" stroke-width="0.8" />
+            <path d="M 68 36 C 60 18, 42 2, 18 2 C 8 2, 2 10, 4 20 C 6 30, 22 42, 38 46 C 54 50, 64 45, 68 36 Z"
+                  fill="url(#heroBfGlowL-{{ section.id }})" />
+            <path d="M 66 38 C 58 44, 46 48, 30 52 C 16 56, 12 66, 20 74 C 28 82, 48 78, 58 64 C 64 54, 66 44, 66 38 Z"
+                  fill="url(#heroBfWingL-{{ section.id }})" stroke="#1a237e" stroke-width="0.8" />
+            <g stroke="rgba(255,255,255,0.6)" stroke-width="0.65" fill="none">
+              <path d="M 66 36 Q 40 24 16 12" />
+              <path d="M 66 36 Q 36 32 10 24" />
+              <path d="M 66 36 Q 42 40 24 38" />
+              <path d="M 65 42 Q 46 56 26 68" />
+              <path d="M 65 42 Q 52 64 42 74" />
+            </g>
+            <circle cx="10" cy="14" r="1.3" fill="#ffffff" />
+            <circle cx="6" cy="22" r="1" fill="#ffffff" />
+            <circle cx="18" cy="72" r="1.2" fill="#ffffff" />
           </svg>
         </div>
 
-        <!-- Center Slender Body -->
-        <div class="hero-bf-body">
-          <div class="hero-bf-antennae"></div>
-          <div class="hero-bf-thorax"></div>
-          <div class="hero-bf-abdomen"></div>
+        <!-- Center Body -->
+        <div class="butterfly-body">
+          <svg viewBox="0 0 16 80" width="16" height="80">
+            <defs>
+              <linearGradient id="heroBfBodyGrad-{{ section.id }}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4a148c" />
+                <stop offset="50%" stop-color="#1a237e" />
+                <stop offset="100%" stop-color="#00e5ff" />
+              </linearGradient>
+            </defs>
+            <path d="M 7 24 Q 4 12 1 6 Q 0 4 2 4 Q 4 4 5 10 Q 6 18 7 24" fill="#311b92" />
+            <path d="M 9 24 Q 12 12 15 6 Q 16 4 14 4 Q 12 4 11 10 Q 10 18 9 24" fill="#311b92" />
+            <circle cx="2" cy="4" r="1.5" fill="#00e5ff" />
+            <circle cx="14" cy="4" r="1.5" fill="#00e5ff" />
+            <circle cx="8" cy="26" r="3.5" fill="#1a237e" />
+            <circle cx="6.5" cy="25" r="0.9" fill="#69f0ae" />
+            <circle cx="9.5" cy="25" r="0.9" fill="#69f0ae" />
+            <ellipse cx="8" cy="35" rx="3.8" ry="6" fill="url(#heroBfBodyGrad-{{ section.id }})" />
+            <path d="M 5 40 Q 4 54 7 66 Q 8 68 9 66 Q 12 54 11 40 Z" fill="url(#heroBfBodyGrad-{{ section.id }})" />
+            <ellipse cx="8" cy="34" rx="1.8" ry="2.8" fill="#00e5ff" opacity="0.95" />
+          </svg>
         </div>
 
         <!-- Right Wing -->
-        <div class="hero-bf-wing hero-bf-wing-right">
-          <svg viewBox="0 0 64 74" width="58" height="68">
+        <div class="butterfly-wing wing-right">
+          <svg viewBox="0 0 70 80" width="70" height="80">
             <defs>
-              <linearGradient id="heroBfWingR-{{ section.id }}" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#0a1d37" />
-                <stop offset="25%" stop-color="#0d47a1" />
-                <stop offset="55%" stop-color="#0288d1" />
-                <stop offset="85%" stop-color="{{ section.settings.butterfly_color | default: '#00E5FF' }}" />
-                <stop offset="100%" stop-color="#b3e5fc" />
+              <linearGradient id="heroBfWingR-{{ section.id }}" x1="100%" y1="30%" x2="0%" y2="70%">
+                <stop offset="0%" stop-color="#140742" />
+                <stop offset="25%" stop-color="#4a148c" />
+                <stop offset="55%" stop-color="#2979ff" />
+                <stop offset="85%" stop-color="#00e5ff" />
+                <stop offset="100%" stop-color="#80d8ff" />
               </linearGradient>
+              <radialGradient id="heroBfGlowR-{{ section.id }}" cx="40%" cy="45%" r="50%">
+                <stop offset="0%" stop-color="#69f0ae" stop-opacity="0.75" />
+                <stop offset="60%" stop-color="#00e5ff" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="#2979ff" stop-opacity="0" />
+              </radialGradient>
+              <filter id="heroBfShadowR-{{ section.id }}" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00e5ff" flood-opacity="0.6"/>
+              </filter>
             </defs>
-            <path d="M 4 52 C 14 36, 40 16, 58 2 C 66 -4, 66 8, 59 22 C 54 32, 36 46, 4 56 Z"
-                  fill="url(#heroBfWingR-{{ section.id }})" stroke="#00E5FF" stroke-width="0.8"/>
-            <path d="M 4 52 C 20 48, 46 42, 54 32 C 62 20, 66 32, 58 44 C 50 56, 32 64, 4 54 Z"
-                  fill="url(#heroBfWingR-{{ section.id }})" opacity="0.9" stroke="#00E5FF" stroke-width="0.8"/>
-            <!-- Electric Vein Radiance -->
-            <path d="M 6 50 Q 30 32 50 14 M 14 48 Q 36 34 48 26" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="0.75"/>
-            <circle cx="56" cy="18" r="1.3" fill="#ffffff" />
-            <circle cx="48" cy="32" r="1.2" fill="#ffffff" />
+            <path d="M 2 36 C 10 18, 28 2, 52 2 C 62 2, 68 10, 66 20 C 64 30, 48 42, 32 46 C 16 50, 6 45, 2 36 Z"
+                  fill="url(#heroBfWingR-{{ section.id }})" filter="url(#heroBfShadowR-{{ section.id }})" stroke="#0d47a1" stroke-width="0.8" />
+            <path d="M 2 36 C 10 18, 28 2, 52 2 C 62 2, 68 10, 66 20 C 64 30, 48 42, 32 46 C 16 50, 6 45, 2 36 Z"
+                  fill="url(#heroBfGlowR-{{ section.id }})" />
+            <path d="M 4 38 C 12 44, 24 48, 40 52 C 54 56, 58 66, 50 74 C 42 82, 22 78, 12 64 C 6 54, 4 44, 4 38 Z"
+                  fill="url(#heroBfWingR-{{ section.id }})" stroke="#1a237e" stroke-width="0.8" />
+            <g stroke="rgba(255,255,255,0.6)" stroke-width="0.65" fill="none">
+              <path d="M 4 36 Q 30 24 54 12" />
+              <path d="M 4 36 Q 34 32 60 24" />
+              <path d="M 4 36 Q 28 40 46 38" />
+              <path d="M 5 42 Q 24 56 44 68" />
+              <path d="M 5 42 Q 18 64 28 74" />
+            </g>
+            <circle cx="60" cy="14" r="1.3" fill="#ffffff" />
+            <circle cx="64" cy="22" r="1" fill="#ffffff" />
+            <circle cx="52" cy="72" r="1.2" fill="#ffffff" />
           </svg>
         </div>
       </div>
@@ -348,91 +400,116 @@
     transition: opacity 0.3s ease;
   }
 
-  /* ==========================================================================
-     CYAN / ELECTRIC BLUE 3D BUTTERFLY
-     ========================================================================== */
-  #interactive-hero-3d-{{ section.id }} .hero-3d-butterfly {
+  /* Full-Section Canvas for Sparkles */
+  #interactive-hero-3d-{{ section.id }} .hero-3d-sparkles-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  /* FULL-SECTION 3D Royal Butterfly Creature (Matching Section 1) */
+  #interactive-hero-3d-{{ section.id }} .royal-butterfly-creature {
     position: absolute;
     top: 0;
     left: 0;
     width: 90px;
-    height: 75px;
+    height: 70px;
     pointer-events: none !important;
     z-index: 20;
+    transform: translate3d(-200px, -200px, 0);
     will-change: transform;
-    filter: drop-shadow(0 4px 14px rgba(0, 229, 255, 0.75));
     transition: opacity 0.3s ease;
   }
 
-  #interactive-hero-3d-{{ section.id }} .hero-3d-butterfly-wings {
+  #interactive-hero-3d-{{ section.id }} .butterfly-3d-rig {
     position: relative;
+    width: 100%;
+    height: 100%;
+    perspective: 700px;
+    transform-style: preserve-3d;
     display: flex;
     align-items: center;
     justify-content: center;
-    perspective: 480px;
+  }
+
+  #interactive-hero-3d-{{ section.id }} .butterfly-body {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 60px;
+    z-index: 4;
+  }
+
+  #interactive-hero-3d-{{ section.id }} .butterfly-body svg {
     width: 100%;
     height: 100%;
+    filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.7));
   }
 
-  #interactive-hero-3d-{{ section.id }} .hero-bf-wing {
-    width: 44px;
-    height: 52px;
-    display: block;
-    transform-style: preserve-3d;
-  }
-
-  #interactive-hero-3d-{{ section.id }} .hero-bf-wing-left {
-    transform-origin: 100% 50%;
-    animation: heroBfFlapLeft 0.13s ease-in-out infinite alternate;
-  }
-
-  #interactive-hero-3d-{{ section.id }} .hero-bf-wing-right {
-    transform-origin: 0% 50%;
-    animation: heroBfFlapRight 0.13s ease-in-out infinite alternate;
-  }
-
-  @keyframes heroBfFlapLeft {
-    0% { transform: rotateY(0deg) scaleX(1); }
-    100% { transform: rotateY(74deg) scaleX(0.42); }
-  }
-
-  @keyframes heroBfFlapRight {
-    0% { transform: rotateY(0deg) scaleX(1); }
-    100% { transform: rotateY(-74deg) scaleX(0.42); }
-  }
-
-  #interactive-hero-3d-{{ section.id }} .hero-bf-body {
-    position: relative;
-    width: 5px;
-    height: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 3;
-  }
-
-  #interactive-hero-3d-{{ section.id }} .hero-bf-antennae {
+  /* Butterfly Wings */
+  #interactive-hero-3d-{{ section.id }} .butterfly-wing.wing-left {
     position: absolute;
-    top: -6px;
-    width: 14px;
-    height: 7px;
-    border-top: 1.8px solid #00E5FF;
-    border-radius: 8px 8px 0 0;
+    right: 50%;
+    top: 50%;
+    margin-right: -4px;
+    margin-top: -30px;
+    width: 58px;
+    height: 64px;
+    transform-origin: right 45%;
+    transform-style: preserve-3d;
+    animation: flapLeftWingHero 0.16s ease-in-out infinite alternate;
+    z-index: 2;
   }
 
-  #interactive-hero-3d-{{ section.id }} .hero-bf-thorax {
-    width: 5px;
-    height: 9px;
-    background: #0a1d37;
-    border-radius: 3px 3px 2px 2px;
-    border: 0.6px solid #00E5FF;
+  #interactive-hero-3d-{{ section.id }} .butterfly-wing.wing-right {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -30px;
+    width: 58px;
+    height: 64px;
+    transform-origin: left 45%;
+    transform-style: preserve-3d;
+    animation: flapRightWingHero 0.16s ease-in-out infinite alternate;
+    z-index: 2;
   }
 
-  #interactive-hero-3d-{{ section.id }} .hero-bf-abdomen {
-    width: 4px;
-    height: 20px;
-    background: linear-gradient(to bottom, #0a1d37, #0288d1);
-    border-radius: 1px 1px 3px 3px;
+  #interactive-hero-3d-{{ section.id }} .butterfly-wing svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  @keyframes flapLeftWingHero {
+    0% { transform: rotateY(0deg) rotateZ(0deg); }
+    50% { transform: rotateY(52deg) rotateZ(-6deg); }
+    100% { transform: rotateY(78deg) rotateZ(-12deg); }
+  }
+
+  @keyframes flapRightWingHero {
+    0% { transform: rotateY(0deg) rotateZ(0deg); }
+    50% { transform: rotateY(-52deg) rotateZ(6deg); }
+    100% { transform: rotateY(-78deg) rotateZ(12deg); }
+  }
+
+  #interactive-hero-3d-{{ section.id }} .royal-butterfly-creature.fast-flap .wing-left {
+    animation-duration: 0.11s;
+  }
+  #interactive-hero-3d-{{ section.id }} .royal-butterfly-creature.fast-flap .wing-right {
+    animation-duration: 0.11s;
+  }
+  #interactive-hero-3d-{{ section.id }} .royal-butterfly-creature.hover-flap .wing-left {
+    animation-duration: 0.22s;
+  }
+  #interactive-hero-3d-{{ section.id }} .royal-butterfly-creature.hover-flap .wing-right {
+    animation-duration: 0.22s;
   }
 
   /* Responsive Breakpoints */
@@ -483,6 +560,7 @@
   var canvasEl = document.getElementById("hero-3d-canvas-" + sectionId);
   var spinnerEl = document.getElementById("hero-3d-spinner-" + sectionId);
   var butterflyEl = document.getElementById("hero-3d-butterfly-" + sectionId);
+  var sparklesCanvas = document.getElementById("hero-3d-sparkles-" + sectionId);
 
   if (!sectionEl || !canvasEl) return;
 
@@ -764,90 +842,198 @@
     }
   };
 
-  // 3. ELECTRIC CYAN BUTTERFLY CONTROLLER
+  // 3. FAIRY DUST STARDUST SPARKLE TRAIL
+  var SparkleTrail = {
+    canvas: sparklesCanvas,
+    ctx: null,
+    particles: [],
+
+    init: function() {
+      if (!this.canvas || !config.enableButterfly) return;
+      this.ctx = this.canvas.getContext("2d");
+      this.resize();
+      window.addEventListener("resize", this.resize.bind(this));
+    },
+
+    resize: function() {
+      if (!this.canvas || !sectionEl) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var w = sectionEl.offsetWidth || window.innerWidth;
+      var h = sectionEl.offsetHeight || 600;
+      this.canvas.width = w * dpr;
+      this.canvas.height = h * dpr;
+      if (this.ctx) this.ctx.scale(dpr, dpr);
+    },
+
+    addParticle: function(x, y) {
+      if (this.particles.length > 55) return;
+      var hues = ['#00e5ff', '#651fff', '#ffd700', '#76ff03', '#80d8ff'];
+      this.particles.push({
+        x: x + (Math.random() - 0.5) * 8,
+        y: y + (Math.random() - 0.5) * 8,
+        radius: Math.random() * 2.2 + 0.8,
+        alpha: 1.0,
+        decay: Math.random() * 0.024 + 0.014,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: Math.random() * 0.5 + 0.3,
+        color: hues[Math.floor(Math.random() * hues.length)]
+      });
+    },
+
+    updateAndRender: function() {
+      if (!this.ctx || !sectionEl) return;
+      var w = sectionEl.offsetWidth || window.innerWidth;
+      var h = sectionEl.offsetHeight || 600;
+      this.ctx.clearRect(0, 0, w, h);
+
+      for (var i = this.particles.length - 1; i >= 0; i--) {
+        var p = this.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
+          this.particles.splice(i, 1);
+          continue;
+        }
+
+        this.ctx.save();
+        this.ctx.globalAlpha = Math.max(0, p.alpha);
+        this.ctx.fillStyle = p.color;
+        this.ctx.shadowColor = p.color;
+        this.ctx.shadowBlur = 6;
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.restore();
+      }
+    }
+  };
+
+  // 4. FULL-SECTION 3D ROYAL BUTTERFLY CONTROLLER (Exact Physics & Dynamics of Section 1)
   var ElectricButterflyController = {
+    el: butterflyEl,
     posX: 0,
     posY: 0,
     targetX: 0,
     targetY: 0,
-    currentAngle: 0,
-    isActive: false,
+    angle: 0,
+    isHovering: false,
+    lastMoveTime: performance.now(),
 
     init: function() {
-      if (!butterflyEl || !config.enableButterfly) return;
+      if (!this.el || !config.enableButterfly) return;
 
       var self = this;
-      var secRect = sectionEl.getBoundingClientRect();
-      this.posX = secRect.width * 0.20;
-      this.posY = secRect.height * 0.22;
+      var w = sectionEl.offsetWidth || window.innerWidth;
+      var h = sectionEl.offsetHeight || 600;
+      this.posX = w * 0.28;
+      this.posY = h * 0.36;
       this.targetX = this.posX;
       this.targetY = this.posY;
 
-      window.addEventListener("mousemove", function(e) {
+      function updateTarget(clientX, clientY) {
         if (!sectionEl) return;
-        var rect = sectionEl.getBoundingClientRect();
-        
-        // Track target inside section coordinates
-        self.targetX = e.clientX - rect.left;
-        self.targetY = e.clientY - rect.top;
-        self.isActive = true;
+        var secRect = sectionEl.getBoundingClientRect();
+        self.targetX = clientX - secRect.left;
+        self.targetY = clientY - secRect.top;
+        self.isHovering = true;
+        self.lastMoveTime = performance.now();
+      }
+
+      sectionEl.addEventListener("mousemove", function(e) {
+        updateTarget(e.clientX, e.clientY);
       }, { passive: true });
 
-      requestAnimationFrame(this.flightLoop.bind(this));
+      window.addEventListener("mousemove", function(e) {
+        if (!sectionEl) return;
+        var r = sectionEl.getBoundingClientRect();
+        if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
+          updateTarget(e.clientX, e.clientY);
+        }
+      }, { passive: true });
+
+      sectionEl.addEventListener("touchmove", function(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        updateTarget(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+
+      sectionEl.addEventListener("mouseleave", function() {
+        self.isHovering = false;
+      });
+
+      requestAnimationFrame(this.renderLoop.bind(this));
     },
 
-    flightLoop: function(time) {
-      requestAnimationFrame(this.flightLoop.bind(this));
+    renderLoop: function(time) {
+      requestAnimationFrame(this.renderLoop.bind(this));
 
-      if (!butterflyEl || !config.enableButterfly) return;
+      if (!this.el || !config.enableButterfly) return;
 
       var secW = sectionEl.offsetWidth || window.innerWidth;
       var secH = sectionEl.offsetHeight || 600;
 
-      // Autonomous gentle patrol if idle
-      if (!this.isActive) {
-        var t = time * 0.0014;
-        this.targetX = secW * 0.5 + Math.cos(t) * (secW * 0.26);
-        this.targetY = secH * 0.28 + Math.sin(t * 2) * (secH * 0.15);
+      // Autonomous circular flight patrol around character when idle
+      if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
+        var t = time * 0.0012;
+        var patrolCenterX = secW * 0.5;
+        var patrolCenterY = secH * 0.36;
+        this.targetX = patrolCenterX + Math.cos(t) * (secW * 0.35);
+        this.targetY = patrolCenterY + Math.sin(t * 2) * (secH * 0.20);
       }
 
-      // Smooth Trailing Lag
       var dx = this.targetX - this.posX;
       var dy = this.targetY - this.posY;
       var dist = Math.sqrt(dx * dx + dy * dy);
 
-      this.posX += dx * config.butterflySpeed;
-      this.posY += dy * config.butterflySpeed;
+      var vx = dx * 0.082;
+      var vy = dy * 0.082;
+      this.posX += vx;
+      this.posY += vy;
 
-      // Natural Sinusoidal Buoyancy
-      var hoverX = Math.sin(time * 0.0038) * 8;
-      var hoverY = Math.cos(time * 0.0044) * 6;
-      var finalX = this.posX + hoverX;
-      var finalY = this.posY + hoverY;
+      // Natural hovering bob
+      var hoverX = Math.sin(time * 0.0035) * 10;
+      var hoverY = Math.cos(time * 0.0042) * 8;
+      var fx = this.posX + hoverX;
+      var fy = this.posY + hoverY;
 
-      // Boundary Clamping (keeps butterfly visibly inside section)
-      finalX = Math.max(25, Math.min(secW - 95, finalX));
-      finalY = Math.max(20, Math.min(secH - 85, finalY));
+      // Restrain within full section boundaries
+      fx = Math.max(30, Math.min(secW - 70, fx));
+      fy = Math.max(30, Math.min(secH - 70, fy));
 
-      // Calculate Flight Heading & Bank Angle
-      if (dist > 3) {
+      if (dist > 2) {
         var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
-        var diff = (targetAngle - this.currentAngle + 540) % 360 - 180;
-        this.currentAngle += diff * 0.12;
+        var diff = (targetAngle - this.angle + 540) % 360 - 180;
+        this.angle += diff * 0.12;
       }
-      var bankTilt = Math.max(-28, Math.min(28, (dx * config.butterflySpeed) * 2.2));
 
-      // Apply 3D Transform
-      butterflyEl.style.transform = 
-        "translate3d(" + (finalX - 35).toFixed(1) + "px, " + (finalY - 30).toFixed(1) + "px, 0px) " +
-        "rotate(" + this.currentAngle.toFixed(1) + "deg) " +
-        "rotateY(" + bankTilt.toFixed(1) + "deg)";
+      var tilt = Math.max(-25, Math.min(25, vx * 1.8));
+
+      if (dist > 40) {
+        this.el.classList.add("fast-flap");
+        this.el.classList.remove("hover-flap");
+      } else {
+        this.el.classList.remove("fast-flap");
+        this.el.classList.add("hover-flap");
+      }
+
+      this.el.style.transform =
+        "translate3d(" + (fx - 45).toFixed(1) + "px, " + (fy - 35).toFixed(1) + "px, 0px) " +
+        "rotate(" + this.angle.toFixed(1) + "deg) " +
+        "rotateY(" + tilt.toFixed(1) + "deg)";
+
+      if (Math.random() < 0.45) {
+        SparkleTrail.addParticle(fx, fy);
+      }
+
+      SparkleTrail.updateAndRender();
     }
   };
 
-  // 4. BOOTSTRAP HERO SECTION
+  // 5. BOOTSTRAP HERO SECTION
   function bootHeroSection() {
     Mascot3DManager.init();
+    SparkleTrail.init();
     ElectricButterflyController.init();
   }
 

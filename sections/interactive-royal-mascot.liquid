@@ -609,13 +609,19 @@
         // Circular polar coordinate calculation for smooth 360° circular tracking
         var angle = Math.atan2(deltaY, deltaX);
         var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        var r = Math.min(1.2, dist);
+        var r = Math.min(1.25, dist);
 
         var sens = config.sensitivity || 28;
-        // Sweeps continuously through 360 degrees when circling around the mascot
+        var maxPitch = 20;
+
+        // Horizontal: Cursor Left -> Look Left, Cursor Right -> Look Right
+        // Vertical: Cursor UP (deltaY < 0) -> targetRotX is negative -> Head Tilts UP
+        //           Cursor DOWN (deltaY > 0) -> targetRotX is positive -> Head Tilts DOWN
         self.targetRotY = Math.cos(angle) * (r * sens);
-        self.targetRotX = -Math.sin(angle) * (r * 16);
+        self.targetRotX = Math.sin(angle) * (r * maxPitch);
         self.targetRoll = Math.cos(angle) * (r * 5.8);
+        self.isHovering = true;
+        self.lastMoveTime = performance.now();
       }
 
       window.addEventListener("mousemove", function(e) {
@@ -692,12 +698,36 @@
         this.dragVelocity *= 0.92;
       }
 
+      var sens = config.sensitivity || 28;
+
+      // When mouse is idle, mascot smoothly tracks the flying butterfly in circular flight
+      if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
+        if (typeof ButterflyFollower !== "undefined" && ButterflyFollower.posX) {
+          var bRect = stageEl.getBoundingClientRect();
+          var sCenterX = bRect.left + bRect.width / 2;
+          var sCenterY = bRect.top + bRect.height * 0.44;
+          var secRect = sectionEl.getBoundingClientRect();
+
+          var bClientX = secRect.left + ButterflyFollower.posX;
+          var bClientY = secRect.top + ButterflyFollower.posY;
+
+          var bdx = (bClientX - sCenterX) / (window.innerWidth * 0.44);
+          var bdy = (bClientY - sCenterY) / (window.innerHeight * 0.44);
+
+          var bAngle = Math.atan2(bdy, bdx);
+          var bDist = Math.sqrt(bdx * bdx + bdy * bdy);
+          var br = Math.min(1.0, bDist);
+
+          this.targetRotY = Math.cos(bAngle) * (br * sens);
+          this.targetRotX = Math.sin(bAngle) * (br * 18);
+          this.targetRoll = Math.cos(bAngle) * (br * 4.5);
+        }
+      }
+
       // Smooth Spring-Mass Damping (matches bottom section factor: 0.082)
       this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
       this.currentRotX += (this.targetRotX - this.currentRotX) * 0.082;
       this.currentRoll += (this.targetRoll - this.currentRoll) * 0.082;
-
-      var sens = config.sensitivity || 28;
 
       if (this.isReady && this.characterGroup) {
         // 1. Organic Idle Breathing Wave
@@ -713,7 +743,7 @@
         // Ground shadow reacts dynamically in 3D
         if (this.shadowMesh) {
           this.shadowMesh.position.x = leanRatio * 0.08;
-          this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 16) * 0.05;
+          this.shadowMesh.scale.x = 1.0 - Math.abs(this.currentRotX / 20) * 0.05;
         }
 
         // 3. 3D Head & Neck in Circular Gaze (Movement Like Circle)
@@ -723,15 +753,16 @@
 
         if (this.bones.head) {
           this.bones.head.rotation.y = radYaw * 0.85;
-          this.bones.head.rotation.x = radPitch * 0.88;
+          this.bones.head.rotation.x = radPitch * 0.90;
           this.bones.head.rotation.z = radRoll;
         }
         if (this.bones.neck) {
           this.bones.neck.rotation.y = radYaw * 0.44;
-          this.bones.neck.rotation.x = radPitch * 0.36;
+          this.bones.neck.rotation.x = radPitch * 0.38;
         }
         if (this.bones.chest) {
           this.bones.chest.rotation.y = radYaw * 0.14;
+          this.bones.chest.rotation.x = radPitch * 0.12;
         }
 
         // 4. "Gogal Moment": 3D Goggles Physical Depth & Parallax

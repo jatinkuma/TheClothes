@@ -88,7 +88,7 @@
       <!-- 3D 360-Degree Interactive Rotation Cue -->
       <div class="tra-3d-cue">
         <span class="tra-3d-cue-icon">↺</span>
-        <span class="tra-3d-cue-text">Real-Time 3D Gaze Tracking &bull; Drag horizontally to rotate 360°</span>
+        <span class="tra-3d-cue-text">Real-Time 3D Gaze Tracking &bull; Natural Body & Eye Movement</span>
       </div>
 
       <!-- Live Quick-Dressing Outfit Bar -->
@@ -515,15 +515,11 @@
     width: 380px;
     height: 520px;
     border-radius: 16px;
-    cursor: grab;
+    cursor: default;
     touch-action: none;
     display: block;
     margin-bottom: 8px;
     filter: drop-shadow(0 16px 32px rgba(0,0,0,0.18));
-  }
-
-  .tra-3d-webgl-canvas:active {
-    cursor: grabbing;
   }
 
   /* Complete, Connected Unified Fallback Stage (NO CUTS, NO GAPS) */
@@ -1167,7 +1163,7 @@
   var activeCharacterUrl = (customModelUrl && customModelUrl.trim() !== "") ? customModelUrl.trim() : defaultModelUrl;
 
   // 3. THREE.JS REAL-TIME 3D RIGGED ENGINE
-  var scene, camera, renderer, characterGroup, activeOutfitMesh;
+  var scene, camera, renderer, characterGroup, activeOutfitMesh, shadowPlane;
   var headBone = null, neckBone = null, chestBone = null, spineBone = null, rootBone = null;
   var eyeLeftBone = null, eyeRightBone = null;
   var outfitMountNode = null;
@@ -1220,7 +1216,7 @@
       // Pedestal Contact Shadow Plane
       var shadowGeo = new THREE.PlaneGeometry(2.4, 2.4);
       var shadowMat = new THREE.ShadowMaterial({ opacity: 0.28 });
-      var shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
+      shadowPlane = new THREE.Mesh(shadowGeo, shadowMat);
       shadowPlane.rotation.x = -Math.PI / 2;
       shadowPlane.position.y = -0.06;
       shadowPlane.receiveShadow = true;
@@ -1238,7 +1234,7 @@
         showFallbackStage();
       }
 
-      setup360DragControls();
+      setupNaturalGazeTracking();
       requestAnimationFrame(renderLoop);
 
     } catch (err) {
@@ -1320,86 +1316,71 @@
     if (mascotStage) mascotStage.style.display = "flex";
   }
 
-  // 360-Degree Interactive Drag Controls
-  function setup360DragControls() {
-    webglCanvas.addEventListener("mousedown", function(e) {
-      isDragging = true;
-      prevMouseX = e.clientX;
-    });
+  // 4. NATURAL CIRCULAR GAZE & BODY TRACKING (NO 360 SPIN - FRONT FACING)
+  var targetRoll = 0, currentRoll = 0;
 
-    window.addEventListener("mouseup", function() {
-      isDragging = false;
-    });
+  function setupNaturalGazeTracking() {
+    function updatePointer(clientX, clientY) {
+      if (!stageEl) return;
+      var rect = stageEl.getBoundingClientRect();
+      var centerX = rect.left + rect.width / 2;
+      var centerY = rect.top + rect.height * 0.42;
+
+      var deltaX = (clientX - centerX) / (window.innerWidth * 0.44);
+      var deltaY = (clientY - centerY) / (window.innerHeight * 0.44);
+
+      // Circular polar coordinates for smooth 360° circular loops ("moment like circle")
+      var angle = Math.atan2(deltaY, deltaX);
+      var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      var r = Math.min(1.20, dist);
+
+      var sens = 24;
+      var maxPitch = 15;
+
+      // Cursor Left -> Left turn & lean, Cursor Right -> Right turn & lean
+      targetRotY = Math.cos(angle) * (r * sens);
+      targetRotX = Math.sin(angle) * (r * maxPitch);
+      targetRoll = Math.cos(angle) * (r * 3.8);
+    }
 
     window.addEventListener("mousemove", function(e) {
-      if (isDragging && characterGroup) {
-        var delta = e.clientX - prevMouseX;
-        orbitAngleY += delta * 0.015;
-        prevMouseX = e.clientX;
-      }
-    });
-
-    // Touch support for mobile 360 dragging
-    webglCanvas.addEventListener("touchstart", function(e) {
-      if (e.touches.length === 1) {
-        isDragging = true;
-        prevMouseX = e.touches[0].clientX;
-      }
+      updatePointer(e.clientX, e.clientY);
     }, { passive: true });
-
-    window.addEventListener("touchend", function() {
-      isDragging = false;
-    });
 
     window.addEventListener("touchmove", function(e) {
-      if (isDragging && characterGroup && e.touches.length === 1) {
-        var delta = e.touches[0].clientX - prevMouseX;
-        orbitAngleY += delta * 0.015;
-        prevMouseX = e.touches[0].clientX;
-      }
+      if (!e.touches || e.touches.length === 0) return;
+      updatePointer(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
+
+    window.addEventListener("mouseleave", function() {
+      targetRotY = 0;
+      targetRotX = 0;
+      targetRoll = 0;
+    });
   }
-
-  // 4. REAL-TIME CURSOR GAZE CALCULATION & SMOOTH EASING
-  window.addEventListener("mousemove", function(e) {
-    if (!stageEl) return;
-    var rect = stageEl.getBoundingClientRect();
-    var centerX = rect.left + rect.width / 2;
-    var centerY = rect.top + rect.height * 0.42;
-
-    var deltaX = (e.clientX - centerX) / (window.innerWidth * 0.5);
-    var deltaY = (e.clientY - centerY) / (window.innerHeight * 0.5);
-
-    // Natural human rotational limits (-28° to +28° yaw, -14° to +14° pitch)
-    targetRotY = Math.max(-28, Math.min(28, deltaX * 28));
-    targetRotX = Math.max(-14, Math.min(14, -deltaY * 14));
-  }, { passive: true });
-
-  window.addEventListener("mouseleave", function() {
-    targetRotY = 0;
-    targetRotX = 0;
-  });
 
   // Main 60FPS Render & Physics Loop
   function renderLoop(time) {
     // Smooth Spring-Damped Interpolation
-    currentRotY += (targetRotY - currentRotY) * 0.085;
-    currentRotX += (targetRotX - currentRotX) * 0.085;
+    currentRotY += (targetRotY - currentRotY) * 0.082;
+    currentRotX += (targetRotX - currentRotX) * 0.082;
+    currentRoll += (targetRoll - currentRoll) * 0.082;
 
     // Organic idle breathing wave
-    var breathWave = Math.sin(time * 0.0024);
+    var breathWave = Math.sin(time * 0.0022);
 
     if (is3DReady && characterGroup) {
-      // 1. Apply 360 Orbit Rotation to entire character
-      characterGroup.rotation.y = orbitAngleY;
-
-      // 2. Idle breathing vertical expansion
+      // 1. Signature Weight-Shift Leaning Physics (NO 360 SPIN - LOCKED FRONT-FACING)
+      var leanRatio = currentRotY / 24;
+      characterGroup.position.x = leanRatio * 0.085; // Leans towards cursor
       characterGroup.position.y = breathWave * 0.015;
+      characterGroup.rotation.z = -leanRatio * 0.035;
+      characterGroup.rotation.y = leanRatio * 0.08; // Front-facing natural body posture
 
-      // 3. Drive 3D Head & Neck Bones with real 3D rotation
+      // 2. Drive 3D Head & Neck Bones with real 3D rotation
       var radYaw = (currentRotY * Math.PI) / 180;
       var radPitch = (currentRotX * Math.PI) / 180;
-      var radRoll = radYaw * 0.15; // Natural head tilt cocking
+      var radRoll = (currentRoll * Math.PI) / 180;
 
       if (headBone) {
         headBone.rotation.y = radYaw * 0.75;
@@ -1435,6 +1416,11 @@
         eyeRightBone.rotation.y = eyeYaw;
         eyeRightBone.rotation.x = eyePitch;
         eyeRightBone.scale.z = blinkScale;
+      }
+
+      // Dynamic Pedestal Contact Shadow Shift
+      if (shadowPlane) {
+        shadowPlane.position.x = leanRatio * 0.09;
       }
 
       renderer.render(scene, camera);

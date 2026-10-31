@@ -523,6 +523,8 @@
     targetRotX: 0,
     currentRotY: 0,
     currentRotX: 0,
+    targetRoll: 0,
+    currentRoll: 0,
     
     // 360 Drag & Orbit
     isDragging: false,
@@ -644,62 +646,44 @@
     setupEventListeners: function() {
       var self = this;
 
-      // Mouse Drag 360 Rotation
-      canvasEl.addEventListener("mousedown", function(e) {
-        self.isDragging = true;
-        self.prevMouseX = e.clientX;
-      });
-
-      window.addEventListener("mouseup", function() {
-        self.isDragging = false;
-      });
-
-      window.addEventListener("mousemove", function(e) {
-        if (self.isDragging && self.characterGroup) {
-          var delta = e.clientX - self.prevMouseX;
-          self.orbitAngleY += delta * 0.015;
-          self.prevMouseX = e.clientX;
-        }
-
-        // Calculate Real-Time Gaze Coordinates
+      // Natural Circular Gaze & Body Tracking (NO 360 SPIN - FRONT FACING)
+      function updatePointer(clientX, clientY) {
         if (!stageEl) return;
         var rect = stageEl.getBoundingClientRect();
         var centerX = rect.left + rect.width / 2;
         var centerY = rect.top + rect.height * 0.45;
 
-        var deltaX = (e.clientX - centerX) / (window.innerWidth * 0.5);
-        var deltaY = (e.clientY - centerY) / (window.innerHeight * 0.5);
+        var deltaX = (clientX - centerX) / (window.innerWidth * 0.44);
+        var deltaY = (clientY - centerY) / (window.innerHeight * 0.44);
 
-        // Natural Mascot Gaze Limits
-        self.targetRotY = Math.max(-self.sens(), Math.min(self.sens(), deltaX * self.sens()));
-        self.targetRotX = Math.max(-16, Math.min(16, -deltaY * 16));
+        // Circular polar coordinates for continuous circular loops
+        var angle = Math.atan2(deltaY, deltaX);
+        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        var r = Math.min(1.20, dist);
+
+        var sens = self.sens() || 24;
+        var maxPitch = 15;
+
+        // Left cursor -> Left turn & lean, Right cursor -> Right turn & lean
+        self.targetRotY = Math.cos(angle) * (r * sens);
+        self.targetRotX = Math.sin(angle) * (r * maxPitch);
+        self.targetRoll = Math.cos(angle) * (r * 3.8);
+      }
+
+      window.addEventListener("mousemove", function(e) {
+        updatePointer(e.clientX, e.clientY);
       }, { passive: true });
 
-      // Return naturally to center when cursor leaves
+      window.addEventListener("touchmove", function(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
+
       document.addEventListener("mouseleave", function() {
         self.targetRotY = 0;
         self.targetRotX = 0;
+        self.targetRoll = 0;
       });
-
-      // Mobile Touch Support
-      canvasEl.addEventListener("touchstart", function(e) {
-        if (e.touches.length === 1) {
-          self.isDragging = true;
-          self.prevMouseX = e.touches[0].clientX;
-        }
-      }, { passive: true });
-
-      window.addEventListener("touchend", function() {
-        self.isDragging = false;
-      });
-
-      window.addEventListener("touchmove", function(e) {
-        if (self.isDragging && self.characterGroup && e.touches.length === 1) {
-          var delta = e.touches[0].clientX - self.prevMouseX;
-          self.orbitAngleY += delta * 0.015;
-          self.prevMouseX = e.touches[0].clientX;
-        }
-      }, { passive: true });
 
       // Window Resize
       window.addEventListener("resize", function() {
@@ -719,22 +703,26 @@
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
 
-      // Smooth Easing Interpolation
-      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.088;
-      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.088;
+      // Smooth Spring Interpolation
+      this.currentRotY += (this.targetRotY - this.currentRotY) * 0.082;
+      this.currentRotX += (this.targetRotX - this.currentRotX) * 0.082;
+      this.currentRoll += (this.targetRoll - this.currentRoll) * 0.082;
 
       if (this.isReady && this.characterGroup) {
-        // 1. Orbit Rotation
-        this.characterGroup.rotation.y = this.orbitAngleY;
+        // 1. Signature Weight-Shift Leaning Physics (NO 360 SPIN - FRONT FACING)
+        var leanRatio = this.currentRotY / (this.sens() || 24);
+        this.characterGroup.position.x = leanRatio * 0.085;
+        this.characterGroup.rotation.z = -leanRatio * 0.035;
+        this.characterGroup.rotation.y = leanRatio * 0.08; // Locked front-facing natural posture
 
         // 2. Idle Organic Breathing
-        var breathWave = Math.sin(time * 0.0024);
+        var breathWave = Math.sin(time * 0.0022);
         this.characterGroup.position.y = breathWave * 0.016;
 
         // 3. Real 3D Head & Neck Bone Rotation
         var radYaw = (this.currentRotY * Math.PI) / 180;
         var radPitch = (this.currentRotX * Math.PI) / 180;
-        var radRoll = radYaw * 0.14; // Natural curious mascot tilt
+        var radRoll = (this.currentRoll * Math.PI) / 180;
 
         if (this.bones.head) {
           this.bones.head.rotation.y = radYaw * 0.78;

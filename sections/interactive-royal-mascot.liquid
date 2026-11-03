@@ -808,6 +808,18 @@
     sensitivity: {{ section.settings.sensitivity | default: 28 }},
     enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
     enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %},
+    activeMascot: "chipmunk",
+    chipmunkAssets: {
+      body: "{{ 'chipmunk-body-tex.png' | asset_url }}",
+      head: "{{ 'chipmunk-head-tex.png' | asset_url }}",
+      full: "{{ 'chipmunk-clean-master.png' | asset_url }}",
+      outfits: {
+        cream: "{{ 'chipmunk-body-tex.png' | asset_url }}",
+        blue: "{{ 'royal-owl-achkan.png' | asset_url }}",
+        green: "{{ 'royal-owl-mojari.png' | asset_url }}",
+        red: "{{ 'royal-owl-dupatta.png' | asset_url }}"
+      }
+    },
     owlAssets: {
       body: "{{ 'royal-owl-body.png' | asset_url }}",
       headCenter: "{{ 'royal-owl-head-center.png' | asset_url }}",
@@ -943,7 +955,12 @@
         // Build 3D Articulated Avatar Hierarchy & Preload Head Angle Textures
         this.textureLoader = new THREE.TextureLoader();
 
-        // Preload all multi-angle head & outfit textures for 0-latency switching
+        // Preload Royal Chipmunk and owl textures
+        if (config.chipmunkAssets) {
+          this.loadTexture(config.chipmunkAssets.body);
+          this.loadTexture(config.chipmunkAssets.head);
+          this.loadTexture(config.chipmunkAssets.full);
+        }
         for (var hKey in config.owlAssets) {
           if (typeof config.owlAssets[hKey] === "string") {
             this.loadTexture(config.owlAssets[hKey]);
@@ -1020,13 +1037,58 @@
     },
 
     buildAvatarRig: function(outfitKey) {
-      // Proportions matching video character (210w x 415h body, 210w x 195h head)
-      var charWidth = 1.35;
-      var bodyHeight = charWidth * (415.0 / 210.0); // ~2.668
-      var headHeight = charWidth * (195.0 / 210.0); // ~1.254
-      var neckPivotY = bodyHeight * ((415.0 - 170.0) / 415.0); // ~1.575
+      if (config.activeMascot === "chipmunk") {
+        // Proportions matching the Royal Chipmunk mascot from user image (301w x 411h)
+        var charHeight = 2.40;
+        var charWidth = charHeight * (301.0 / 411.0); // ~1.758
+        var bodyHeight = charHeight * (228.0 / 411.0); // ~1.331
+        var headHeight = charHeight * (205.0 / 411.0); // ~1.197
+        var neckPivotY = charHeight * (222.0 / 411.0); // ~1.296
 
-      // 1. Torso & Body: Authentic Cartoon Owl Body from Video
+        // 1. Torso & Body: True 3D Cylindrical Curved Mesh
+        var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 56, 56, 0.13, false);
+        var bodyTex = this.loadTexture(config.chipmunkAssets.body);
+        var bodyMat = new THREE.MeshStandardMaterial({
+          map: bodyTex,
+          transparent: true,
+          alphaTest: 0.005,
+          roughness: 0.38,
+          metalness: 0.08,
+          side: THREE.DoubleSide
+        });
+        this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        this.bodyMesh.position.set(0, bodyHeight * 0.5, 0);
+        this.bodyMesh.renderOrder = 2;
+        this.characterGroup.add(this.bodyMesh);
+
+        // 2. Head Group & 3D Ellipsoidal Curved Mesh with Forward Neck Pivot
+        this.headGroup = new THREE.Group();
+        this.headGroup.position.set(0, neckPivotY, 0.035);
+        this.characterGroup.add(this.headGroup);
+
+        var headGeo = this.createCurvedGeometry(charWidth, headHeight, 56, 56, 0.20, true);
+        var headTex = this.loadTexture(config.chipmunkAssets.head);
+        var headMat = new THREE.MeshStandardMaterial({
+          map: headTex,
+          transparent: true,
+          alphaTest: 0.005,
+          roughness: 0.38,
+          metalness: 0.12,
+          side: THREE.DoubleSide
+        });
+        this.headMesh = new THREE.Mesh(headGeo, headMat);
+        this.headMesh.position.set(0, (headHeight * 0.5) - 0.06, 0);
+        this.headMesh.renderOrder = 3;
+        this.headGroup.add(this.headMesh);
+        return;
+      }
+
+      // Fallback Owl rig
+      var charWidth = 1.35;
+      var bodyHeight = charWidth * (415.0 / 210.0);
+      var headHeight = charWidth * (195.0 / 210.0);
+      var neckPivotY = bodyHeight * ((415.0 - 170.0) / 415.0);
+
       var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 48, 48, 0.12, false);
       var bodyTex = this.loadTexture(config.owlAssets.body);
       var bodyMat = new THREE.MeshStandardMaterial({
@@ -1042,9 +1104,8 @@
       this.bodyMesh.renderOrder = 2;
       this.characterGroup.add(this.bodyMesh);
 
-      // 2. Head Group & 3D Ellipsoidal Curved Mesh with Neck Joint Parallax
       this.headGroup = new THREE.Group();
-      this.headGroup.position.set(0, neckPivotY, 0.055); // Forward neck pivot in 3D
+      this.headGroup.position.set(0, neckPivotY, 0.055);
       this.characterGroup.add(this.headGroup);
 
       var headGeo = this.createCurvedGeometry(charWidth, headHeight, 48, 48, 0.18, true);
@@ -1058,7 +1119,6 @@
         side: THREE.DoubleSide
       });
       this.headMesh = new THREE.Mesh(headGeo, headMat);
-      // Sit atop neck joint seamlessly with zero gap
       this.headMesh.position.set(0, (headHeight * 0.5) - 0.20, 0);
       this.headMesh.renderOrder = 3;
       this.headGroup.add(this.headMesh);
@@ -1236,11 +1296,13 @@
         activeHeadKey = "headRight";
       }
 
-      if (activeHeadKey !== this.currentHeadKey && this.loadedTextures[config.owlAssets[activeHeadKey]]) {
-        this.currentHeadKey = activeHeadKey;
-        if (this.headMesh) {
-          this.headMesh.material.map = this.loadedTextures[config.owlAssets[activeHeadKey]];
-          this.headMesh.material.needsUpdate = true;
+      if (config.activeMascot === "owl") {
+        if (activeHeadKey !== this.currentHeadKey && this.loadedTextures[config.owlAssets[activeHeadKey]]) {
+          this.currentHeadKey = activeHeadKey;
+          if (this.headMesh) {
+            this.headMesh.material.map = this.loadedTextures[config.owlAssets[activeHeadKey]];
+            this.headMesh.material.needsUpdate = true;
+          }
         }
       }
 

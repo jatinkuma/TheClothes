@@ -31,6 +31,7 @@
 
 <!-- Three.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <div
   id="royal-mascot-section-{{ section.id }}"
@@ -516,7 +517,7 @@
   #royal-mascot-section-{{ section.id }} .royal-mascot-canvas {
     width: 100% !important;
     max-width: 580px;
-    height: 480px !important;
+    height: 520px !important;
     display: block;
     outline: none;
     cursor: default;
@@ -809,6 +810,7 @@
     enableButterfly: {{ section.settings.enable_butterfly | json }},
     enableSparkles: {{ section.settings.enable_sparkles | json }},
     activeMascot: "{{ section.settings.mascot_character | default: 'cat' }}",
+    glbUrl: "{{ 'royal-cat-mascot.glb' | asset_url }}",
     catAssets: {
       body: "{{ 'royal-cat-body.png' | asset_url }}",
       head: "{{ 'royal-cat-head.png' | asset_url }}",
@@ -920,6 +922,14 @@
     textureLoader: null,
     loadedTextures: {},
     isReady: false,
+    isGlbLoaded: false,
+    headBone: null,
+    neckBone: null,
+    torsoBone: null,
+    rootBone: null,
+    eyeLeftBone: null,
+    eyeRightBone: null,
+    fullCatMesh: null,
 
     // Smooth Biomechanical Angles
     headYaw: 0,
@@ -957,8 +967,8 @@
 
         // Perspective Camera directly viewing the FRONT of the character
         this.camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-        this.camera.position.set(0, 1.15, 3.25);
-        this.camera.lookAt(0, 0.95, 0);
+        this.camera.position.set(0, 1.05, 3.40);
+        this.camera.lookAt(0, 0.98, 0);
 
         // WebGL Renderer with High-Fidelity Color & Tone Mapping
         this.renderer = new THREE.WebGLRenderer({
@@ -1044,6 +1054,46 @@
 
         this.buildAvatarRig("cream");
 
+        // Load Authentic 3D Rigged Cat Model (.glb)
+        var self = this;
+        if (typeof THREE.GLTFLoader !== "undefined" && config.activeMascot === "cat" && config.glbUrl) {
+          var gltfLoader = new THREE.GLTFLoader();
+          gltfLoader.load(config.glbUrl, function(gltf) {
+            if (self.fullCatMesh) {
+              self.characterGroup.remove(self.fullCatMesh);
+              self.fullCatMesh = null;
+            }
+            var charModel = gltf.scene;
+            charModel.position.set(0, 0, 0);
+            charModel.scale.set(1, 1, 1);
+            self.characterGroup.add(charModel);
+
+            charModel.traverse(function(node) {
+              if (node.isBone || node.type === "Bone") {
+                var name = (node.name || "").toLowerCase();
+                if (name.indexOf("head") !== -1 && !self.headBone) self.headBone = node;
+                else if (name.indexOf("neck") !== -1 && !self.neckBone) self.neckBone = node;
+                else if ((name.indexOf("chest") !== -1 || name.indexOf("spine") !== -1) && !self.torsoBone) self.torsoBone = node;
+                else if (name.indexOf("root") !== -1 && !self.rootBone) self.rootBone = node;
+                else if (name.indexOf("eye.l") !== -1 || name === "eye_l") self.eyeLeftBone = node;
+                else if (name.indexOf("eye.r") !== -1 || name === "eye_r") self.eyeRightBone = node;
+              }
+              if (node.isMesh) {
+                node.castShadow = true;
+                node.receiveShadow = true;
+                if (node.material) {
+                  node.material.roughness = 0.38;
+                  node.material.metalness = 0.08;
+                }
+              }
+            });
+            self.isGlbLoaded = true;
+            if (spinnerEl) spinnerEl.classList.add("loaded");
+          }, undefined, function(err) {
+            console.warn("GLTF loader fallback to seamless procedural rig:", err);
+          });
+        }
+
         // Setup Event Listeners & Animation Loop
         this.setupEventListeners();
         requestAnimationFrame(this.renderLoop.bind(this));
@@ -1110,45 +1160,25 @@
 
     buildAvatarRig: function(outfitKey) {
       if (config.activeMascot === "cat") {
-        var charHeight = 2.40;
-        var charWidth = 2.40;
-        var bodyHeight = charHeight * 0.38;
-        var headHeight = charHeight * 0.72;
-        var neckPivotY = charHeight * 0.33;
+        var charHeight = 2.10;
+        var charWidth = 2.10;
 
-        var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 56, 56, 0.16, false);
-        var bodyTex = this.loadTexture(config.catAssets.body);
-        var bodyMat = new THREE.MeshStandardMaterial({
-          map: bodyTex,
-          transparent: true,
-          alphaTest: 0.005,
-          roughness: 0.38,
-          metalness: 0.06,
-          side: THREE.DoubleSide
-        });
-        this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-        this.bodyMesh.position.set(0, bodyHeight * 0.5, 0);
-        this.bodyMesh.renderOrder = 2;
-        this.characterGroup.add(this.bodyMesh);
-
-        this.headGroup = new THREE.Group();
-        this.headGroup.position.set(0, neckPivotY, 0.035);
-        this.characterGroup.add(this.headGroup);
-
-        var headGeo = this.createCurvedGeometry(charWidth, headHeight, 56, 56, 0.24, true);
-        var headTex = this.loadTexture(config.catAssets.head);
-        var headMat = new THREE.MeshStandardMaterial({
-          map: headTex,
+        // One single seamless, continuous 3D curved geometry for the entire cat (Head + Body + Court Attire)
+        // Zero gap, perfectly contiguous, full-resolution master texture
+        var catGeo = this.createCurvedGeometry(charWidth, charHeight, 64, 64, 0.22, true);
+        var catTex = this.loadTexture(config.catAssets.full);
+        var catMat = new THREE.MeshStandardMaterial({
+          map: catTex,
           transparent: true,
           alphaTest: 0.005,
           roughness: 0.38,
           metalness: 0.08,
           side: THREE.DoubleSide
         });
-        this.headMesh = new THREE.Mesh(headGeo, headMat);
-        this.headMesh.position.set(0, (headHeight * 0.5) - 0.06, 0);
-        this.headMesh.renderOrder = 3;
-        this.headGroup.add(this.headMesh);
+        this.fullCatMesh = new THREE.Mesh(catGeo, catMat);
+        this.fullCatMesh.position.set(0, charHeight * 0.5, 0);
+        this.fullCatMesh.renderOrder = 2;
+        this.characterGroup.add(this.fullCatMesh);
         return;
       }
 
@@ -1391,49 +1421,90 @@
       this.characterGroup.rotation.z = this.torsoLean;
       this.characterGroup.rotation.y = 0; // Front-facing lock (no 360 spin)
 
-      // 2. Torso / Body: True 3D Curved Rotation
-      var radTorsoYaw = (this.torsoYaw * Math.PI) / 180;
-      var radTorsoPitch = (this.torsoPitch * Math.PI) / 180;
-      if (this.bodyMesh) {
-        this.bodyMesh.rotation.y = radTorsoYaw;
-        this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
-      }
-
-      // 3. Dynamic Head Angle Sprite Switching for Owl (if active)
-      if (config.activeMascot === "owl") {
-        var blinkProgress = (time % 3600) / 3600;
-        this.isBlinking = (blinkProgress > 0.965);
-
-        var activeHeadKey = "headCenter";
-        if (this.isBlinking) {
-          activeHeadKey = "headBlink";
-        } else if (this.headYaw < -13) {
-          activeHeadKey = "headFarLeft";
-        } else if (this.headYaw < -3.5) {
-          activeHeadKey = "headLeft";
-        } else if (this.headYaw > 13) {
-          activeHeadKey = "headFarRight";
-        } else if (this.headYaw > 3.5) {
-          activeHeadKey = "headRight";
-        }
-
-        if (activeHeadKey !== this.currentHeadKey && this.loadedTextures[config.owlAssets[activeHeadKey]]) {
-          this.currentHeadKey = activeHeadKey;
-          if (this.headMesh) {
-            this.headMesh.material.map = this.loadedTextures[config.owlAssets[activeHeadKey]];
-            this.headMesh.material.needsUpdate = true;
-          }
-        }
-      }
-
-      // 4. Head Group: True 3D Yaw, Pitch, Roll & Natural Gaze Tilt
       var radHeadYaw = (this.headYaw * Math.PI) / 180;
       var radHeadPitch = (this.headPitch * Math.PI) / 180;
       var radHeadRoll = (this.headRoll * Math.PI) / 180;
-      if (this.headGroup) {
-        this.headGroup.rotation.y = radHeadYaw * 0.72;
-        this.headGroup.rotation.x = radHeadPitch * 0.85 + breathePitch * 0.6;
-        this.headGroup.rotation.z = radHeadRoll * 0.55;
+      var radTorsoYaw = (this.torsoYaw * Math.PI) / 180;
+      var radTorsoPitch = (this.torsoPitch * Math.PI) / 180;
+
+      // 2. Drive 3D Rigged Bones if GLTF model is active
+      if (this.isGlbLoaded) {
+        if (this.headBone) {
+          this.headBone.rotation.y = radHeadYaw * 0.75;
+          this.headBone.rotation.x = radHeadPitch * 0.85;
+          this.headBone.rotation.z = radHeadRoll * 0.45;
+        }
+        if (this.neckBone) {
+          this.neckBone.rotation.y = radHeadYaw * 0.35;
+          this.neckBone.rotation.x = radHeadPitch * 0.25;
+        }
+        if (this.torsoBone) {
+          this.torsoBone.rotation.y = radTorsoYaw * 0.20;
+          this.torsoBone.rotation.x = radTorsoPitch * 0.15;
+        }
+
+        // 3D Eyes Tracking & Natural Blinking
+        var eyeYaw = radHeadYaw * 1.25;
+        var eyePitch = radHeadPitch * 1.35;
+        var blinkProgress = (time % 3600) / 3600;
+        var blinkScale = 1.0;
+        if (blinkProgress > 0.955) {
+          var bt = (blinkProgress - 0.955) / 0.045;
+          blinkScale = 1.0 - Math.sin(bt * Math.PI) * 0.90;
+        }
+        if (this.eyeLeftBone) {
+          this.eyeLeftBone.rotation.y = eyeYaw;
+          this.eyeLeftBone.rotation.x = eyePitch;
+          this.eyeLeftBone.scale.z = blinkScale;
+        }
+        if (this.eyeRightBone) {
+          this.eyeRightBone.rotation.y = eyeYaw;
+          this.eyeRightBone.rotation.x = eyePitch;
+          this.eyeRightBone.scale.z = blinkScale;
+        }
+      } else if (this.fullCatMesh) {
+        // Single continuous seamless 3D curved mesh
+        this.fullCatMesh.rotation.y = radHeadYaw * 0.65;
+        this.fullCatMesh.rotation.x = radHeadPitch * 0.75 + breathePitch;
+        this.fullCatMesh.rotation.z = radHeadRoll * 0.50;
+      } else {
+        // Fallback for chipmunk / owl
+        if (this.bodyMesh) {
+          this.bodyMesh.rotation.y = radTorsoYaw;
+          this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
+        }
+
+        if (config.activeMascot === "owl") {
+          var blinkProgress = (time % 3600) / 3600;
+          this.isBlinking = (blinkProgress > 0.965);
+
+          var activeHeadKey = "headCenter";
+          if (this.isBlinking) {
+            activeHeadKey = "headBlink";
+          } else if (this.headYaw < -13) {
+            activeHeadKey = "headFarLeft";
+          } else if (this.headYaw < -3.5) {
+            activeHeadKey = "headLeft";
+          } else if (this.headYaw > 13) {
+            activeHeadKey = "headFarRight";
+          } else if (this.headYaw > 3.5) {
+            activeHeadKey = "headRight";
+          }
+
+          if (activeHeadKey !== this.currentHeadKey && this.loadedTextures[config.owlAssets[activeHeadKey]]) {
+            this.currentHeadKey = activeHeadKey;
+            if (this.headMesh) {
+              this.headMesh.material.map = this.loadedTextures[config.owlAssets[activeHeadKey]];
+              this.headMesh.material.needsUpdate = true;
+            }
+          }
+        }
+
+        if (this.headGroup) {
+          this.headGroup.rotation.y = radHeadYaw * 0.72;
+          this.headGroup.rotation.x = radHeadPitch * 0.85 + breathePitch * 0.6;
+          this.headGroup.rotation.z = radHeadRoll * 0.55;
+        }
       }
 
       // 5. Ground Contact Shadow: Dynamic shift reacting to lean

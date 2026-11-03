@@ -806,9 +806,9 @@
 
   var config = {
     sensitivity: {{ section.settings.sensitivity | default: 28 }},
-    enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
-    enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %},
-    activeMascot: "cat",
+    enableButterfly: {{ section.settings.enable_butterfly | json }},
+    enableSparkles: {{ section.settings.enable_sparkles | json }},
+    activeMascot: "{{ section.settings.mascot_character | default: 'cat' }}",
     catAssets: {
       body: "{{ 'royal-cat-body.png' | asset_url }}",
       head: "{{ 'royal-cat-head.png' | asset_url }}",
@@ -844,6 +844,62 @@
         blue: "{{ 'royal-owl-achkan.png' | asset_url }}",
         green: "{{ 'royal-owl-mojari.png' | asset_url }}",
         red: "{{ 'royal-owl-dupatta.png' | asset_url }}"
+      }
+    }
+  };
+
+  // ==========================================================================
+  // SHARED INTERACTION STATE & SYNCHRONIZATION ENGINE
+  // Coordinates continuous orbital flutter, 3D cursor gaze tracking,
+  // and head-butterfly motion synchronization when stationary.
+  // ==========================================================================
+  var InteractionState = {
+    cursorClientX: window.innerWidth * 0.5,
+    cursorClientY: window.innerHeight * 0.38,
+    cursorSecX: (sectionEl.offsetWidth || window.innerWidth) * 0.5,
+    cursorSecY: (sectionEl.offsetHeight || 740) * 0.36,
+    isHovering: false,
+    lastMoveTime: performance.now(),
+
+    isStationary: false,
+    stationaryPointSecX: (sectionEl.offsetWidth || window.innerWidth) * 0.5,
+    stationaryPointSecY: (sectionEl.offsetHeight || 740) * 0.36,
+    stationaryPointClientX: window.innerWidth * 0.5,
+    stationaryPointClientY: window.innerHeight * 0.38,
+    stationaryStartTime: performance.now(),
+
+    syncWeight: 0,
+
+    butterflySecX: (sectionEl.offsetWidth || window.innerWidth) * 0.35,
+    butterflySecY: (sectionEl.offsetHeight || 740) * 0.32,
+    butterflyClientX: window.innerWidth * 0.45,
+    butterflyClientY: window.innerHeight * 0.35,
+
+    onPointerMove: function(clientX, clientY) {
+      if (!sectionEl) return;
+      var secRect = sectionEl.getBoundingClientRect();
+      this.cursorClientX = clientX;
+      this.cursorClientY = clientY;
+      this.cursorSecX = clientX - secRect.left;
+      this.cursorSecY = clientY - secRect.top;
+      this.isHovering = true;
+      this.isStationary = false;
+      this.lastMoveTime = performance.now();
+    },
+
+    updateStationaryState: function(now) {
+      var idleElapsed = now - this.lastMoveTime;
+      if (idleElapsed > 150) {
+        if (!this.isStationary) {
+          this.isStationary = true;
+          this.stationaryStartTime = now;
+          this.stationaryPointSecX = this.cursorSecX;
+          this.stationaryPointSecY = this.cursorSecY;
+          this.stationaryPointClientX = this.cursorClientX;
+          this.stationaryPointClientY = this.cursorClientY;
+        }
+      } else {
+        this.isStationary = false;
       }
     }
   };
@@ -1195,8 +1251,14 @@
         return;
       }
 
-      // Map to royal owl outfits (Achkan, Dupatta, Mojari, Safa)
-      var outfitUrl = config.owlAssets.outfits[outfitKey] || config.owlAssets.outfits.cream;
+      var outfitUrl = null;
+      if (config.activeMascot === 'cat' && config.catAssets && config.catAssets.outfits) {
+        outfitUrl = config.catAssets.outfits[outfitKey] || config.catAssets.body;
+      } else if (config.activeMascot === 'chipmunk' && config.chipmunkAssets && config.chipmunkAssets.outfits) {
+        outfitUrl = config.chipmunkAssets.outfits[outfitKey] || config.chipmunkAssets.body;
+      } else {
+        outfitUrl = config.owlAssets.outfits[outfitKey] || config.owlAssets.outfits.cream;
+      }
       this.loadTexture(outfitUrl, function(tex) {
         if (self.bodyMesh) {
           self.bodyMesh.material.map = tex;
@@ -1208,64 +1270,29 @@
     setupEventListeners: function() {
       var self = this;
 
-      // Exact Movement Mechanics from the "Chashme" Model:
-      // Cursor Left -> Head & Body turn and lean Left
-      // Cursor Right -> Head & Body turn and lean Right
-      // Cursor Up -> Head tilts Up
-      // Cursor Down -> Head tilts Down
-      function updatePointer(clientX, clientY) {
-        if (!stageEl) return;
-        var rect = stageEl.getBoundingClientRect();
-        var centerX = rect.left + rect.width / 2;
-        var centerY = rect.top + rect.height * 0.40;
-
-        var deltaX = (clientX - centerX) / (window.innerWidth * 0.42);
-        var deltaY = (clientY - centerY) / (window.innerHeight * 0.42);
-
-        // Circular polar coordinate calculation for smooth 360° circular tracking ("moment like circle")
-        var angle = Math.atan2(deltaY, deltaX);
-        var dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        var r = Math.min(1.20, dist);
-
-        var sens = config.sensitivity || 24;
-        var maxPitch = 15;
-
-        // Exact natural direction (left cursor -> left move, right cursor -> right move)
-        self.targetHeadYaw = Math.cos(angle) * (r * sens);
-        self.targetHeadPitch = Math.sin(angle) * (r * maxPitch);
-        self.targetHeadRoll = Math.cos(angle) * (r * 3.8);
-
-        // Natural Torso Anatomical Follow-Through
-        self.targetTorsoYaw = self.targetHeadYaw * 0.32;
-        self.targetTorsoPitch = self.targetHeadPitch * 0.22;
-        self.targetTorsoLean = -self.targetHeadYaw * 0.0018;
-
-        // Weight-shift leaning displacement towards cursor (left on left, right on right)
-        self.targetLeanX = (self.targetHeadYaw / sens) * 0.085;
-
-        self.isCursorActive = true;
-        self.lastMoveTime = performance.now();
+      function handlePointer(clientX, clientY) {
+        InteractionState.onPointerMove(clientX, clientY);
       }
 
       sectionEl.addEventListener("mousemove", function(e) {
-        updatePointer(e.clientX, e.clientY);
+        handlePointer(e.clientX, e.clientY);
       }, { passive: true });
 
       window.addEventListener("mousemove", function(e) {
         if (!sectionEl) return;
         var r = sectionEl.getBoundingClientRect();
         if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
-          updatePointer(e.clientX, e.clientY);
+          handlePointer(e.clientX, e.clientY);
         }
       }, { passive: true });
 
       sectionEl.addEventListener("touchmove", function(e) {
         if (!e.touches || e.touches.length === 0) return;
-        updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+        handlePointer(e.touches[0].clientX, e.touches[0].clientY);
       }, { passive: true });
 
       sectionEl.addEventListener("mouseleave", function() {
-        self.isCursorActive = false;
+        InteractionState.isHovering = false;
       });
 
       window.addEventListener("resize", function() {
@@ -1280,37 +1307,71 @@
 
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
+      if (!this.isReady || !this.characterGroup) return;
 
-      // Autonomous circular gaze patrol following the 3D butterfly when cursor is idle
-      if ((time - this.lastMoveTime > 3000) && ButterflyFollower.el) {
-        var bRect = stageEl.getBoundingClientRect();
-        var sCenterX = bRect.left + bRect.width / 2;
-        var sCenterY = bRect.top + bRect.height * 0.40;
-        var secRect = sectionEl.getBoundingClientRect();
+      var dt = Math.min(0.05, Math.max(0.001, (time - (this.lastFrameTime || time)) * 0.001));
+      this.lastFrameTime = time;
 
-        var bClientX = secRect.left + ButterflyFollower.posX;
-        var bClientY = secRect.top + ButterflyFollower.posY;
+      // Update stationary state
+      InteractionState.updateStationaryState(time);
 
-        var bdx = (bClientX - sCenterX) / (window.innerWidth * 0.42);
-        var bdy = (bClientY - sCenterY) / (window.innerHeight * 0.42);
-
-        var bAngle = Math.atan2(bdy, bdx);
-        var bDist = Math.sqrt(bdx * bdx + bdy * bdy);
-        var br = Math.min(1.0, bDist);
-
-        var sens = config.sensitivity || 24;
-        this.targetHeadYaw = Math.cos(bAngle) * (br * sens * 0.85);
-        this.targetHeadPitch = Math.sin(bAngle) * (br * 12);
-        this.targetHeadRoll = Math.cos(bAngle) * (br * 2.8);
-
-        this.targetTorsoYaw = this.targetHeadYaw * 0.30;
-        this.targetTorsoPitch = this.targetHeadPitch * 0.20;
-        this.targetTorsoLean = -this.targetHeadYaw * 0.0015;
-        this.targetLeanX = (this.targetHeadYaw / sens) * 0.065;
+      // ----------------------------------------------------------------------
+      // SMOOTH SYNCHRONIZATION TRANSITION
+      // When cursor is stationary at a designated point: syncWeight ramps from 0 to 1 over ~350ms
+      // When cursor moves: syncWeight drops quickly from 1 to 0 over ~180ms
+      // ----------------------------------------------------------------------
+      if (InteractionState.isStationary) {
+        InteractionState.syncWeight = Math.min(1.0, InteractionState.syncWeight + dt * 2.85);
+      } else {
+        InteractionState.syncWeight = Math.max(0.0, InteractionState.syncWeight - dt * 5.2);
       }
 
-      // Smooth Organic Spring Lerp (Matching signature chashme damping factor: 0.082)
-      var ease = 0.082;
+      // Smooth cubic Hermite curve for seamless, organic transition
+      var s = InteractionState.syncWeight;
+      var smoothSync = s * s * (3 - 2 * s);
+
+      // Character center of gaze in screen coordinates
+      var sRect = stageEl.getBoundingClientRect();
+      var sCenterX = sRect.left + sRect.width / 2;
+      var sCenterY = sRect.top + sRect.height * 0.40;
+
+      // Target 1: Cursor Position
+      var curDeltaX = (InteractionState.cursorClientX - sCenterX) / (window.innerWidth * 0.42);
+      var curDeltaY = (InteractionState.cursorClientY - sCenterY) / (window.innerHeight * 0.42);
+
+      // Target 2: Live Fluttering Butterfly Position
+      var butDeltaX = (InteractionState.butterflyClientX - sCenterX) / (window.innerWidth * 0.42);
+      var butDeltaY = (InteractionState.butterflyClientY - sCenterY) / (window.innerHeight * 0.42);
+
+      // Blended Target:
+      // While cursor is in motion (smoothSync = 0): Character turns head to follow cursor position with lifelike responsiveness.
+      // While cursor is stationary (smoothSync -> 1): Both butterfly motion and character head movement become SYNCHRONIZED!
+      var effDeltaX = (1.0 - smoothSync) * curDeltaX + smoothSync * butDeltaX;
+      var effDeltaY = (1.0 - smoothSync) * curDeltaY + smoothSync * butDeltaY;
+
+      // Circular polar calculation for smooth 3D tracking
+      var effAngle = Math.atan2(effDeltaY, effDeltaX);
+      var effDist = Math.sqrt(effDeltaX * effDeltaX + effDeltaY * effDeltaY);
+      var effR = Math.min(1.22, effDist);
+
+      var sens = config.sensitivity || 28;
+      var maxPitch = 16;
+
+      // Exact natural direction (left -> head turns left, right -> head turns right, up/down pitch)
+      this.targetHeadYaw = Math.cos(effAngle) * (effR * sens);
+      this.targetHeadPitch = Math.sin(effAngle) * (effR * maxPitch);
+      this.targetHeadRoll = Math.cos(effAngle) * (effR * 3.8);
+
+      // Natural Torso Anatomical Follow-Through
+      this.targetTorsoYaw = this.targetHeadYaw * 0.32;
+      this.targetTorsoPitch = this.targetHeadPitch * 0.22;
+      this.targetTorsoLean = -this.targetHeadYaw * 0.0018;
+
+      // Weight-shift leaning displacement towards target
+      this.targetLeanX = (this.targetHeadYaw / sens) * 0.082;
+
+      // Smooth Spring-Damper Lerp (0.088)
+      var ease = 0.088;
       this.headYaw += (this.targetHeadYaw - this.headYaw) * ease;
       this.headPitch += (this.targetHeadPitch - this.headPitch) * ease;
       this.headRoll += (this.targetHeadRoll - this.headRoll) * ease;
@@ -1324,11 +1385,11 @@
       var breatheY = Math.sin(time * 0.0018) * 0.012;
       var breathePitch = Math.sin(time * 0.0018) * 0.008;
 
-      // 1. Character Group: Grounded Leaning & Weight Shift (Towards cursor)
+      // 1. Character Group: Grounded Leaning & Weight Shift
       this.characterGroup.position.x = this.leanX;
       this.characterGroup.position.y = breatheY;
       this.characterGroup.rotation.z = this.torsoLean;
-      this.characterGroup.rotation.y = 0; // FRONT-FACING ONLY (NO 360 SPIN)
+      this.characterGroup.rotation.y = 0; // Front-facing lock (no 360 spin)
 
       // 2. Torso / Body: True 3D Curved Rotation
       var radTorsoYaw = (this.torsoYaw * Math.PI) / 180;
@@ -1338,24 +1399,24 @@
         this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
       }
 
-      // 3. Dynamic Head Angle Sprite Switching + 3D Gaze Parallax
-      var blinkProgress = (time % 3600) / 3600;
-      this.isBlinking = (blinkProgress > 0.965);
-
-      var activeHeadKey = "headCenter";
-      if (this.isBlinking) {
-        activeHeadKey = "headBlink";
-      } else if (this.headYaw < -13) {
-        activeHeadKey = "headFarLeft";
-      } else if (this.headYaw < -3.5) {
-        activeHeadKey = "headLeft";
-      } else if (this.headYaw > 13) {
-        activeHeadKey = "headFarRight";
-      } else if (this.headYaw > 3.5) {
-        activeHeadKey = "headRight";
-      }
-
+      // 3. Dynamic Head Angle Sprite Switching for Owl (if active)
       if (config.activeMascot === "owl") {
+        var blinkProgress = (time % 3600) / 3600;
+        this.isBlinking = (blinkProgress > 0.965);
+
+        var activeHeadKey = "headCenter";
+        if (this.isBlinking) {
+          activeHeadKey = "headBlink";
+        } else if (this.headYaw < -13) {
+          activeHeadKey = "headFarLeft";
+        } else if (this.headYaw < -3.5) {
+          activeHeadKey = "headLeft";
+        } else if (this.headYaw > 13) {
+          activeHeadKey = "headFarRight";
+        } else if (this.headYaw > 3.5) {
+          activeHeadKey = "headRight";
+        }
+
         if (activeHeadKey !== this.currentHeadKey && this.loadedTextures[config.owlAssets[activeHeadKey]]) {
           this.currentHeadKey = activeHeadKey;
           if (this.headMesh) {
@@ -1365,18 +1426,19 @@
         }
       }
 
+      // 4. Head Group: True 3D Yaw, Pitch, Roll & Natural Gaze Tilt
       var radHeadYaw = (this.headYaw * Math.PI) / 180;
       var radHeadPitch = (this.headPitch * Math.PI) / 180;
       var radHeadRoll = (this.headRoll * Math.PI) / 180;
       if (this.headGroup) {
-        this.headGroup.rotation.y = radHeadYaw * 0.70;
-        this.headGroup.rotation.x = radHeadPitch * 0.85;
+        this.headGroup.rotation.y = radHeadYaw * 0.72;
+        this.headGroup.rotation.x = radHeadPitch * 0.85 + breathePitch * 0.6;
         this.headGroup.rotation.z = radHeadRoll * 0.55;
       }
 
-      // 4. Ground Contact Shadow: Dynamic shift reacting to lean
+      // 5. Ground Contact Shadow: Dynamic shift reacting to lean
       if (this.shadowMesh) {
-        this.shadowMesh.position.x = this.leanX * 0.90;
+        this.shadowMesh.position.x = this.leanX * 0.88;
         this.shadowMesh.scale.x = 1.0 - Math.abs(this.headPitch / 30) * 0.06;
       }
 
@@ -1508,105 +1570,122 @@
     }
   };
 
+  // ==========================================================================
+  // 4. FULL-SECTION 3D ROYAL BUTTERFLY CREATURE
+  // Continuously flutters dynamically around cursor; synchronizes motion
+  // with character head when cursor remains stationary at a designated point.
+  // ==========================================================================
   var ButterflyFollower = {
     el: butterflyEl,
     posX: 0,
     posY: 0,
-    targetX: 0,
-    targetY: 0,
+    vx: 0,
+    vy: 0,
     angle: 0,
-    isHovering: false,
-    lastMoveTime: performance.now(),
+    bank: 0,
+    lastTime: performance.now(),
 
     init: function() {
       if (!this.el || !config.enableButterfly) return;
 
-      var self = this;
-      var w = sectionEl.offsetWidth || window.innerWidth;
-      var h = sectionEl.offsetHeight || 740;
-      this.posX = w * 0.28;
-      this.posY = h * 0.36;
-      this.targetX = this.posX;
-      this.targetY = this.posY;
-
-      function updateTarget(clientX, clientY) {
-        if (!sectionEl) return;
-        var secRect = sectionEl.getBoundingClientRect();
-        self.targetX = clientX - secRect.left;
-        self.targetY = clientY - secRect.top;
-        self.isHovering = true;
-        self.lastMoveTime = performance.now();
-      }
-
-      sectionEl.addEventListener("mousemove", function(e) {
-        updateTarget(e.clientX, e.clientY);
-      }, { passive: true });
-
-      window.addEventListener("mousemove", function(e) {
-        if (!sectionEl) return;
-        var r = sectionEl.getBoundingClientRect();
-        if (e.clientY >= r.top - 80 && e.clientY <= r.bottom + 80) {
-          updateTarget(e.clientX, e.clientY);
-        }
-      }, { passive: true });
-
-      sectionEl.addEventListener("touchmove", function(e) {
-        if (!e.touches || e.touches.length === 0) return;
-        updateTarget(e.touches[0].clientX, e.touches[0].clientY);
-      }, { passive: true });
-
-      sectionEl.addEventListener("mouseleave", function() {
-        self.isHovering = false;
-      });
+      var secW = sectionEl.offsetWidth || window.innerWidth;
+      var secH = sectionEl.offsetHeight || 740;
+      this.posX = secW * 0.35;
+      this.posY = secH * 0.32;
+      this.lastTime = performance.now();
 
       requestAnimationFrame(this.renderLoop.bind(this));
     },
 
     renderLoop: function(time) {
       requestAnimationFrame(this.renderLoop.bind(this));
-
       if (!this.el || !config.enableButterfly) return;
+
+      var dt = Math.min(0.05, Math.max(0.001, (time - this.lastTime) * 0.001));
+      this.lastTime = time;
 
       var secW = sectionEl.offsetWidth || window.innerWidth;
       var secH = sectionEl.offsetHeight || 740;
+      var secRect = sectionEl.getBoundingClientRect();
 
-      // Autonomous circular flight patrol around character when idle
-      if (!this.isHovering || (time - this.lastMoveTime > 3200)) {
-        var t = time * 0.0012;
-        var patrolCenterX = secW * 0.5;
-        var patrolCenterY = secH * 0.36;
-        this.targetX = patrolCenterX + Math.cos(t) * (secW * 0.35);
-        this.targetY = patrolCenterY + Math.sin(t * 2) * (secH * 0.20);
+      // Update stationary state detection
+      InteractionState.updateStationaryState(time);
+
+      var destX, destY;
+
+      if (!InteractionState.isHovering || (time - InteractionState.lastMoveTime > 4500)) {
+        // Broad ambient court flight patrol when inactive for > 4.5s
+        var pt = time * 0.0011;
+        destX = (secW * 0.5) + Math.cos(pt) * (secW * 0.34);
+        destY = (secH * 0.36) + Math.sin(pt * 2) * (secH * 0.18);
+      } else if (InteractionState.isStationary) {
+        // ------------------------------------------------------------------
+        // DESIGNATED STATIONARY POINT: Harmonic figure-8 / flower petal flutter
+        // The butterfly continuously flutters in fluid, natural harmony around
+        // the designated point where the cursor stopped.
+        // ------------------------------------------------------------------
+        var st = (time - InteractionState.stationaryStartTime) * 0.0028;
+        var statR_X = 54;
+        var statR_Y = 40;
+        var hoverFlutterX = Math.sin(st) * statR_X + Math.sin(st * 2.2) * 16;
+        var hoverFlutterY = Math.sin(st * 2.0) * (statR_Y * 0.60) + Math.cos(st * 3.1) * 12;
+        destX = InteractionState.stationaryPointSecX + hoverFlutterX;
+        destY = InteractionState.stationaryPointSecY + hoverFlutterY;
+      } else {
+        // ------------------------------------------------------------------
+        // MOVING CURSOR: Continuously flutters dynamically around the cursor!
+        // Creates a dynamic trailing & orbiting visual effect around cursor
+        // ------------------------------------------------------------------
+        var ot = time * 0.0036;
+        var dynR_X = 42;
+        var dynR_Y = 30;
+        var flutterX = Math.sin(ot) * dynR_X + Math.sin(ot * 2.5) * 14;
+        var flutterY = Math.cos(ot * 1.35) * dynR_Y + Math.cos(ot * 3.2) * 10;
+        destX = InteractionState.cursorSecX + flutterX;
+        destY = InteractionState.cursorSecY + flutterY;
       }
 
-      var dx = this.targetX - this.posX;
-      var dy = this.targetY - this.posY;
+      // Air resistance and smooth pursuit acceleration
+      var dx = destX - this.posX;
+      var dy = destY - this.posY;
       var dist = Math.sqrt(dx * dx + dy * dy);
 
-      var vx = dx * 0.082;
-      var vy = dy * 0.082;
-      this.posX += vx;
-      this.posY += vy;
+      var accel = (dist > 120) ? 0.095 : 0.082;
+      this.vx += (dx * accel - this.vx) * 0.24;
+      this.vy += (dy * accel - this.vy) * 0.24;
+      this.posX += this.vx;
+      this.posY += this.vy;
 
-      // Natural hovering bob
-      var hoverX = Math.sin(time * 0.0035) * 10;
-      var hoverY = Math.cos(time * 0.0042) * 8;
-      var fx = this.posX + hoverX;
-      var fy = this.posY + hoverY;
+      // Natural micro-wing bobbing
+      var wingBobX = Math.cos(time * 0.0052) * 3.2;
+      var wingBobY = Math.sin(time * 0.0068) * 4.2;
+      var finalX = this.posX + wingBobX;
+      var finalY = this.posY + wingBobY;
 
-      // Restrain within full section boundaries
-      fx = Math.max(30, Math.min(secW - 70, fx));
-      fy = Math.max(30, Math.min(secH - 70, fy));
+      // Restrain within section boundaries
+      finalX = Math.max(30, Math.min(secW - 75, finalX));
+      finalY = Math.max(30, Math.min(secH - 75, finalY));
 
-      if (dist > 2) {
-        var targetAngle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+      // Publish live coordinates for ThreeAvatarManager synchronization
+      InteractionState.butterflySecX = finalX;
+      InteractionState.butterflySecY = finalY;
+      InteractionState.butterflyClientX = secRect.left + finalX;
+      InteractionState.butterflyClientY = secRect.top + finalY;
+
+      // Shortest-arc angular interpolation for natural heading orientation
+      if (dist > 3 || Math.abs(this.vx) + Math.abs(this.vy) > 0.8) {
+        var targetAngle = Math.atan2(this.vy, this.vx) * (180 / Math.PI) + 90;
         var diff = (targetAngle - this.angle + 540) % 360 - 180;
-        this.angle += diff * 0.12;
+        this.angle += diff * 0.14;
       }
 
-      var tilt = Math.max(-25, Math.min(25, vx * 1.8));
+      // Dynamic banking tilt into turns
+      var bankTarget = Math.max(-28, Math.min(28, this.vx * 2.2));
+      this.bank += (bankTarget - this.bank) * 0.16;
 
-      if (dist > 40) {
+      // Dynamic wing flapping: Fast-flap when pursuing distance, hover-flap when hovering
+      var currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+      if (dist > 45 || currentSpeed > 3.2) {
         this.el.classList.add("fast-flap");
         this.el.classList.remove("hover-flap");
       } else {
@@ -1614,15 +1693,16 @@
         this.el.classList.add("hover-flap");
       }
 
+      // Render 3D transform of butterfly
       this.el.style.transform =
-        "translate3d(" + (fx - 45).toFixed(1) + "px, " + (fy - 35).toFixed(1) + "px, 0px) " +
+        "translate3d(" + (finalX - 45).toFixed(1) + "px, " + (finalY - 35).toFixed(1) + "px, 0px) " +
         "rotate(" + this.angle.toFixed(1) + "deg) " +
-        "rotateY(" + tilt.toFixed(1) + "deg)";
+        "rotateY(" + this.bank.toFixed(1) + "deg)";
 
-      if (config.enableSparkles && Math.random() < 0.45) {
-        SparkleTrail.addParticle(fx, fy);
+      // Emit fairy stardust sparkles from wings
+      if (config.enableSparkles && Math.random() < 0.48) {
+        SparkleTrail.addParticle(finalX, finalY);
       }
-
       SparkleTrail.updateAndRender();
     }
   };
@@ -1655,6 +1735,17 @@
   "tag": "section",
   "class": "section-royal-mascot",
   "settings": [
+    {
+      "type": "select",
+      "id": "mascot_character",
+      "label": "Mascot Character",
+      "options": [
+        { "value": "cat", "label": "Realistic Royal Cat" },
+        { "value": "chipmunk", "label": "Royal Chipmunk" },
+        { "value": "owl", "label": "Royal Owl" }
+      ],
+      "default": "cat"
+    },
     {
       "type": "color",
       "id": "bg_color",

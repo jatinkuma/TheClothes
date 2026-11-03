@@ -808,7 +808,18 @@
     sensitivity: {{ section.settings.sensitivity | default: 28 }},
     enableButterfly: {% if section.settings.enable_butterfly %}true{% else %}false{% endif %},
     enableSparkles: {% if section.settings.enable_sparkles %}true{% else %}false{% endif %},
-    activeMascot: "chipmunk",
+    activeMascot: "cat",
+    catAssets: {
+      body: "{{ 'royal-cat-body.png' | asset_url }}",
+      head: "{{ 'royal-cat-head.png' | asset_url }}",
+      full: "{{ 'royal-cat-mascot.png' | asset_url }}",
+      outfits: {
+        cream: "{{ 'royal-cat-body.png' | asset_url }}",
+        blue: "{{ 'royal-cat-body.png' | asset_url }}",
+        green: "{{ 'royal-cat-body.png' | asset_url }}",
+        red: "{{ 'royal-cat-body.png' | asset_url }}"
+      }
+    },
     chipmunkAssets: {
       body: "{{ 'chipmunk-body-tex.png' | asset_url }}",
       head: "{{ 'chipmunk-head-tex.png' | asset_url }}",
@@ -956,6 +967,11 @@
         this.textureLoader = new THREE.TextureLoader();
 
         // Preload Royal Chipmunk and owl textures
+        if (config.catAssets) {
+          this.loadTexture(config.catAssets.body);
+          this.loadTexture(config.catAssets.head);
+          this.loadTexture(config.catAssets.full);
+        }
         if (config.chipmunkAssets) {
           this.loadTexture(config.chipmunkAssets.body);
           this.loadTexture(config.chipmunkAssets.head);
@@ -1037,6 +1053,49 @@
     },
 
     buildAvatarRig: function(outfitKey) {
+      if (config.activeMascot === "cat") {
+        var charHeight = 2.40;
+        var charWidth = 2.40;
+        var bodyHeight = charHeight * 0.38;
+        var headHeight = charHeight * 0.72;
+        var neckPivotY = charHeight * 0.33;
+
+        var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 56, 56, 0.16, false);
+        var bodyTex = this.loadTexture(config.catAssets.body);
+        var bodyMat = new THREE.MeshStandardMaterial({
+          map: bodyTex,
+          transparent: true,
+          alphaTest: 0.005,
+          roughness: 0.38,
+          metalness: 0.06,
+          side: THREE.DoubleSide
+        });
+        this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        this.bodyMesh.position.set(0, bodyHeight * 0.5, 0);
+        this.bodyMesh.renderOrder = 2;
+        this.characterGroup.add(this.bodyMesh);
+
+        this.headGroup = new THREE.Group();
+        this.headGroup.position.set(0, neckPivotY, 0.035);
+        this.characterGroup.add(this.headGroup);
+
+        var headGeo = this.createCurvedGeometry(charWidth, headHeight, 56, 56, 0.24, true);
+        var headTex = this.loadTexture(config.catAssets.head);
+        var headMat = new THREE.MeshStandardMaterial({
+          map: headTex,
+          transparent: true,
+          alphaTest: 0.005,
+          roughness: 0.38,
+          metalness: 0.08,
+          side: THREE.DoubleSide
+        });
+        this.headMesh = new THREE.Mesh(headGeo, headMat);
+        this.headMesh.position.set(0, (headHeight * 0.5) - 0.06, 0);
+        this.headMesh.renderOrder = 3;
+        this.headGroup.add(this.headMesh);
+        return;
+      }
+
       if (config.activeMascot === "chipmunk") {
         // Proportions matching the Royal Chipmunk mascot from user image (301w x 411h)
         var charHeight = 2.40;

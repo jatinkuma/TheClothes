@@ -1082,6 +1082,13 @@
                 else if (name.indexOf("eye.r") !== -1 || name === "eye_r") self.eyeRightBone = node;
               }
               if (node.isMesh) {
+                if (node.material) {
+                  node.material.transparent = true;
+                  node.material.alphaTest = 0.05;
+                  node.material.side = THREE.DoubleSide;
+                  node.material.depthWrite = true;
+                  node.material.needsUpdate = true;
+                }
                 node.castShadow = true;
                 node.receiveShadow = true;
               }

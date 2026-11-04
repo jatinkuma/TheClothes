@@ -1,0 +1,1292 @@
+{% comment %}
+  ==============================================================================
+  CLOTHESLINE HANGING PRODUCT SLIDER
+  ------------------------------------------------------------------------------
+  A realistic clothesline hanging product slider for Shopify.
+  
+  Key Features:
+  - Continuous horizontal clothesline rope spanning the entire section width
+  - Realistic wooden clothespins (pegs) clamping each product to the rope
+  - Zero card containers, zero white card boxes — products hang freely in air
+  - Subtle independent swinging breeze animations per garment
+  - Neighboring products partially visible at slider edges (peek composition)
+  - Smooth horizontal carousel movement (touch swipe, drag, arrows, keyboard)
+  - Minimal floating typography below garments without any container background
+  - Fallback demonstration regalia when no collection is assigned
+  ==============================================================================
+{% endcomment %}
+
+{% liquid
+  assign section_id = section.id
+  assign collection = section.settings.collection
+  assign products_limit = section.settings.products_to_show | default: 8
+  assign show_pegs = section.settings.show_pegs
+  assign enable_sway = section.settings.enable_breeze_sway
+  assign blend_mode = section.settings.blend_mode | default: 'multiply'
+%}
+
+<div
+  id="clothesline-slider-{{ section_id }}"
+  class="clothesline-slider-section{% if enable_sway %} clothesline-sway-active{% endif %}"
+  style="
+    --cls-bg: {{ section.settings.bg_color | default: '#FAF7F2' }};
+    --cls-text: {{ section.settings.text_color | default: '#1F1A16' }};
+    --cls-price: {{ section.settings.price_color | default: '#845A25' }};
+    --cls-rope-color: {{ section.settings.rope_color | default: '#9E703B' }};
+    --cls-cols-desktop: {{ section.settings.desktop_columns | default: 4 }};
+    --cls-cols-mobile: {{ section.settings.mobile_columns | default: '1.35' }};
+    --cls-gap: {{ section.settings.gap | default: 36 }}px;
+    --cls-pt: {{ section.settings.padding_top | default: 60 }}px;
+    --cls-pb: {{ section.settings.padding_bottom | default: 80 }}px;
+    --cls-blend: {{ blend_mode }};
+  "
+>
+  <!-- Background Ambient Tint & Sunlight Glow -->
+  <div class="clothesline-bg-glow" aria-hidden="true"></div>
+
+  <!-- Section Header -->
+  {% if section.settings.heading != blank or section.settings.subheading != blank or section.settings.description != blank %}
+    <header class="clothesline-header text-{{ section.settings.header_alignment | default: 'center' }}">
+      <div class="clothesline-header-inner">
+        {% if section.settings.subheading != blank %}
+          <span class="clothesline-badge">{{ section.settings.subheading }}</span>
+        {% endif %}
+        {% if section.settings.heading != blank %}
+          <h2 class="clothesline-title">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.description != blank %}
+          <p class="clothesline-description">{{ section.settings.description }}</p>
+        {% endif %}
+      </div>
+    </header>
+  {% endif %}
+
+  <!-- Clothesline Stage Container -->
+  <div class="clothesline-stage" data-stage>
+    
+    <!-- Rustic Left & Right Mounting Anchors / Hooks -->
+    <div class="clothesline-post post-left" aria-hidden="true">
+      <div class="post-bracket"></div>
+      <div class="post-eyelet"></div>
+      <div class="post-knot"></div>
+    </div>
+    <div class="clothesline-post post-right" aria-hidden="true">
+      <div class="post-bracket"></div>
+      <div class="post-eyelet"></div>
+      <div class="post-knot"></div>
+    </div>
+
+    <!-- Continuous Horizontal Clothesline Rope -->
+    <div class="clothesline-rope-line" aria-hidden="true">
+      <div class="rope-strand"></div>
+      <div class="rope-ambient-shadow"></div>
+    </div>
+
+    <!-- Carousel Viewport & Scroll Track -->
+    <div
+      class="clothesline-viewport"
+      data-viewport
+      tabindex="0"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="{{ section.settings.heading | default: 'Clothesline Products' }}"
+    >
+      <ul class="clothesline-track" data-track>
+        {% assign item_counter = 0 %}
+
+        {% if section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% assign item_counter = item_counter | plus: 1 %}
+            {% case block.type %}
+              {% when 'product' %}
+                {% assign b_product = block.settings.product %}
+                {% if b_product != blank %}
+                  {% render 'clothesline-item-markup',
+                    product: b_product,
+                    show_pegs: show_pegs,
+                    enable_sway: enable_sway,
+                    section: section,
+                    index: forloop.index0,
+                    block: block
+                  %}
+                {% endif %}
+              {% when 'custom_item' %}
+                <li
+                  class="clothesline-slide"
+                  data-slide
+                  style="--item-index: {{ forloop.index0 }};"
+                  {{ block.shopify_attributes }}
+                >
+                  <div class="hanging-unit sway-variant-{{ forloop.index | modulo: 4 }}">
+                    {% if show_pegs %}
+                      <div class="peg-anchor peg-left" aria-hidden="true">
+                        {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+                      </div>
+                      <div class="peg-anchor peg-right" aria-hidden="true">
+                        {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+                      </div>
+                    {% endif %}
+
+                    {% if block.settings.link != blank %}
+                      <a href="{{ block.settings.link }}" class="hanging-product-link">
+                    {% else %}
+                      <div class="hanging-product-link">
+                    {% endif %}
+                      <div class="hanging-media-wrapper">
+                        {% if block.settings.image != blank %}
+                          <img
+                            src="{{ block.settings.image | image_url: width: 700 }}"
+                            alt="{{ block.settings.title | escape }}"
+                            class="hanging-garment-image"
+                            loading="lazy"
+                          >
+                        {% else %}
+                          {{ 'product-1' | placeholder_svg_tag: 'hanging-placeholder-svg' }}
+                        {% endif %}
+                      </div>
+                    {% if block.settings.link != blank %}
+                      </a>
+                    {% else %}
+                      </div>
+                    {% endif %}
+
+                    <div class="hanging-typography">
+                      {% if block.settings.title != blank %}
+                        <h3 class="hanging-title">{{ block.settings.title }}</h3>
+                      {% endif %}
+                      {% if block.settings.price != blank %}
+                        <div class="hanging-price-wrap">
+                          <span class="hanging-price">{{ block.settings.price }}</span>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </li>
+            {% endcase %}
+          {% endfor %}
+
+        {% elsif collection != blank and collection.products_count > 0 %}
+          {% for product in collection.products limit: products_limit %}
+            {% assign item_counter = item_counter | plus: 1 %}
+            <li
+              class="clothesline-slide"
+              data-slide
+              style="--item-index: {{ forloop.index0 }};"
+            >
+              <div class="hanging-unit sway-variant-{{ forloop.index | modulo: 4 }}">
+                {% if show_pegs %}
+                  <div class="peg-anchor peg-left" aria-hidden="true">
+                    {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+                  </div>
+                  <div class="peg-anchor peg-right" aria-hidden="true">
+                    {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+                  </div>
+                {% endif %}
+
+                <a href="{{ product.url }}" class="hanging-product-link" aria-label="{{ product.title | escape }}">
+                  <div class="hanging-media-wrapper">
+                    {% if product.featured_image != blank %}
+                      <img
+                        src="{{ product.featured_image | image_url: width: 700 }}"
+                        alt="{{ product.title | escape }}"
+                        class="hanging-garment-image"
+                        loading="lazy"
+                      >
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'hanging-placeholder-svg' }}
+                    {% endif %}
+                  </div>
+                </a>
+
+                <div class="hanging-typography">
+                  {% if section.settings.show_vendor and product.vendor != blank %}
+                    <span class="hanging-vendor">{{ product.vendor }}</span>
+                  {% endif %}
+
+                  {% if section.settings.show_title %}
+                    <h3 class="hanging-title">
+                      <a href="{{ product.url }}">{{ product.title }}</a>
+                    </h3>
+                  {% endif %}
+
+                  {% if section.settings.show_price %}
+                    <div class="hanging-price-wrap">
+                      <span class="hanging-price">{{ product.price | money }}</span>
+                      {% if product.compare_at_price > product.price %}
+                        <s class="hanging-compare-price">{{ product.compare_at_price | money }}</s>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+
+                  {% if section.settings.show_quick_buy %}
+                    <a href="{{ product.url }}" class="hanging-action-link">
+                      {{ section.settings.quick_buy_text | default: 'Explore Piece' }}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+
+        {% else %}
+          {% comment %}
+            FALLBACK ONBOARDING SHOWCASE:
+            High-fashion artisanal court regalia displayed when no collection is connected.
+          {% endcomment %}
+          {% assign demo_items = "Imperial Cream & Gold Sherwani:Rs. 48,000:royal-product-sherwani-cream.jpg|Sapphire Blue Jodhpuri:Rs. 52,000:royal-product-sherwani-blue.jpg|Heritage Emerald Silk Sherwani:Rs. 50,000:royal-product-sherwani-green.jpg|Ruby Red Ceremonial Sherwani:Rs. 54,000:royal-product-sherwani-red.jpg|Maharaja Royal Embroidered Safa:Rs. 18,500:royal-product-safa.jpg|Handcrafted Zardozi Mojari:Rs. 14,000:royal-product-mojari.jpg" | split: "|" %}
+          
+          {% for item in demo_items %}
+            {% assign parts = item | split: ":" %}
+            {% assign d_title = parts[0] %}
+            {% assign d_price = parts[1] %}
+            {% assign d_asset = parts[2] %}
+            
+            <li
+              class="clothesline-slide"
+              data-slide
+              style="--item-index: {{ forloop.index0 }};"
+            >
+              <div class="hanging-unit sway-variant-{{ forloop.index | modulo: 4 }}">
+                {% if show_pegs %}
+                  <div class="peg-anchor peg-left" aria-hidden="true">
+                    {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+                  </div>
+                  <div class="peg-anchor peg-right" aria-hidden="true">
+                    {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+                  </div>
+                {% endif %}
+
+                <div class="hanging-product-link">
+                  <div class="hanging-media-wrapper">
+                    <img
+                      src="{{ d_asset | asset_url }}"
+                      alt="{{ d_title | escape }}"
+                      class="hanging-garment-image"
+                      loading="lazy"
+                    >
+                  </div>
+                </div>
+
+                <div class="hanging-typography">
+                  {% if section.settings.show_vendor %}
+                    <span class="hanging-vendor">ROYAL ATELIER</span>
+                  {% endif %}
+
+                  {% if section.settings.show_title %}
+                    <h3 class="hanging-title">{{ d_title }}</h3>
+                  {% endif %}
+
+                  {% if section.settings.show_price %}
+                    <div class="hanging-price-wrap">
+                      <span class="hanging-price">{{ d_price }}</span>
+                    </div>
+                  {% endif %}
+
+                  {% if section.settings.show_quick_buy %}
+                    <span class="hanging-action-link">
+                      {{ section.settings.quick_buy_text | default: 'Explore Piece' }}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Navigation Arrows -->
+    {% if section.settings.show_arrows %}
+      <button
+        type="button"
+        class="clothesline-nav-btn nav-prev"
+        data-prev
+        aria-label="Previous hanging products"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="clothesline-nav-btn nav-next"
+        data-next
+        aria-label="Next hanging products"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Progress Bar (Artisanal Clothesline Wire Indicator) -->
+  {% if section.settings.show_progress_bar %}
+    <div class="clothesline-progress-container" aria-hidden="true">
+      <div class="clothesline-progress-track">
+        <div class="clothesline-progress-bead" data-progress-bead></div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% comment %}
+  ==============================================================================
+  EMBEDDED STYLES: Realistic Clothesline, Wooden Clothespins, Breeze Sway & Carousel
+  ==============================================================================
+{% endcomment %}
+<style>
+  /* 1. Base Section Container */
+  .clothesline-slider-section {
+    position: relative;
+    width: 100%;
+    background-color: var(--cls-bg);
+    color: var(--cls-text);
+    padding-top: var(--cls-pt);
+    padding-bottom: var(--cls-pb);
+    overflow: hidden;
+    font-family: inherit;
+  }
+
+  .clothesline-bg-glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1200px;
+    height: 480px;
+    background: radial-gradient(ellipse at 50% 15%, rgba(255, 238, 205, 0.45) 0%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 2. Header */
+  .clothesline-header {
+    position: relative;
+    z-index: 3;
+    max-width: 820px;
+    margin: 0 auto 36px auto;
+    padding: 0 24px;
+  }
+  .clothesline-header.text-left { text-align: left; margin-left: max(24px, 5vw); margin-right: auto; }
+  .clothesline-header.text-center { text-align: center; }
+  .clothesline-header.text-right { text-align: right; margin-right: max(24px, 5vw); margin-left: auto; }
+
+  .clothesline-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cls-price);
+    background: rgba(160, 112, 59, 0.10);
+    border: 1px solid rgba(160, 112, 59, 0.22);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+
+  .clothesline-title {
+    font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.18;
+    color: var(--cls-text);
+    margin: 0 0 10px 0;
+  }
+
+  .clothesline-description {
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--cls-text);
+    opacity: 0.78;
+    margin: 0;
+  }
+
+  /* 3. Clothesline Stage */
+  .clothesline-stage {
+    position: relative;
+    width: 100%;
+    z-index: 3;
+    padding-top: 18px;
+    padding-bottom: 24px;
+  }
+
+  /* Continuous Clothesline Rope Cord */
+  .clothesline-rope-line {
+    position: absolute;
+    top: 52px; /* Exact height where clothespin jaws bite */
+    left: -60px;
+    right: -60px;
+    height: 7px;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .rope-strand {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: repeating-linear-gradient(
+      -52deg,
+      #7b4d1f 0px,
+      #7b4d1f 3px,
+      #a8753b 3px,
+      #dfba86 5px,
+      #b38148 7px,
+      #6c4217 8px
+    );
+    border-radius: 3px;
+    box-shadow: 
+      0 3px 6px rgba(45, 25, 10, 0.32),
+      0 1px 2px rgba(0, 0, 0, 0.20),
+      inset 0 1px 1px rgba(255, 255, 255, 0.40),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.35);
+  }
+
+  .rope-ambient-shadow {
+    position: absolute;
+    top: 7px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(180deg, rgba(30, 15, 5, 0.16) 0%, rgba(30, 15, 5, 0) 100%);
+    filter: blur(1.5px);
+  }
+
+  /* Rustic Mounting Posts */
+  .clothesline-post {
+    position: absolute;
+    top: 34px;
+    width: 36px;
+    height: 44px;
+    z-index: 7;
+    pointer-events: none;
+  }
+  .clothesline-post.post-left {
+    left: 0;
+  }
+  .clothesline-post.post-right {
+    right: 0;
+    transform: scaleX(-1);
+  }
+  .post-bracket {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    width: 18px;
+    height: 28px;
+    background: linear-gradient(90deg, #3a2a1a 0%, #6e4e30 60%, #4a3420 100%);
+    border-radius: 0 4px 4px 0;
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.35);
+  }
+  .post-eyelet {
+    position: absolute;
+    top: 14px;
+    left: 12px;
+    width: 14px;
+    height: 14px;
+    border: 3px solid #b38855;
+    border-radius: 50%;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.25);
+  }
+  .post-knot {
+    position: absolute;
+    top: 16px;
+    left: 18px;
+    width: 16px;
+    height: 10px;
+    background: #875c2e;
+    border-radius: 5px;
+    box-shadow: 1px 2px 3px rgba(0,0,0,0.3);
+  }
+
+  /* 4. Carousel Viewport & Track */
+  .clothesline-viewport {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Hide default scrollbar */
+    padding-left: max(24px, 5vw);
+    padding-right: max(24px, 5vw);
+    cursor: grab;
+    user-select: none;
+  }
+  .clothesline-viewport::-webkit-scrollbar {
+    display: none;
+  }
+  .clothesline-viewport:active {
+    cursor: grabbing;
+  }
+
+  .clothesline-track {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--cls-gap);
+    width: max-content;
+  }
+
+  /* 5. Each Hanging Product Slide */
+  .clothesline-slide {
+    position: relative;
+    flex: 0 0 calc((100vw - (max(24px, 5vw) * 2) - (var(--cls-gap) * (var(--cls-cols-desktop) - 1))) / var(--cls-cols-desktop));
+    min-width: 240px;
+    max-width: 380px;
+    scroll-snap-align: center;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .clothesline-slide {
+      flex: 0 0 calc((100vw - (max(20px, 4vw) * 2) - (var(--cls-gap) * 2)) / 3);
+      min-width: 220px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .clothesline-slide {
+      flex: 0 0 calc((100vw - 48px) / var(--cls-cols-mobile));
+      min-width: 200px;
+    }
+    .clothesline-rope-line {
+      top: 48px;
+    }
+  }
+
+  /* 6. Hanging Unit & Breeze Sway Physics */
+  .hanging-unit {
+    position: relative;
+    width: 100%;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform-origin: 50% 52px; /* Hangs from the rope! */
+    will-change: transform;
+    transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.0);
+  }
+
+  /* Independent Organic Sway Cycles */
+  .clothesline-sway-active .hanging-unit.sway-variant-0 {
+    animation: clothesline-sway-0 4.8s ease-in-out infinite;
+    animation-delay: -0.4s;
+  }
+  .clothesline-sway-active .hanging-unit.sway-variant-1 {
+    animation: clothesline-sway-1 5.4s ease-in-out infinite;
+    animation-delay: -2.1s;
+  }
+  .clothesline-sway-active .hanging-unit.sway-variant-2 {
+    animation: clothesline-sway-2 4.2s ease-in-out infinite;
+    animation-delay: -3.6s;
+  }
+  .clothesline-sway-active .hanging-unit.sway-variant-3 {
+    animation: clothesline-sway-3 5.9s ease-in-out infinite;
+    animation-delay: -1.2s;
+  }
+
+  @keyframes clothesline-sway-0 {
+    0%, 100% { transform: rotate(-1.5deg) translateX(-1px); }
+    50% { transform: rotate(1.7deg) translateX(1.5px); }
+  }
+  @keyframes clothesline-sway-1 {
+    0%, 100% { transform: rotate(1.8deg) translateX(1.2px); }
+    50% { transform: rotate(-1.6deg) translateX(-1.4px); }
+  }
+  @keyframes clothesline-sway-2 {
+    0%, 100% { transform: rotate(-1.3deg) translateX(-0.8px); }
+    50% { transform: rotate(1.4deg) translateX(1px); }
+  }
+  @keyframes clothesline-sway-3 {
+    0%, 100% { transform: rotate(2.0deg) translateX(1.6px); }
+    50% { transform: rotate(-1.7deg) translateX(-1.2px); }
+  }
+
+  /* Interactive Hover Sway Reactivity */
+  .hanging-unit:hover {
+    animation-play-state: paused !important;
+    transform: rotate(2.6deg) translateY(-2px) scale(1.02);
+  }
+
+  /* 7. Clothespins (Wooden Pegs) */
+  .peg-anchor {
+    position: absolute;
+    top: 24px; /* Clamps directly over the rope at y=52px */
+    width: 20px;
+    height: 56px;
+    z-index: 10;
+    pointer-events: none;
+    transform-origin: 50% 28px;
+    filter: drop-shadow(2px 4px 4px rgba(25, 12, 0, 0.38));
+  }
+  .peg-anchor.peg-left {
+    left: 22%;
+  }
+  .peg-anchor.peg-right {
+    right: 22%;
+  }
+
+  .peg-svg-render {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 8. Garment Presentation (NO CARD, NO BOX) */
+  .hanging-product-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  .hanging-media-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 32px; /* Garment hangs below the rope */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hanging-garment-image {
+    display: block;
+    width: 100%;
+    height: 380px;
+    max-height: 420px;
+    object-fit: contain;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    mix-blend-mode: var(--cls-blend);
+    /* Soft ambient drop shadow simulating hanging in real 3D air */
+    filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.12));
+    transition: transform 0.4s ease, filter 0.4s ease;
+  }
+
+  @media (max-width: 768px) {
+    .hanging-garment-image {
+      height: 300px;
+      max-height: 320px;
+    }
+  }
+
+  .hanging-unit:hover .hanging-garment-image {
+    filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.18));
+  }
+
+  .hanging-placeholder-svg {
+    width: 100%;
+    height: 340px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 8px;
+  }
+
+  /* 9. Minimal Floating Typography Below (NO Card Container) */
+  .hanging-typography {
+    margin-top: 18px;
+    text-align: center;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 8px;
+  }
+
+  .hanging-vendor {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cls-price);
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+
+  .hanging-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.015em;
+    color: var(--cls-text);
+    margin: 0 0 6px 0;
+  }
+  .hanging-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .hanging-title a:hover {
+    color: var(--cls-price);
+  }
+
+  .hanging-price-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .hanging-price {
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--cls-price);
+  }
+
+  .hanging-compare-price {
+    font-size: 0.88rem;
+    color: var(--cls-text);
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+
+  .hanging-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--cls-text);
+    text-decoration: none;
+    opacity: 0.75;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .hanging-action-link:hover {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+
+  /* 10. Navigation Arrows */
+  .clothesline-nav-btn {
+    position: absolute;
+    top: 48%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(160, 112, 59, 0.25);
+    color: var(--cls-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(40, 20, 5, 0.12);
+    z-index: 12;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .clothesline-nav-btn:hover {
+    background: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 6px 18px rgba(40, 20, 5, 0.20);
+    color: var(--cls-price);
+  }
+  .clothesline-nav-btn.nav-prev {
+    left: max(12px, 2vw);
+  }
+  .clothesline-nav-btn.nav-next {
+    right: max(12px, 2vw);
+  }
+  @media (max-width: 768px) {
+    .clothesline-nav-btn {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  /* 11. Clothesline Progress Track */
+  .clothesline-progress-container {
+    width: min(280px, 80%);
+    margin: 28px auto 0 auto;
+    position: relative;
+    z-index: 3;
+  }
+  .clothesline-progress-track {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(160, 112, 59, 0.22);
+    border-radius: 2px;
+  }
+  .clothesline-progress-bead {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: var(--cls-price);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    transition: left 0.12s linear;
+  }
+</style>
+
+{% comment %}
+  ==============================================================================
+  CLIENT-SIDE SLIDER INTERACTIVITY (Touch Swipe, Drag & Scroll Physics)
+  ==============================================================================
+{% endcomment %}
+<script>
+  (function() {
+    function initClotheslineSlider(sectionId) {
+      var root = document.getElementById("clothesline-slider-" + sectionId);
+      if (!root) return;
+
+      var viewport = root.querySelector("[data-viewport]");
+      var track = root.querySelector("[data-track]");
+      var prevBtn = root.querySelector("[data-prev]");
+      var nextBtn = root.querySelector("[data-next]");
+      var progressBead = root.querySelector("[data-progress-bead]");
+
+      if (!viewport || !track) return;
+
+      var isDown = false;
+      var startX = 0;
+      var scrollLeft = 0;
+      var isDragging = false;
+
+      // Mouse Drag-to-Scroll
+      viewport.addEventListener("mousedown", function(e) {
+        isDown = true;
+        isDragging = false;
+        startX = e.pageX - viewport.offsetLeft;
+        scrollLeft = viewport.scrollLeft;
+        viewport.style.scrollBehavior = "auto";
+      });
+
+      window.addEventListener("mouseup", function() {
+        if (!isDown) return;
+        isDown = false;
+        viewport.style.scrollBehavior = "smooth";
+        setTimeout(function() { isDragging = false; }, 50);
+      });
+
+      viewport.addEventListener("mousemove", function(e) {
+        if (!isDown) return;
+        e.preventDefault();
+        var x = e.pageX - viewport.offsetLeft;
+        var walk = (x - startX) * 1.35;
+        if (Math.abs(walk) > 5) isDragging = true;
+        viewport.scrollLeft = scrollLeft - walk;
+        updateProgress();
+      });
+
+      // Prevent accidental link clicks when dragging
+      viewport.addEventListener("click", function(e) {
+        if (isDragging) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      // Button Navigation
+      function getScrollStep() {
+        var firstSlide = track.querySelector(".clothesline-slide");
+        if (firstSlide) {
+          return firstSlide.offsetWidth + 36;
+        }
+        return viewport.clientWidth * 0.75;
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", function() {
+          viewport.scrollBy({ left: -getScrollStep(), behavior: "smooth" });
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", function() {
+          viewport.scrollBy({ left: getScrollStep(), behavior: "smooth" });
+        });
+      }
+
+      // Progress Bead Tracking
+      function updateProgress() {
+        if (!progressBead) return;
+        var maxScroll = viewport.scrollWidth - viewport.clientWidth;
+        if (maxScroll <= 0) {
+          progressBead.style.left = "0%";
+          return;
+        }
+        var progress = Math.min(1.0, Math.max(0.0, viewport.scrollLeft / maxScroll));
+        progressBead.style.left = (progress * 100) + "%";
+      }
+
+      viewport.addEventListener("scroll", updateProgress, { passive: true });
+      window.addEventListener("resize", updateProgress, { passive: true });
+      updateProgress();
+
+      // Keyboard Accessibility
+      viewport.addEventListener("keydown", function(e) {
+        if (e.key === "ArrowLeft") {
+          viewport.scrollBy({ left: -getScrollStep(), behavior: "smooth" });
+        } else if (e.key === "ArrowRight") {
+          viewport.scrollBy({ left: getScrollStep(), behavior: "smooth" });
+        }
+      });
+
+      // Optional Autoplay
+      {% if section.settings.autoplay %}
+        var autoInterval = ({{ section.settings.autoplay_speed | default: 5 }}) * 1000;
+        var autoTimer = null;
+
+        function startAutoplay() {
+          if (autoTimer) clearInterval(autoTimer);
+          autoTimer = setInterval(function() {
+            var maxScroll = viewport.scrollWidth - viewport.clientWidth;
+            if (viewport.scrollLeft >= maxScroll - 10) {
+              viewport.scrollTo({ left: 0, behavior: "smooth" });
+            } else {
+              viewport.scrollBy({ left: getScrollStep(), behavior: "smooth" });
+            }
+          }, autoInterval);
+        }
+
+        function stopAutoplay() {
+          if (autoTimer) clearInterval(autoTimer);
+        }
+
+        root.addEventListener("mouseenter", stopAutoplay);
+        root.addEventListener("mouseleave", startAutoplay);
+        root.addEventListener("touchstart", stopAutoplay, { passive: true });
+        startAutoplay();
+      {% endif %}
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() {
+        initClotheslineSlider("{{ section_id }}");
+      });
+    } else {
+      initClotheslineSlider("{{ section_id }}");
+    }
+
+    // Support Shopify Theme Editor live events
+    document.addEventListener("shopify:section:load", function(e) {
+      if (e.detail && e.detail.sectionId === "{{ section_id }}") {
+        initClotheslineSlider("{{ section_id }}");
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Clothesline Hanging Slider",
+  "tag": "section",
+  "class": "clothesline-hanging-slider-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading / Badge",
+      "default": "ARTISANAL HANGING ATELIER"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Fresh On The Clothesline"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Handcrafted court regalia hanging freely on our artisanal line. Swipe or drag to explore each piece in the breeze."
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Header Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Products & Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Leave empty to display curated demonstration regalia or add individual custom blocks below."
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 8,
+      "label": "Maximum products to show"
+    },
+    {
+      "type": "header",
+      "content": "Clothesline & Wooden Pegs"
+    },
+    {
+      "type": "color",
+      "id": "rope_color",
+      "label": "Clothesline Rope Color",
+      "default": "#9E703B"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_pegs",
+      "label": "Show Wooden Clothespins (Pegs)",
+      "default": true,
+      "info": "Attaches realistic wooden clothespins clamping each piece to the rope."
+    },
+    {
+      "type": "select",
+      "id": "peg_style",
+      "label": "Clothespin Style",
+      "options": [
+        { "value": "natural_wood", "label": "Natural Pine Wood" },
+        { "value": "dark_wood", "label": "Dark Walnut Wood" },
+        { "value": "brass_clip", "label": "Vintage Brass Wire" }
+      ],
+      "default": "natural_wood"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_breeze_sway",
+      "label": "Enable Breeze Sway Physics",
+      "default": true,
+      "info": "Adds subtle independent pendulum swinging animations to each hanging product."
+    },
+    {
+      "type": "select",
+      "id": "blend_mode",
+      "label": "Product Image Blend Mode",
+      "options": [
+        { "value": "multiply", "label": "Multiply (Recommended for white background photos)" },
+        { "value": "normal", "label": "Normal (Best for transparent PNG cutouts)" }
+      ],
+      "default": "multiply"
+    },
+    {
+      "type": "header",
+      "content": "Slider & Peek Controls"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4,
+      "label": "Visible products on desktop"
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Visible products on mobile",
+      "options": [
+        { "value": "1.2", "label": "1.2 (Large peek)" },
+        { "value": "1.35", "label": "1.35 (Recommended balanced peek)" },
+        { "value": "1.6", "label": "1.6 (Compact peek)" },
+        { "value": "2.0", "label": "2 Full products" }
+      ],
+      "default": "1.35"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 16,
+      "max": 64,
+      "step": 4,
+      "default": 36,
+      "unit": "px",
+      "label": "Natural spacing between garments"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Navigation Arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "Show Progress Wire Indicator",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable Autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5,
+      "unit": "s",
+      "label": "Autoplay interval"
+    },
+    {
+      "type": "header",
+      "content": "Floating Product Details"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show Product Title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show Price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show Vendor",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_buy",
+      "label": "Show Action Link (View Piece)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "quick_buy_text",
+      "label": "Action Link Label",
+      "default": "Explore Piece"
+    },
+    {
+      "type": "header",
+      "content": "Color Scheme & Section Padding"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAF7F2"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1F1A16"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price Color",
+      "default": "#845A25"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "default": 60,
+      "unit": "px",
+      "label": "Padding Top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "default": 80,
+      "unit": "px",
+      "label": "Padding Bottom"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Specific Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        }
+      ]
+    },
+    {
+      "type": "custom_item",
+      "name": "Custom Hanging Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Garment Cutout / Photo"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Item Title",
+          "default": "Handcrafted Silk Kurta"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Item Price",
+          "default": "Rs. 24,000"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Item Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Clothesline Hanging Slider",
+      "category": "Products"
+    }
+  ]
+}
+{% endschema %}

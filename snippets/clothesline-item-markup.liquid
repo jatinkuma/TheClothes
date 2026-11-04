@@ -1,0 +1,73 @@
+{% comment %}
+  Individual Clothesline Hanging Product Slide Markup
+  Usage:
+  {% render 'clothesline-item-markup',
+    product: product,
+    show_pegs: show_pegs,
+    enable_sway: enable_sway,
+    section: section,
+    index: forloop.index0,
+    block: block
+  %}
+{% endcomment %}
+
+<li
+  class="clothesline-slide"
+  data-slide
+  style="--item-index: {{ index | default: 0 }};"
+  {% if block %}{{ block.shopify_attributes }}{% endif %}
+>
+  <div class="hanging-unit sway-variant-{{ index | modulo: 4 }}">
+    {% if show_pegs %}
+      <div class="peg-anchor peg-left" aria-hidden="true">
+        {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+      </div>
+      <div class="peg-anchor peg-right" aria-hidden="true">
+        {% render 'clothesline-peg-svg', style: section.settings.peg_style %}
+      </div>
+    {% endif %}
+
+    <a href="{{ product.url }}" class="hanging-product-link" aria-label="{{ product.title | escape }}">
+      <div class="hanging-media-wrapper">
+        {% if product.featured_image != blank %}
+          <img
+            src="{{ product.featured_image | image_url: width: 700 }}"
+            alt="{{ product.title | escape }}"
+            class="hanging-garment-image"
+            loading="lazy"
+          >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag: 'hanging-placeholder-svg' }}
+        {% endif %}
+      </div>
+    </a>
+
+    <div class="hanging-typography">
+      {% if section.settings.show_vendor and product.vendor != blank %}
+        <span class="hanging-vendor">{{ product.vendor }}</span>
+      {% endif %}
+
+      {% if section.settings.show_title %}
+        <h3 class="hanging-title">
+          <a href="{{ product.url }}">{{ product.title }}</a>
+        </h3>
+      {% endif %}
+
+      {% if section.settings.show_price %}
+        <div class="hanging-price-wrap">
+          <span class="hanging-price">{{ product.price | money }}</span>
+          {% if product.compare_at_price > product.price %}
+            <s class="hanging-compare-price">{{ product.compare_at_price | money }}</s>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_quick_buy %}
+        <a href="{{ product.url }}" class="hanging-action-link">
+          {{ section.settings.quick_buy_text | default: 'Explore Piece' }}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</li>

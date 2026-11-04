@@ -1,0 +1,72 @@
+{% comment %}
+  Realistic Wooden Clothespin SVG Snippet
+  Usage: {% render 'clothesline-peg-svg', style: 'natural_wood' %}
+{% endcomment %}
+
+{% assign peg_style = style | default: 'natural_wood' %}
+
+<svg class="peg-svg-render" viewBox="0 0 24 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    {% case peg_style %}
+      {% when 'dark_wood' %}
+        <linearGradient id="pegWoodGrad-{{ peg_style }}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#6a452a"/>
+          <stop offset="35%" stop-color="#4d301c"/>
+          <stop offset="70%" stop-color="#382112"/>
+          <stop offset="100%" stop-color="#24140a"/>
+        </linearGradient>
+      {% when 'brass_clip' %}
+        <linearGradient id="pegWoodGrad-{{ peg_style }}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f5d77f"/>
+          <stop offset="35%" stop-color="#d4af37"/>
+          <stop offset="70%" stop-color="#aa820a"/>
+          <stop offset="100%" stop-color="#7a5c00"/>
+        </linearGradient>
+      {% else %}
+        <!-- natural_wood default -->
+        <linearGradient id="pegWoodGrad-{{ peg_style }}" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e2ba8e"/>
+          <stop offset="35%" stop-color="#c99763"/>
+          <stop offset="70%" stop-color="#a6713c"/>
+          <stop offset="100%" stop-color="#845325"/>
+        </linearGradient>
+    {% endcase %}
+
+    <linearGradient id="pegHighlightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <linearGradient id="pegSpringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#666666"/>
+      <stop offset="30%" stop-color="#e0e0e0"/>
+      <stop offset="65%" stop-color="#ffffff"/>
+      <stop offset="85%" stop-color="#999999"/>
+      <stop offset="100%" stop-color="#444444"/>
+    </linearGradient>
+
+    <filter id="pegInnerShadow" x="-20%" y="-10%" width="140%" height="120%">
+      <feDropShadow dx="1" dy="1.5" stdDeviation="1" flood-color="#150a00" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#pegInnerShadow)">
+    <!-- Back Jaw Depth -->
+    <path d="M 6.5 22 L 8 48 C 8 50, 9.5 50, 9.5 48 L 11 22 Z" fill="#503014"/>
+
+    <!-- Left Wooden Arm / Clamp Jaw -->
+    <path d="M 5 2 C 5 1, 6.5 0.5, 8 1 L 9 19 C 7.5 21, 6 23, 6 27 C 6 29.5, 7 31, 7.5 32 L 8.5 58 C 8.5 60.5, 6 60.5, 5.5 58 L 4 23 C 4 20, 4.5 3, 5 2 Z" fill="url(#pegWoodGrad-{{ peg_style }})"/>
+    <path d="M 5 2 C 5 1, 6.5 0.5, 8 1 L 9 19 C 7.5 21, 6 23, 6 27 C 6 29.5, 7 31, 7.5 32 L 8.5 58 C 8.5 60.5, 6 60.5, 5.5 58 L 4 23 C 4 20, 4.5 3, 5 2 Z" fill="url(#pegHighlightGrad)"/>
+
+    <!-- Right Wooden Arm / Clamp Jaw -->
+    <path d="M 19 2 C 19 1, 17.5 0.5, 16 1 L 15 19 C 16.5 21, 18 23, 18 27 C 18 29.5, 17 31, 16.5 32 L 15.5 58 C 15.5 60.5, 18 60.5, 18.5 58 L 20 23 C 20 20, 19.5 3, 19 2 Z" fill="url(#pegWoodGrad-{{ peg_style }})"/>
+    <path d="M 19 2 C 19 1, 17.5 0.5, 16 1 L 15 19 C 16.5 21, 18 23, 18 27 C 18 29.5, 17 31, 16.5 32 L 15.5 58 C 15.5 60.5, 18 60.5, 18.5 58 L 20 23 C 20 20, 19.5 3, 19 2 Z" fill="url(#pegHighlightGrad)"/>
+
+    <!-- Realistic Metal Torsion Spring -->
+    <ellipse cx="12" cy="20" rx="4.5" ry="3.5" fill="none" stroke="url(#pegSpringGrad)" stroke-width="2"/>
+    <path d="M 7.5 20 L 16.5 20" stroke="url(#pegSpringGrad)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M 7.5 18 C 6.2 20, 6.2 22, 7.5 24" fill="none" stroke="url(#pegSpringGrad)" stroke-width="1.8"/>
+    <path d="M 16.5 18 C 17.8 20, 17.8 22, 16.5 24" fill="none" stroke="url(#pegSpringGrad)" stroke-width="1.8"/>
+  </g>
+</svg>

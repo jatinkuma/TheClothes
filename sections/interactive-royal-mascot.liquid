@@ -967,8 +967,8 @@
 
         // Perspective Camera directly viewing the FRONT of the character
         this.camera = new THREE.PerspectiveCamera(38, w / h, 0.1, 100);
-        this.camera.position.set(0, 1.05, 3.40);
-        this.camera.lookAt(0, 0.98, 0);
+        this.camera.position.set(0, 1.08, 3.50);
+        this.camera.lookAt(0, 1.02, 0);
 
         // WebGL Renderer with High-Fidelity Color & Tone Mapping
         this.renderer = new THREE.WebGLRenderer({
@@ -1052,8 +1052,6 @@
           this.loadTexture(config.owlAssets.outfits[oKey]);
         }
 
-        this.buildAvatarRig("cream");
-
         // Load Authentic 3D Rigged Cat Model (.glb) with CORS and absolute URL handling
         var self = this;
         if (typeof THREE.GLTFLoader !== "undefined" && config.activeMascot === "cat" && config.glbUrl) {
@@ -1064,7 +1062,7 @@
             modelUrl = window.location.protocol + modelUrl;
           }
           gltfLoader.load(modelUrl, function(gltf) {
-            // Remove procedural meshes when full 3D GLB arrives
+            // Remove any placeholder meshes
             while (self.characterGroup.children.length > 0) {
               self.characterGroup.remove(self.characterGroup.children[0]);
             }
@@ -1078,7 +1076,7 @@
                 var name = (node.name || "").toLowerCase();
                 if (name.indexOf("head") !== -1 && !self.headBone) self.headBone = node;
                 else if (name.indexOf("neck") !== -1 && !self.neckBone) self.neckBone = node;
-                else if ((name.indexOf("chest") !== -1 || name.indexOf("spine") !== -1) && !self.torsoBone) self.torsoBone = node;
+                else if ((name.indexOf("chest") !== -1 || name.indexOf("spine") !== -1 || name.indexOf("torso") !== -1) && !self.torsoBone) self.torsoBone = node;
                 else if (name.indexOf("root") !== -1 && !self.rootBone) self.rootBone = node;
                 else if (name.indexOf("eye.l") !== -1 || name === "eye_l") self.eyeLeftBone = node;
                 else if (name.indexOf("eye.r") !== -1 || name === "eye_r") self.eyeRightBone = node;
@@ -1086,25 +1084,24 @@
               if (node.isMesh) {
                 node.castShadow = true;
                 node.receiveShadow = true;
-                if (node.material) {
-                  node.material.roughness = 0.38;
-                  node.material.metalness = 0.08;
-                }
               }
             });
             self.isGlbLoaded = true;
+            self.equipDress("cream");
             if (spinnerEl) spinnerEl.classList.add("loaded");
           }, undefined, function(err) {
-            console.warn("GLTF loader fallback to seamless procedural rig:", err);
+            console.warn("GLTF loader fallback to procedural rig:", err);
+            self.buildAvatarRig("cream");
+            if (spinnerEl) spinnerEl.classList.add("loaded");
           });
+        } else {
+          this.buildAvatarRig("cream");
+          if (spinnerEl) spinnerEl.classList.add("loaded");
         }
 
         // Setup Event Listeners & Animation Loop
         this.setupEventListeners();
         requestAnimationFrame(this.renderLoop.bind(this));
-
-        // Hide spinner once loaded
-        if (spinnerEl) spinnerEl.classList.add("loaded");
         this.isReady = true;
 
       } catch (err) {
@@ -1439,30 +1436,69 @@
 
     equipDress: function(outfitKey, customUrl) {
       var self = this;
-      if (customUrl) {
-        this.loadTexture(customUrl, function(t) {
+      var colorMap = {
+        cream: 0xF5EEE1, // Imperial Cream & Gold
+        ivory: 0xF5EEE1,
+        blue: 0x1A365D,  // Sapphire Blue Jodhpuri
+        green: 0x0F5132, // Heritage Emerald Silk
+        emerald: 0x0F5132,
+        red: 0x7A1228,   // Ruby Red Ceremonial
+        ruby: 0x7A1228,
+        maroon: 0x7A1228,
+        purple: 0x6B21A8 // Royal Purple Silk
+      };
+
+      if (self.isGlbLoaded && self.characterGroup) {
+        var targetColor = colorMap[outfitKey] || 0xF5EEE1;
+        self.characterGroup.traverse(function(child) {
+          if (child.isMesh && child.material) {
+            var matName = (child.material.name || "").toLowerCase();
+            var meshName = (child.name || "").toLowerCase();
+            if (matName.indexOf("silk") !== -1 || matName.indexOf("purple") !== -1 || meshName.indexOf("sherwani") !== -1 || meshName.indexOf("sleeve") !== -1) {
+              if (customUrl) {
+                self.loadTexture(customUrl, function(t) {
+                  child.material.map = t;
+                  child.material.color.setHex(0xFFFFFF);
+                  child.material.needsUpdate = true;
+                });
+              } else {
+                child.material.map = null;
+                child.material.color.setHex(targetColor);
+                child.material.roughness = 0.35;
+                child.material.metalness = 0.12;
+                child.material.needsUpdate = true;
+              }
+            }
+          }
+        });
+      }
+
+      if (self.bodyMesh && !self.isGlbLoaded) {
+        if (customUrl) {
+          this.loadTexture(customUrl, function(t) {
+            if (self.bodyMesh) {
+              self.bodyMesh.material.map = t;
+              self.bodyMesh.material.needsUpdate = true;
+            }
+          });
+          return;
+        }
+
+        var outfitUrl = null;
+        if (config.activeMascot === 'cat' && config.catAssets && config.catAssets.outfits) {
+          outfitUrl = config.catAssets.outfits[outfitKey] || config.catAssets.body;
+        } else if (config.activeMascot === 'chipmunk' && config.chipmunkAssets && config.chipmunkAssets.outfits) {
+          outfitUrl = config.chipmunkAssets.outfits[outfitKey] || config.chipmunkAssets.body;
+        } else {
+          outfitUrl = config.owlAssets.outfits[outfitKey] || config.owlAssets.outfits.cream;
+        }
+        this.loadTexture(outfitUrl, function(tex) {
           if (self.bodyMesh) {
-            self.bodyMesh.material.map = t;
+            self.bodyMesh.material.map = tex;
             self.bodyMesh.material.needsUpdate = true;
           }
         });
-        return;
       }
-
-      var outfitUrl = null;
-      if (config.activeMascot === 'cat' && config.catAssets && config.catAssets.outfits) {
-        outfitUrl = config.catAssets.outfits[outfitKey] || config.catAssets.body;
-      } else if (config.activeMascot === 'chipmunk' && config.chipmunkAssets && config.chipmunkAssets.outfits) {
-        outfitUrl = config.chipmunkAssets.outfits[outfitKey] || config.chipmunkAssets.body;
-      } else {
-        outfitUrl = config.owlAssets.outfits[outfitKey] || config.owlAssets.outfits.cream;
-      }
-      this.loadTexture(outfitUrl, function(tex) {
-        if (self.bodyMesh) {
-          self.bodyMesh.material.map = tex;
-          self.bodyMesh.material.needsUpdate = true;
-        }
-      });
     },
 
     setupEventListeners: function() {

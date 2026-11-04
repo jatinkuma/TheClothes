@@ -9,6 +9,71 @@
  */
 {
   "sections": {
+    "interactive_royal_mascot": {
+      "type": "interactive-royal-mascot",
+      "blocks": {
+        "outfit_cream": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Imperial Cream & Gold",
+            "outfit_key": "cream",
+            "swatch_color": "#f5e5c9",
+            "price": "Rs. 48,000",
+            "description": "Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping."
+          }
+        },
+        "outfit_blue": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Sapphire Blue Jodhpuri",
+            "outfit_key": "blue",
+            "swatch_color": "#1b3b6f",
+            "price": "Rs. 52,000",
+            "description": "Celestial lapis blue brocade adorned with real silver and gold thread floral booti motifs and mandarin collar."
+          }
+        },
+        "outfit_green": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Heritage Emerald Silk",
+            "outfit_key": "green",
+            "swatch_color": "#1e4a38",
+            "price": "Rs. 54,000",
+            "description": "Rich forest emerald raw silk sherwani featuring heritage paisleys, antique gold placket, and emerald buttons."
+          }
+        },
+        "outfit_red": {
+          "type": "outfit",
+          "settings": {
+            "outfit_name": "Ruby Red Ceremonial",
+            "outfit_key": "red",
+            "swatch_color": "#8b1e1e",
+            "price": "Rs. 56,000",
+            "description": "Ceremonial state regalia in deep ruby velvet enriched with dense antique gold zardozi placket embroidery."
+          }
+        }
+      },
+      "block_order": [
+        "outfit_cream",
+        "outfit_blue",
+        "outfit_green",
+        "outfit_red"
+      ],
+      "settings": {
+        "mascot_character": "cat",
+        "bg_color": "#e5a625",
+        "heading": "Interactive Royal Wardrobe",
+        "subheading": "ROYAL COURT ATELIER",
+        "description": "Select any royal regalia below to instantly drape the character in handcrafted court attire.",
+        "mascot_size": 440,
+        "sensitivity": 28,
+        "enable_butterfly": true,
+        "butterfly_speed": 8,
+        "enable_sparkles": true,
+        "show_hint": true,
+        "hint_text": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -426,66 +491,38 @@
         "butterfly_color": "#00e5ff"
       }
     },
-    "interactive_royal_mascot": {
-      "type": "interactive-royal-mascot",
-      "blocks": {
-        "outfit_cream": {
-          "type": "outfit",
-          "settings": {
-            "outfit_name": "Imperial Cream & Gold",
-            "outfit_key": "cream",
-            "swatch_color": "#F5E5C9",
-            "price": "Rs. 48,000",
-            "description": "Chanderi silk woven with intricate ivory-on-cream needlework, freshwater pearl button fastenings, and gold piping."
-          }
-        },
-        "outfit_blue": {
-          "type": "outfit",
-          "settings": {
-            "outfit_name": "Sapphire Blue Jodhpuri",
-            "outfit_key": "blue",
-            "swatch_color": "#1B3B6F",
-            "price": "Rs. 52,000",
-            "description": "Celestial lapis blue brocade adorned with real silver and gold thread floral booti motifs and mandarin collar."
-          }
-        },
-        "outfit_green": {
-          "type": "outfit",
-          "settings": {
-            "outfit_name": "Heritage Emerald Silk",
-            "outfit_key": "green",
-            "swatch_color": "#1E4A38",
-            "price": "Rs. 54,000",
-            "description": "Rich forest emerald raw silk sherwani featuring heritage paisleys, antique gold placket, and emerald buttons."
-          }
-        },
-        "outfit_red": {
-          "type": "outfit",
-          "settings": {
-            "outfit_name": "Ruby Red Ceremonial",
-            "outfit_key": "red",
-            "swatch_color": "#8B1E1E",
-            "price": "Rs. 56,000",
-            "description": "Ceremonial state regalia in deep ruby velvet enriched with dense antique gold zardozi placket embroidery."
-          }
-        }
-      },
-      "block_order": [
-        "outfit_cream",
-        "outfit_blue",
-        "outfit_green",
-        "outfit_red"
-      ],
+    "clothesline_hanging_slider_DAXMTg": {
+      "type": "clothesline-hanging-slider",
+      "name": "Clothesline Slider",
       "settings": {
-        "bg_color": "#E5A625",
-        "heading": "Interactive Royal Wardrobe",
-        "subheading": "ROYAL COURT ATELIER",
-        "description": "Select any royal regalia below to instantly drape the character in handcrafted court attire.",
-        "mascot_size": 440,
-        "enable_butterfly": true,
-        "enable_sparkles": true,
-        "show_hint": true,
-        "hint_text": "Click any dress to drape the character • Move mouse to track natural gaze in real-time"
+        "subheading": "ARTISANAL HANGING ATELIER",
+        "heading": "Fresh On The Clothesline",
+        "description": "Handcrafted court regalia hanging freely on our artisanal line. Swipe or drag to explore each piece in the breeze.",
+        "header_alignment": "center",
+        "collection": "frontpage",
+        "products_to_show": 20,
+        "rope_color": "#9E703B",
+        "show_pegs": true,
+        "peg_style": "natural_wood",
+        "enable_breeze_sway": true,
+        "blend_mode": "multiply",
+        "desktop_columns": 4,
+        "mobile_columns": "1.35",
+        "gap": 36,
+        "show_arrows": true,
+        "show_progress_bar": true,
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_title": true,
+        "show_price": true,
+        "show_vendor": false,
+        "show_quick_buy": true,
+        "quick_buy_text": "Explore Piece",
+        "bg_color": "#FAF7F2",
+        "text_color": "#1F1A16",
+        "price_color": "#845A25",
+        "padding_top": 60,
+        "padding_bottom": 80
       }
     }
   },
@@ -495,6 +532,7 @@
     "product_list_fa6P9H",
     "the_royal_attire",
     "interactive_royal_doll_JwazkP",
-    "interactive_hero_3d_QnGc3H"
+    "interactive_hero_3d_QnGc3H",
+    "clothesline_hanging_slider_DAXMTg"
   ]
 }

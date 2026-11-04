@@ -1130,65 +1130,172 @@
       return tex;
     },
 
-    // 3D Volumetric Mesh Constructor: Generates organic continuous 3D curved geometry
-    // with chubby facial contours, spherical head volume, and exact UV windowing
+    // 3D Volumetric Mesh Constructor: Generates a TRUE 3D SOLID CLOSED SHELL
+    // with organic facial contours, protruding snout, chubby cheeks, lateral side walls,
+    // and rounded back cranium (ensures realistic 3D volume from every viewing angle, NO flat paper look!)
     createCurvedGeometry: function(width, height, segX, segY, maxDepth, isHead, vMin, vMax) {
-      var geo = new THREE.PlaneGeometry(width, height, segX, segY);
-      var pos = geo.attributes.position;
-      var uv = geo.attributes.uv;
+      var nx = segX + 1;
+      var ny = segY + 1;
       var halfW = width * 0.5;
       var halfH = height * 0.5;
-
       var hasVWindow = (typeof vMin === "number" && typeof vMax === "number");
 
-      for (var i = 0; i < pos.count; i++) {
-        var x = pos.getX(i);
-        var y = pos.getY(i);
-        var u = x / halfW; // -1 to +1
+      var positions = [];
+      var uvs = [];
+      var indices = [];
+
+      // 1. Front Volumetric Facial / Chest Surface
+      for (var j = 0; j < ny; j++) {
+        var vNorm = j / (ny - 1);
+        var y = -halfH + vNorm * height;
+        var vCoord = hasVWindow ? (vMin + vNorm * (vMax - vMin)) : vNorm;
         var v = y / halfH; // -1 to +1
 
-        // Remap UV coordinates if partial vertical window is specified
-        if (hasVWindow && uv) {
-          var origV = uv.getY(i);
-          uv.setY(i, vMin + origV * (vMax - vMin));
-        }
+        for (var i = 0; i < nx; i++) {
+          var uNorm = i / (nx - 1);
+          var x = -halfW + uNorm * width;
+          var u = x / halfW; // -1 to +1
 
-        var u2 = u * u;
-        var depth = 0;
-        if (u2 < 1.0) {
-          if (isHead) {
-            // Organic 3D Spherical Head Dome + Chubby Cheeks + Pink Muzzle
-            var r2_dome = Math.min(1.0, u2 * 0.85 + (v * 0.5) * (v * 0.5));
-            var baseDome = Math.sqrt(Math.max(0, 1.0 - r2_dome)) * maxDepth;
+          var depth = 0;
+          var u2 = u * u;
+          if (u2 < 1.0) {
+            if (isHead) {
+              // Organic 3D Spherical Head Dome + Chubby Cheeks + Protruding Snout + Recessed Eyes
+              var r2_dome = Math.min(1.0, u2 * 0.85 + (v * 0.5) * (v * 0.5));
+              var baseDome = Math.sqrt(Math.max(0, 1.0 - r2_dome)) * maxDepth;
 
-            // Chubby cheeks (puffed out for cute, full, adorable round face)
-            var dCheek = Math.min(
-              Math.sqrt(Math.pow(u - (-0.36), 2) * 1.5 + Math.pow(v - (-0.15), 2) * 4.0),
-              Math.sqrt(Math.pow(u - 0.36, 2) * 1.5 + Math.pow(v - (-0.15), 2) * 4.0)
-            );
-            var cheekPuff = Math.pow(Math.max(0, 1.0 - dCheek * 1.6), 2) * 0.09;
+              // Chubby cheeks
+              var dCheek = Math.min(
+                Math.sqrt(Math.pow(u - (-0.36), 2) * 1.5 + Math.pow(v - (-0.15), 2) * 4.0),
+                Math.sqrt(Math.pow(u - 0.36, 2) * 1.5 + Math.pow(v - (-0.15), 2) * 4.0)
+              );
+              var cheekPuff = Math.pow(Math.max(0, 1.0 - dCheek * 1.6), 2) * 0.16;
 
-            // Muzzle & pink nose projection
-            var dSnout = Math.sqrt(u * u * 2.5 + Math.pow(v - (-0.18), 2) * 6.0);
-            var snoutPuff = Math.pow(Math.max(0, 1.0 - dSnout * 2.2), 2) * 0.11;
+              // Protruding snout & muzzle
+              var dSnout = Math.sqrt(u * u * 2.5 + Math.pow(v - (-0.18), 2) * 6.0);
+              var snoutPuff = Math.pow(Math.max(0, 1.0 - dSnout * 2.2), 2) * 0.22;
 
-            // Eye socket indentation (subtle recessed depth where eyes and glasses sit)
-            var dEyeL = Math.sqrt(Math.pow(u - (-0.24), 2) * 2.5 + Math.pow(v - 0.05, 2) * 4.5);
-            var dEyeR = Math.sqrt(Math.pow(u - 0.24, 2) * 2.5 + Math.pow(v - 0.05, 2) * 4.5);
-            var eyeSocket = Math.min(
-              Math.pow(Math.max(0, 1.0 - dEyeL * 2.2), 2),
-              Math.pow(Math.max(0, 1.0 - dEyeR * 2.2), 2)
-            ) * 0.035;
+              // Eye socket indentation
+              var dEyeL = Math.sqrt(Math.pow(u - (-0.24), 2) * 2.5 + Math.pow(v - 0.05, 2) * 4.5);
+              var dEyeR = Math.sqrt(Math.pow(u - 0.24, 2) * 2.5 + Math.pow(v - 0.05, 2) * 4.5);
+              var eyeSocket = Math.min(
+                Math.pow(Math.max(0, 1.0 - dEyeL * 2.2), 2),
+                Math.pow(Math.max(0, 1.0 - dEyeR * 2.2), 2)
+              ) * 0.04;
 
-            depth = Math.max(0, baseDome + cheekPuff + snoutPuff - eyeSocket);
-          } else {
-            // Cylindrical chest curvature for court sherwani
-            var r2_body = Math.max(0, 1.0 - u2 * 0.82);
-            depth = Math.sqrt(r2_body) * maxDepth;
+              depth = Math.max(0, baseDome + cheekPuff + snoutPuff - eyeSocket);
+            } else {
+              // Cylindrical chest curvature for court sherwani
+              var r2_body = Math.max(0, 1.0 - u2 * 0.82);
+              depth = Math.sqrt(r2_body) * maxDepth;
+            }
           }
+
+          positions.push(x, y, depth);
+          uvs.push(uNorm, vCoord);
         }
-        pos.setZ(i, depth);
       }
+
+      // Front Indices
+      for (var j = 0; j < ny - 1; j++) {
+        for (var i = 0; i < nx - 1; i++) {
+          var v0 = j * nx + i;
+          var v1 = j * nx + (i + 1);
+          var v2 = (j + 1) * nx + (i + 1);
+          var v3 = (j + 1) * nx + i;
+          indices.push(v0, v1, v2);
+          indices.push(v0, v2, v3);
+        }
+      }
+
+      // 2. Back Volumetric Cranium / Torso Shell
+      var vBackStart = positions.length / 3;
+      for (var j = 0; j < ny; j++) {
+        var vNorm = j / (ny - 1);
+        var y = -halfH + vNorm * height;
+        var vCoord = hasVWindow ? (vMin + vNorm * (vMax - vMin)) : vNorm;
+        var v = y / halfH;
+
+        for (var i = 0; i < nx; i++) {
+          var uNorm = i / (nx - 1);
+          var x = (-halfW + uNorm * width) * 0.88;
+          var u = x / halfW;
+
+          var backDepth = -0.06;
+          var u2 = u * u;
+          if (u2 < 1.0) {
+            if (isHead) {
+              var r2_back = Math.min(1.0, u2 * 0.80 + (v * 0.6) * (v * 0.6));
+              backDepth = - (Math.sqrt(Math.max(0, 1.0 - r2_back)) * (maxDepth * 0.95) + 0.08);
+            } else {
+              backDepth = - (Math.sqrt(Math.max(0, 1.0 - u2 * 0.80)) * (maxDepth * 0.85) + 0.05);
+            }
+          }
+
+          positions.push(x, y, backDepth);
+          uvs.push(uNorm, vCoord);
+        }
+      }
+
+      // Back Indices (reversed winding)
+      for (var j = 0; j < ny - 1; j++) {
+        for (var i = 0; i < nx - 1; i++) {
+          var v0 = vBackStart + j * nx + i;
+          var v1 = vBackStart + j * nx + (i + 1);
+          var v2 = vBackStart + (j + 1) * nx + (i + 1);
+          var v3 = vBackStart + (j + 1) * nx + i;
+          indices.push(v0, v2, v1);
+          indices.push(v0, v3, v2);
+        }
+      }
+
+      // 3. Lateral Side Profile Walls (connect front to back for true 3D side profile!)
+      // Left Wall
+      for (var j = 0; j < ny - 1; j++) {
+        var f0 = j * nx;
+        var f1 = (j + 1) * nx;
+        var b0 = vBackStart + j * nx;
+        var b1 = vBackStart + (j + 1) * nx;
+        indices.push(f0, b0, b1);
+        indices.push(f0, b1, f1);
+      }
+
+      // Right Wall
+      for (var j = 0; j < ny - 1; j++) {
+        var f0 = j * nx + (nx - 1);
+        var f1 = (j + 1) * nx + (nx - 1);
+        var b0 = vBackStart + j * nx + (nx - 1);
+        var b1 = vBackStart + (j + 1) * nx + (nx - 1);
+        indices.push(f0, f1, b1);
+        indices.push(f0, b1, b0);
+      }
+
+      // Bottom Rim
+      for (var i = 0; i < nx - 1; i++) {
+        var f0 = i;
+        var f1 = i + 1;
+        var b0 = vBackStart + i;
+        var b1 = vBackStart + i + 1;
+        indices.push(f0, b1, b0);
+        indices.push(f0, f1, b1);
+      }
+
+      // Top Rim
+      var topF = (ny - 1) * nx;
+      var topB = vBackStart + (ny - 1) * nx;
+      for (var i = 0; i < nx - 1; i++) {
+        var f0 = topF + i;
+        var f1 = topF + i + 1;
+        var b0 = topB + i;
+        var b1 = topB + i + 1;
+        indices.push(f0, b0, b1);
+        indices.push(f0, b1, f1);
+      }
+
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(indices);
       geo.computeVertexNormals();
       return geo;
     },

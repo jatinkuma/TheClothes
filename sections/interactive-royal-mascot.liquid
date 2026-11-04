@@ -812,11 +812,11 @@
     activeMascot: "{{ section.settings.mascot_character | default: 'cat' }}",
     glbUrl: "{{ 'royal-cat-mascot.glb' | asset_url }}",
     catAssets: {
-      body: "{{ 'royal-cat-body.png' | asset_url }}",
+      body: "{{ 'royal-cat-mascot.png' | asset_url }}",
       head: "{{ 'royal-cat-head.png' | asset_url }}",
       full: "{{ 'royal-cat-mascot.png' | asset_url }}",
       outfits: {
-        cream: "{{ 'royal-cat-body.png' | asset_url }}",
+        cream: "{{ 'royal-cat-mascot.png' | asset_url }}",
         blue: "{{ 'royal-cat-body.png' | asset_url }}",
         green: "{{ 'royal-cat-body.png' | asset_url }}",
         red: "{{ 'royal-cat-body.png' | asset_url }}"
@@ -1054,14 +1054,19 @@
 
         this.buildAvatarRig("cream");
 
-        // Load Authentic 3D Rigged Cat Model (.glb)
+        // Load Authentic 3D Rigged Cat Model (.glb) with CORS and absolute URL handling
         var self = this;
         if (typeof THREE.GLTFLoader !== "undefined" && config.activeMascot === "cat" && config.glbUrl) {
           var gltfLoader = new THREE.GLTFLoader();
-          gltfLoader.load(config.glbUrl, function(gltf) {
-            if (self.fullCatMesh) {
-              self.characterGroup.remove(self.fullCatMesh);
-              self.fullCatMesh = null;
+          gltfLoader.setCrossOrigin('anonymous');
+          var modelUrl = config.glbUrl;
+          if (modelUrl.indexOf("//") === 0) {
+            modelUrl = window.location.protocol + modelUrl;
+          }
+          gltfLoader.load(modelUrl, function(gltf) {
+            // Remove procedural meshes when full 3D GLB arrives
+            while (self.characterGroup.children.length > 0) {
+              self.characterGroup.remove(self.characterGroup.children[0]);
             }
             var charModel = gltf.scene;
             charModel.position.set(0, 0, 0);
@@ -1125,12 +1130,16 @@
       return tex;
     },
 
-    // 3D Volumetric Mesh Constructor: Generates curved 3D geometry with authentic depth
-    createCurvedGeometry: function(width, height, segX, segY, maxDepth, isHead) {
+    // 3D Volumetric Mesh Constructor: Generates organic continuous 3D curved geometry
+    // with chubby facial contours, spherical head volume, and exact UV windowing
+    createCurvedGeometry: function(width, height, segX, segY, maxDepth, isHead, vMin, vMax) {
       var geo = new THREE.PlaneGeometry(width, height, segX, segY);
       var pos = geo.attributes.position;
+      var uv = geo.attributes.uv;
       var halfW = width * 0.5;
       var halfH = height * 0.5;
+
+      var hasVWindow = (typeof vMin === "number" && typeof vMax === "number");
 
       for (var i = 0; i < pos.count; i++) {
         var x = pos.getX(i);
@@ -1138,18 +1147,44 @@
         var u = x / halfW; // -1 to +1
         var v = y / halfH; // -1 to +1
 
+        // Remap UV coordinates if partial vertical window is specified
+        if (hasVWindow && uv) {
+          var origV = uv.getY(i);
+          uv.setY(i, vMin + origV * (vMax - vMin));
+        }
+
         var u2 = u * u;
         var depth = 0;
         if (u2 < 1.0) {
           if (isHead) {
-            // 3D Ellipsoidal Dome for head: cheek volume, nose projection, rounded safa
-            var v2 = (v - 0.12) * (v - 0.12);
-            var r2 = Math.max(0, 1.0 - (u2 * 0.82 + v2 * 0.40));
-            depth = Math.sqrt(r2) * maxDepth;
+            // Organic 3D Spherical Head Dome + Chubby Cheeks + Pink Muzzle
+            var r2_dome = Math.min(1.0, u2 * 0.85 + (v * 0.5) * (v * 0.5));
+            var baseDome = Math.sqrt(Math.max(0, 1.0 - r2_dome)) * maxDepth;
+
+            // Chubby cheeks (puffed out for cute, full, adorable round face)
+            var dCheek = Math.min(
+              Math.sqrt(Math.pow(u - (-0.36), 2) * 1.5 + Math.pow(v - (-0.15), 2) * 4.0),
+              Math.sqrt(Math.pow(u - 0.36, 2) * 1.5 + Math.pow(v - (-0.15), 2) * 4.0)
+            );
+            var cheekPuff = Math.pow(Math.max(0, 1.0 - dCheek * 1.6), 2) * 0.09;
+
+            // Muzzle & pink nose projection
+            var dSnout = Math.sqrt(u * u * 2.5 + Math.pow(v - (-0.18), 2) * 6.0);
+            var snoutPuff = Math.pow(Math.max(0, 1.0 - dSnout * 2.2), 2) * 0.11;
+
+            // Eye socket indentation (subtle recessed depth where eyes and glasses sit)
+            var dEyeL = Math.sqrt(Math.pow(u - (-0.24), 2) * 2.5 + Math.pow(v - 0.05, 2) * 4.5);
+            var dEyeR = Math.sqrt(Math.pow(u - 0.24, 2) * 2.5 + Math.pow(v - 0.05, 2) * 4.5);
+            var eyeSocket = Math.min(
+              Math.pow(Math.max(0, 1.0 - dEyeL * 2.2), 2),
+              Math.pow(Math.max(0, 1.0 - dEyeR * 2.2), 2)
+            ) * 0.035;
+
+            depth = Math.max(0, baseDome + cheekPuff + snoutPuff - eyeSocket);
           } else {
-            // 3D Cylindrical Curvature for torso & sherwani jacket
-            var r2 = Math.max(0, 1.0 - (u2 * 0.88));
-            depth = Math.sqrt(r2) * maxDepth;
+            // Cylindrical chest curvature for court sherwani
+            var r2_body = Math.max(0, 1.0 - u2 * 0.82);
+            depth = Math.sqrt(r2_body) * maxDepth;
           }
         }
         pos.setZ(i, depth);
@@ -1160,25 +1195,51 @@
 
     buildAvatarRig: function(outfitKey) {
       if (config.activeMascot === "cat") {
-        var charHeight = 2.10;
-        var charWidth = 2.10;
+        // True Chubby Proportions (Aspect ratio matches natural British Shorthair feline face)
+        var charHeight = 2.05;
+        var charWidth = 2.68; // Generous width: restores full chubby cheeks and broad royal attire
 
-        // One single seamless, continuous 3D curved geometry for the entire cat (Head + Body + Court Attire)
-        // Zero gap, perfectly contiguous, full-resolution master texture
-        var catGeo = this.createCurvedGeometry(charWidth, charHeight, 64, 64, 0.22, true);
         var catTex = this.loadTexture(config.catAssets.full);
-        var catMat = new THREE.MeshStandardMaterial({
+
+        // 1. Torso & Sherwani Mesh (Height from y=0 to y=0.72m, UV [0.0 to 0.352])
+        var bodyHeight = 0.72;
+        var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 64, 32, 0.16, false, 0.0, 0.352);
+        var bodyMat = new THREE.MeshStandardMaterial({
           map: catTex,
           transparent: true,
           alphaTest: 0.005,
-          roughness: 0.38,
-          metalness: 0.08,
+          roughness: 0.40,
+          metalness: 0.05,
           side: THREE.DoubleSide
         });
-        this.fullCatMesh = new THREE.Mesh(catGeo, catMat);
-        this.fullCatMesh.position.set(0, charHeight * 0.5, 0);
-        this.fullCatMesh.renderOrder = 2;
-        this.characterGroup.add(this.fullCatMesh);
+        this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        this.bodyMesh.position.set(0, bodyHeight * 0.5, 0);
+        this.bodyMesh.renderOrder = 2;
+        this.characterGroup.add(this.bodyMesh);
+
+        // 2. Articulated Head Group (Pivoted at exact anatomical collar: y = 0.641m)
+        var neckPivotY = 0.641;
+        this.headGroup = new THREE.Group();
+        this.headGroup.position.set(0, neckPivotY, 0.035);
+        this.characterGroup.add(this.headGroup);
+
+        // 3. Head & Safa Mesh (Height from y=0.58m to y=2.05m -> total 1.47m, UV [0.273 to 1.0])
+        // Overlaps the torso collar by 0.14m (5.5 inches) -> ZERO GAP PHYSICALLY POSSIBLE!
+        var headHeight = charHeight - 0.58; // 1.47m
+        var headGeo = this.createCurvedGeometry(charWidth, headHeight, 64, 64, 0.28, true, 0.273, 1.0);
+        var headMat = new THREE.MeshStandardMaterial({
+          map: catTex,
+          transparent: true,
+          alphaTest: 0.005,
+          roughness: 0.40,
+          metalness: 0.05,
+          side: THREE.DoubleSide
+        });
+        this.headMesh = new THREE.Mesh(headGeo, headMat);
+        // Center relative to headGroup: bottom is at 0.58 - 0.641 = -0.061, top is at 2.05 - 0.641 = +1.409
+        this.headMesh.position.set(0, 0.674, 0);
+        this.headMesh.renderOrder = 3;
+        this.headGroup.add(this.headMesh);
         return;
       }
 
@@ -1384,8 +1445,8 @@
       var effDist = Math.sqrt(effDeltaX * effDeltaX + effDeltaY * effDeltaY);
       var effR = Math.min(1.22, effDist);
 
-      var sens = config.sensitivity || 28;
-      var maxPitch = 16;
+      var sens = 16; // Calibrated for natural 3D depth without perspective compression
+      var maxPitch = 12;
 
       // Exact natural direction (left -> head turns left, right -> head turns right, up/down pitch)
       this.targetHeadYaw = Math.cos(effAngle) * (effR * sens);
@@ -1462,16 +1523,17 @@
           this.eyeRightBone.rotation.x = eyePitch;
           this.eyeRightBone.scale.z = blinkScale;
         }
-      } else if (this.fullCatMesh) {
-        // Single continuous seamless 3D curved mesh
-        this.fullCatMesh.rotation.y = radHeadYaw * 0.65;
-        this.fullCatMesh.rotation.x = radHeadPitch * 0.75 + breathePitch;
-        this.fullCatMesh.rotation.z = radHeadRoll * 0.50;
       } else {
-        // Fallback for chipmunk / owl
+        // High-Fidelity Articulated Procedural 3D Rig (Head turns on neck + Torso follow-through)
         if (this.bodyMesh) {
-          this.bodyMesh.rotation.y = radTorsoYaw;
-          this.bodyMesh.rotation.x = radTorsoPitch + breathePitch;
+          this.bodyMesh.rotation.y = radTorsoYaw * 0.25;
+          this.bodyMesh.rotation.x = radTorsoPitch * 0.18 + breathePitch;
+        }
+
+        if (this.headGroup) {
+          this.headGroup.rotation.y = radHeadYaw * 0.78;
+          this.headGroup.rotation.x = radHeadPitch * 0.85 + breathePitch * 0.6;
+          this.headGroup.rotation.z = radHeadRoll * 0.45;
         }
 
         if (config.activeMascot === "owl") {

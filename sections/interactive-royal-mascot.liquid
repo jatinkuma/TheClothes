@@ -1082,6 +1082,14 @@
                 else if (name.indexOf("eye.r") !== -1 || name === "eye_r") self.eyeRightBone = node;
               }
               if (node.isMesh) {
+                if (node.material) {
+                  node.material.transparent = true;
+                  node.material.alphaTest = 0.05;
+                  node.material.side = THREE.FrontSide;
+                  node.material.roughness = 0.40;
+                  node.material.metalness = 0.05;
+                  node.material.needsUpdate = true;
+                }
                 node.castShadow = true;
                 node.receiveShadow = true;
               }
@@ -1299,51 +1307,26 @@
 
     buildAvatarRig: function(outfitKey) {
       if (config.activeMascot === "cat") {
-        // True Chubby Proportions (Aspect ratio matches natural British Shorthair feline face)
         var charHeight = 2.05;
-        var charWidth = 2.68; // Generous width: restores full chubby cheeks and broad royal attire
+        var charWidth = 2.05;
 
         var catTex = this.loadTexture(config.catAssets.full);
 
-        // 1. Torso & Sherwani Mesh (Height from y=0 to y=0.72m, UV [0.0 to 0.352])
-        var bodyHeight = 0.72;
-        var bodyGeo = this.createCurvedGeometry(charWidth, bodyHeight, 64, 32, 0.16, false, 0.0, 0.352);
+        // Single continuous volumetric 3D mesh spanning the entire cat from sherwani base to turban crown:
+        // Topologically unified contiguous geometry -> ZERO GAP PHYSICALLY POSSIBLE!
+        var bodyGeo = this.createCurvedGeometry(charWidth, charHeight, 64, 64, 0.22, false, 0.0, 1.0);
         var bodyMat = new THREE.MeshStandardMaterial({
           map: catTex,
           transparent: true,
-          alphaTest: 0.005,
+          alphaTest: 0.05,
           roughness: 0.40,
           metalness: 0.05,
-          side: THREE.DoubleSide
+          side: THREE.FrontSide
         });
         this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-        this.bodyMesh.position.set(0, bodyHeight * 0.5, 0);
+        this.bodyMesh.position.set(0, charHeight * 0.5, 0);
         this.bodyMesh.renderOrder = 2;
         this.characterGroup.add(this.bodyMesh);
-
-        // 2. Articulated Head Group (Pivoted at exact anatomical collar: y = 0.641m)
-        var neckPivotY = 0.641;
-        this.headGroup = new THREE.Group();
-        this.headGroup.position.set(0, neckPivotY, 0.035);
-        this.characterGroup.add(this.headGroup);
-
-        // 3. Head & Safa Mesh (Height from y=0.58m to y=2.05m -> total 1.47m, UV [0.273 to 1.0])
-        // Overlaps the torso collar by 0.14m (5.5 inches) -> ZERO GAP PHYSICALLY POSSIBLE!
-        var headHeight = charHeight - 0.58; // 1.47m
-        var headGeo = this.createCurvedGeometry(charWidth, headHeight, 64, 64, 0.28, true, 0.273, 1.0);
-        var headMat = new THREE.MeshStandardMaterial({
-          map: catTex,
-          transparent: true,
-          alphaTest: 0.005,
-          roughness: 0.40,
-          metalness: 0.05,
-          side: THREE.DoubleSide
-        });
-        this.headMesh = new THREE.Mesh(headGeo, headMat);
-        // Center relative to headGroup: bottom is at 0.58 - 0.641 = -0.061, top is at 2.05 - 0.641 = +1.409
-        this.headMesh.position.set(0, 0.674, 0);
-        this.headMesh.renderOrder = 3;
-        this.headGroup.add(this.headMesh);
         return;
       }
 

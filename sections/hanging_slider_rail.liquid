@@ -1,252 +1,1349 @@
-{% comment %} Scene Rail: per-block initial image, hover image and product link {% endcomment %}
-<section id="SceneRail-{{ section.id }}" class="scene-rail" style="
-  --sr-bg:{{ section.settings.background_color }};
-  --sr-text:{{ section.settings.text_color }};
-  --sr-metal:{{ section.settings.rail_color }};
-  --sr-rail-size:{{ section.settings.rail_thickness }}px;
-  --sr-garment-height:{{ section.settings.garment_height }}px;
-  --sr-max-width:{{ section.settings.garment_max_width }}px;
-  --sr-gap:{{ section.settings.product_gap }}px;
-  --sr-swing:{{ section.settings.swing_intensity }}deg;
-  --sr-speed:{{ section.settings.swing_duration }}s;
-  --sr-height:{{ section.settings.desktop_height }}vh;
-">
+{% comment %}
+  ==============================================================================
+  SCENE RAIL: HANGING PRODUCT SLIDER (CURVED METALLIC RAIL)
+  ------------------------------------------------------------------------------
+  - Continuous curved horizontal metallic rail spanning the screen in a smooth arc.
+  - Realistic wooden/metal hanger hooks locked to the rail curve.
+  - Hanging paper price tags with top hole grommet, hanging thread, and bold price.
+  - Per-block INITIAL IMAGE (side/profile view on hanger) and HOVERED IMAGE (front view).
+  - Hovering any garment smoothly reveals its front-facing view, matching the reference design.
+  - Mathematical catenary/parabolic curve trajectory: hooks stay anchored to the rail on scroll/drag.
+  - Zero cards or boxes: pure direct garment display with natural ambient shadows.
+  ==============================================================================
+{% endcomment %}
+
+{% liquid
+  assign section_id = section.id
+  assign rail_color = section.settings.rail_color | default: '#9DA3A8'
+  assign rail_thickness = section.settings.rail_thickness | default: 9
+  assign rail_sag = section.settings.rail_sag | default: 55
+  assign garment_h = section.settings.garment_height | default: 320
+  assign spacing = section.settings.product_spacing | default: 34
+  assign show_tags = section.settings.show_price_tags
+  assign tag_bg = section.settings.tag_background | default: '#FAF9F5'
+  assign tag_text = section.settings.tag_text | default: '#111111'
+  assign enable_sway = section.settings.enable_breeze_sway
+  assign enable_tilt = section.settings.enable_curve_tilt
+%}
+
+<section
+  id="HangingRail-{{ section_id }}"
+  class="hanging-rail-section{% if enable_sway %} sway-active{% endif %}"
+  data-section-id="{{ section_id }}"
+  data-sag="{{ rail_sag }}"
+  data-tilt="{{ enable_tilt }}"
+  style="
+    --hr-bg: {{ section.settings.background_color | default: '#F8F9FA' }};
+    --hr-text: {{ section.settings.text_color | default: '#1A1815' }};
+    --hr-rail-color: {{ rail_color }};
+    --hr-rail-thickness: {{ rail_thickness }}px;
+    --hr-rail-sag: {{ rail_sag }}px;
+    --hr-garment-h: {{ garment_h }}px;
+    --hr-gap: {{ spacing }}px;
+    --hr-tag-bg: {{ tag_bg }};
+    --hr-tag-text: {{ tag_text }};
+    --hr-pt: {{ section.settings.padding_top | default: 40 }}px;
+    --hr-pb: {{ section.settings.padding_bottom | default: 50 }}px;
+    --hr-side-pad: {{ section.settings.side_padding | default: 40 }}px;
+  "
+>
   {% if section.settings.background_image != blank %}
-    <div class="scene-rail__background">
-      {{ section.settings.background_image | image_url: width: 2400 | image_tag: loading: 'lazy', alt: '' }}
-    </div>
+    <div
+      class="hanging-rail-bg-img"
+      style="background-image: url('{{ section.settings.background_image | image_url: width: 2400 }}');"
+      aria-hidden="true"
+    ></div>
   {% endif %}
 
-  <div class="scene-rail__inner">
-    <header class="scene-rail__header">
-      {% if section.settings.eyebrow != blank %}<p class="scene-rail__eyebrow">{{ section.settings.eyebrow | escape }}</p>{% endif %}
-      {% if section.settings.heading != blank %}<h2>{{ section.settings.heading | escape }}</h2>{% endif %}
-      {% if section.settings.subheading != blank %}<p class="scene-rail__subheading">{{ section.settings.subheading | escape }}</p>{% endif %}
+  <!-- Ambient Stage Vignette & Soft Overhead Lighting -->
+  <div class="hanging-rail-ambient" aria-hidden="true"></div>
+
+  <!-- Optional Editorial Header -->
+  {% if section.settings.heading != blank or section.settings.eyebrow != blank or section.settings.subheading != blank %}
+    <header class="hanging-rail-header text-{{ section.settings.header_alignment | default: 'center' }}">
+      {% if section.settings.eyebrow != blank %}
+        <span class="hanging-rail-eyebrow">{{ section.settings.eyebrow | escape }}</span>
+      {% endif %}
+      {% if section.settings.heading != blank %}
+        <h2 class="hanging-rail-title">{{ section.settings.heading | escape }}</h2>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p class="hanging-rail-subheading">{{ section.settings.subheading | escape }}</p>
+      {% endif %}
     </header>
+  {% endif %}
 
-    <div class="scene-rail__stage">
-      <svg class="scene-rail__rod" viewBox="0 0 1500 190" preserveAspectRatio="none" aria-hidden="true">
+  <!-- Curved Rail Stage -->
+  <div class="hanging-rail-stage" data-rail-stage>
+    
+    <!-- Continuous Metallic Curved SVG Rail -->
+    <div class="hanging-rail-svg-wrap" aria-hidden="true">
+      <svg class="hanging-rail-svg" data-rail-svg viewBox="0 0 1400 180" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="SRMetal-{{ section.id }}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#fff" stop-opacity=".95"/>
-            <stop offset="45%" stop-color="{{ section.settings.rail_color }}"/>
-            <stop offset="100%" stop-color="#303438" stop-opacity=".75"/>
+          <!-- Cylindrical Metallic Tube Shading Gradient -->
+          <linearGradient id="railTubeGrad-{{ section_id }}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="18%" stop-color="#e3e6e9"/>
+            <stop offset="42%" stop-color="{{ rail_color }}"/>
+            <stop offset="78%" stop-color="#555d64"/>
+            <stop offset="100%" stop-color="#2d3236"/>
           </linearGradient>
-        </defs>
-        <path d="M-25 18 Q750 190 1525 18" fill="none" stroke="#000" stroke-opacity=".2" stroke-width="{{ section.settings.rail_thickness | plus: 4 }}" transform="translate(0 4)"/>
-        <path d="M-25 18 Q750 190 1525 18" fill="none" stroke="url(#SRMetal-{{ section.id }})" stroke-width="{{ section.settings.rail_thickness }}" stroke-linecap="round"/>
-        <path d="M-25 14 Q750 186 1525 14" fill="none" stroke="#fff" stroke-opacity=".48" stroke-width="1.2"/>
-      </svg>
 
-      <div class="scene-rail__viewport" data-rail-viewport>
-        <div class="scene-rail__track">
+          <!-- Drop Shadow for Realistic Tube Depth -->
+          <filter id="railShadow-{{ section_id }}" x="-10%" y="-40%" width="120%" height="240%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+            <feOffset dx="0" dy="6" result="offsetblur"/>
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.28"/>
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Ambient Shadow Curve -->
+        <path
+          class="rail-path-shadow"
+          data-rail-shadow
+          d="M 0,38 Q 700,148 1400,38"
+          fill="none"
+          stroke="rgba(20, 24, 28, 0.22)"
+          stroke-width="{{ rail_thickness | plus: 4 }}"
+          stroke-linecap="round"
+        />
+
+        <!-- Core Metallic Cylindrical Pipe -->
+        <path
+          class="rail-path-core"
+          data-rail-core
+          d="M 0,32 Q 700,142 1400,32"
+          fill="none"
+          stroke="url(#railTubeGrad-{{ section_id }})"
+          stroke-width="{{ rail_thickness }}"
+          stroke-linecap="round"
+          filter="url(#railShadow-{{ section_id }})"
+        />
+
+        <!-- Specular Highlight Line Running Along Top Lip -->
+        <path
+          class="rail-path-specular"
+          data-rail-specular
+          d="M 0,31 Q 700,141 1400,31"
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.72)"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+      </svg>
+    </div>
+
+    <!-- Horizontal Viewport & Track -->
+    <div
+      class="hanging-rail-viewport"
+      data-rail-viewport
+      tabindex="0"
+      role="region"
+      aria-label="{{ section.settings.heading | default: 'Hanging Product Rail' }}"
+    >
+      <div class="hanging-rail-track" data-rail-track>
+        {% assign items_count = section.blocks.size %}
+
+        {% if items_count > 0 %}
+          <!-- MERCHANT BLOCKS: Initial Image & Hovered Image -->
           {% for block in section.blocks %}
             {% assign linked_product = block.settings.product %}
             {% assign item_url = block.settings.custom_link | default: linked_product.url %}
-            {% assign item_title = block.settings.custom_title | default: linked_product.title %}
+            {% assign item_title = block.settings.custom_title | default: linked_product.title | default: 'Bespoke Garment' %}
+            
             {% assign item_price = block.settings.custom_price %}
             {% if item_price == blank and linked_product != blank %}
               {% assign item_price = linked_product.price | money %}
             {% endif %}
+            {% if item_price == blank %}
+              {% assign item_price = section.settings.default_tag_price | default: '$199' %}
+            {% endif %}
 
-            <article class="scene-rail__item" style="--drop:{{ block.settings.drop_offset }}px;--delay:{{ forloop.index | times: 0.13 }}s" {{ block.shopify_attributes }}>
-              <span class="scene-rail__suspension" aria-hidden="true"><i class="scene-rail__hook"></i><i class="scene-rail__thread"></i></span>
+            {% assign initial_img = block.settings.initial_image | default: linked_product.featured_image %}
+            {% assign hover_img = block.settings.hover_image | default: linked_product.images[1] | default: initial_img %}
+            {% assign offset_y = block.settings.drop_offset | default: 0 %}
+            {% assign rot_seed = forloop.index | times: 7 | modulo: 7 | minus: 3 %}
 
-              {% if item_url != blank %}
-                <a class="scene-rail__link" href="{{ item_url }}" aria-label="{% if item_title != blank %}View {{ item_title | escape }}{% else %}View product{% endif %}">
-              {% else %}
-                <div class="scene-rail__link scene-rail__link--unlinked">
-              {% endif %}
+            <div
+              class="hanging-rail-item"
+              data-rail-item
+              data-item-index="{{ forloop.index0 }}"
+              style="--item-drop: {{ offset_y }}px; --tag-rot: {{ rot_seed }}deg;"
+              {{ block.shopify_attributes }}
+            >
+              <div class="hanger-assembly">
+                
+                <!-- Metallic Hook & Wooden Neck -->
+                <div class="hanger-hardware" aria-hidden="true">
+                  <!-- Silver Hook Looping Over Rail -->
+                  <svg class="hanger-hook-svg" viewBox="0 0 28 44" fill="none">
+                    <!-- Hook Loop over Rail -->
+                    <path
+                      d="M 14 18 C 14 8 22 4 22 12 C 22 15 20 17 16 19 C 14 20 14 22 14 28"
+                      stroke="{{ rail_color }}"
+                      stroke-width="2.6"
+                      stroke-linecap="round"
+                    />
+                    <!-- Ball Tip -->
+                    <circle cx="22" cy="12" r="2" fill="{{ rail_color }}"/>
+                    <!-- Brass Ferrule / Neck Collar -->
+                    <rect x="11.5" y="28" width="5" height="4" rx="1" fill="#a07d46"/>
+                  </svg>
 
-                {% if section.settings.show_price_tags and item_price != blank %}
-                  <span class="scene-rail__tag">{{ item_price | escape }}</span>
+                  <!-- Wooden Hanger Neck/Shoulder Anchor -->
+                  <div class="hanger-wood-neck"></div>
+                </div>
+
+                <!-- Floating Paper Price Tag with Hole & Thread -->
+                {% if show_tags and item_price != blank %}
+                  <div class="hanging-tag" data-tag aria-hidden="true">
+                    <span class="tag-thread"></span>
+                    <div class="tag-card">
+                      <span class="tag-eyelet"></span>
+                      <span class="tag-amount">{{ item_price }}</span>
+                    </div>
+                  </div>
                 {% endif %}
 
-                <span class="scene-rail__garment">
-                  {% if block.settings.initial_image != blank %}
-                    {{ block.settings.initial_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '240,360,540,720,1000,1200', alt: item_title | default: 'Hanging product', class: 'scene-rail__image scene-rail__image--initial' }}
-                  {% else %}
-                    {{ 'product-1' | placeholder_svg_tag: 'scene-rail__placeholder' }}
-                  {% endif %}
-                  {% if block.settings.hover_image != blank %}
-                    {{ block.settings.hover_image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '240,360,540,720,1000,1200', alt: item_title | default: 'Product front view', class: 'scene-rail__image scene-rail__image--hover' }}
-                  {% endif %}
-                </span>
+                <!-- Garment Silhouette (Initial Side View -> Hovered Front View) -->
+                {% if item_url != blank %}
+                  <a href="{{ item_url }}" class="garment-anchor" aria-label="{{ item_title | escape }}">
+                {% else %}
+                  <div class="garment-anchor">
+                {% endif %}
+
+                  <div class="garment-view-box">
+                    {% if initial_img != blank %}
+                      <img
+                        src="{{ initial_img | image_url: width: 900 }}"
+                        alt="{{ item_title | escape }}"
+                        class="garment-img img-initial"
+                        loading="lazy"
+                      >
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'garment-placeholder' }}
+                    {% endif %}
+
+                    {% if hover_img != blank and hover_img != initial_img %}
+                      <img
+                        src="{{ hover_img | image_url: width: 900 }}"
+                        alt="{{ item_title | escape }} front view"
+                        class="garment-img img-hover"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </div>
+
+                {% if item_url != blank %}</a>{% else %}</div>{% endif %}
+
+                <!-- Ambient Floor Shadow beneath Garment -->
+                <div class="garment-shadow" aria-hidden="true"></div>
 
                 {% if section.settings.show_product_titles and item_title != blank %}
-                  <span class="scene-rail__title">{{ item_title | escape }}</span>
+                  <span class="garment-title">{{ item_title | escape }}</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+
+        {% else %}
+          <!-- DEFAULT DEMO PREVIEW (Matches attached reference image exactly) -->
+          {% assign demo_tags = "$199|$199|$199|$199|$199|$199|$199|$199|$199|$199|$199|$199|$199|$199|$199" | split: "|" %}
+          {% for price_text in demo_tags %}
+            {% assign idx = forloop.index0 %}
+            {% assign is_center = false %}
+            {% if idx == 7 %}{% assign is_center = true %}{% endif %}
+            {% assign rot_seed = forloop.index | times: 5 | modulo: 7 | minus: 3 %}
+
+            <div
+              class="hanging-rail-item demo-item{% if is_center %} is-demo-hovered{% endif %}"
+              data-rail-item
+              data-item-index="{{ idx }}"
+              style="--item-drop: 0px; --tag-rot: {{ rot_seed }}deg;"
+            >
+              <div class="hanger-assembly">
+                
+                <!-- Hook & Wooden Neck -->
+                <div class="hanger-hardware" aria-hidden="true">
+                  <svg class="hanger-hook-svg" viewBox="0 0 28 44" fill="none">
+                    <path
+                      d="M 14 18 C 14 8 22 4 22 12 C 22 15 20 17 16 19 C 14 20 14 22 14 28"
+                      stroke="{{ rail_color }}"
+                      stroke-width="2.6"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="22" cy="12" r="2" fill="{{ rail_color }}"/>
+                    <rect x="11.5" y="28" width="5" height="4" rx="1" fill="#a07d46"/>
+                  </svg>
+                  <div class="hanger-wood-neck"></div>
+                </div>
+
+                <!-- Price Tag -->
+                {% if show_tags %}
+                  <div class="hanging-tag" data-tag aria-hidden="true">
+                    <span class="tag-thread"></span>
+                    <div class="tag-card">
+                      <span class="tag-eyelet"></span>
+                      <span class="tag-amount">{{ price_text }}</span>
+                    </div>
+                  </div>
                 {% endif %}
 
-              {% if item_url != blank %}</a>{% else %}</div>{% endif %}
-            </article>
+                <!-- Garment Silhouette -->
+                <div class="garment-anchor">
+                  <div class="garment-view-box">
+                    {% liquid
+                      assign mod3 = idx | modulo: 4
+                      case mod3
+                        when 0
+                          assign demo_asset = 'royal-doll-blue.png'
+                        when 1
+                          assign demo_asset = 'royal-doll-cream.png'
+                        when 2
+                          assign demo_asset = 'royal-doll-green.png'
+                        else
+                          assign demo_asset = 'royal-doll-red.png'
+                      endcase
+                    %}
+                    <img
+                      src="{{ demo_asset | asset_url }}"
+                      alt="Garment view"
+                      class="garment-img img-initial"
+                      loading="lazy"
+                    >
+                    <img
+                      src="{{ demo_asset | asset_url }}"
+                      alt="Garment front view"
+                      class="garment-img img-hover"
+                      loading="lazy"
+                    >
+                  </div>
+                </div>
+
+                <div class="garment-shadow" aria-hidden="true"></div>
+              </div>
+            </div>
           {% endfor %}
-        </div>
+        {% endif %}
       </div>
     </div>
 
-    <footer class="scene-rail__footer">
-      <div class="scene-rail__hint">{% if section.settings.footer_hint != blank %}<span></span>{{ section.settings.footer_hint | escape }}{% endif %}</div>
-      <div class="scene-rail__cta">
-        {% if section.settings.footer_text != blank %}<p>{{ section.settings.footer_text | escape }}</p>{% endif %}
-        {% if section.settings.button_label != blank and section.settings.button_link != blank %}
-          <a href="{{ section.settings.button_link }}">{{ section.settings.button_label | escape }} <span aria-hidden="true">→</span></a>
-        {% endif %}
-      </div>
-    </footer>
+    <!-- Navigation Arrows -->
+    {% if section.settings.show_arrows %}
+      <button
+        type="button"
+        class="rail-nav-arrow arrow-prev"
+        data-rail-prev
+        aria-label="Scroll left"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="rail-nav-arrow arrow-next"
+        data-rail-next
+        aria-label="Scroll right"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
   </div>
+
+  <!-- Bottom Hint & Progress Indicator -->
+  <footer class="hanging-rail-footer">
+    <div class="hanging-rail-hint">
+      <span class="hint-line" aria-hidden="true"></span>
+      <span class="hint-text">{{ section.settings.footer_hint | default: 'Hover a piece · click to view' }}</span>
+    </div>
+
+    {% if section.settings.show_progress_bar %}
+      <div class="hanging-rail-progress-bar" aria-hidden="true">
+        <div class="progress-rail-track">
+          <div class="progress-rail-bead" data-progress-bead></div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+      <div class="hanging-rail-cta">
+        <a href="{{ section.settings.button_link }}" class="rail-cta-link">
+          <span>{{ section.settings.button_label | escape }}</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    {% endif %}
+  </footer>
 </section>
 
+{% comment %}
+  ==============================================================================
+  STYLES: Pure Cardless Aesthetic, Metallic Tubular Rail, Tags & Trajectory
+  ==============================================================================
+{% endcomment %}
 <style>
-  #SceneRail-{{ section.id }}{position:relative;isolation:isolate;display:flex;min-height:var(--sr-height);overflow:hidden;padding:{{ section.settings.padding_top }}px {{ section.settings.side_padding }}px {{ section.settings.padding_bottom }}px;background:var(--sr-bg);color:var(--sr-text)}
-  #SceneRail-{{ section.id }} .scene-rail__background{position:absolute;inset:0;z-index:-1}
-  #SceneRail-{{ section.id }} .scene-rail__background img{width:100%;height:100%;object-fit:cover}
-  #SceneRail-{{ section.id }} .scene-rail__inner{position:relative;display:flex;flex:1;min-width:0;flex-direction:column;justify-content:space-between}
-  #SceneRail-{{ section.id }} .scene-rail__header{position:relative;z-index:3;text-align:center;padding-top:8px}
-  #SceneRail-{{ section.id }} .scene-rail__eyebrow{margin:0 0 8px;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
-  #SceneRail-{{ section.id }} .scene-rail__header h2{margin:0;color:inherit;font-size:clamp(25px,3vw,44px);line-height:1.05;font-weight:750;letter-spacing:-.035em}
-  #SceneRail-{{ section.id }} .scene-rail__subheading{margin:10px 0 0;font-size:12px;opacity:.75}
-  #SceneRail-{{ section.id }} .scene-rail__stage{position:relative;flex:1;min-height:390px;margin-top:8px}
-  #SceneRail-{{ section.id }} .scene-rail__rod{position:absolute;z-index:1;top:0;left:-2%;width:104%;height:clamp(105px,15vw,190px);overflow:visible;pointer-events:none}
-  #SceneRail-{{ section.id }} .scene-rail__viewport{position:absolute;z-index:2;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;cursor:grab;touch-action:pan-y}
-  #SceneRail-{{ section.id }} .scene-rail__viewport::-webkit-scrollbar{display:none}
-  #SceneRail-{{ section.id }} .scene-rail__viewport.is-dragging{cursor:grabbing}
-  #SceneRail-{{ section.id }} .scene-rail__track{display:flex;width:max-content;min-width:100%;align-items:flex-start;justify-content:center;gap:var(--sr-gap);padding:clamp(100px,10vw,142px) 5vw 30px}
-  #SceneRail-{{ section.id }} .scene-rail__item{position:relative;flex:0 0 auto;width:max-content;min-width:0;transform:translateY(var(--drop));transform-origin:50% 0;animation:srSway-{{ section.id }} var(--sr-speed) ease-in-out infinite alternate;animation-delay:var(--delay)}
-  #SceneRail-{{ section.id }} .scene-rail__suspension{position:absolute;top:-53px;left:50%;width:12px;height:53px;transform:translateX(-50%);pointer-events:none}
-  #SceneRail-{{ section.id }} .scene-rail__hook{position:absolute;top:0;left:50%;width:8px;height:9px;border:1.3px solid #777;border-bottom:0;border-radius:7px 7px 0 0;transform:translateX(-50%)}
-  #SceneRail-{{ section.id }} .scene-rail__thread{position:absolute;top:8px;left:50%;width:1.5px;height:45px;background:linear-gradient(90deg,#777,#eee 48%,#777);transform:translateX(-50%)}
-  #SceneRail-{{ section.id }} .scene-rail__link{position:relative;display:flex;width:max-content;max-width:var(--sr-max-width);flex-direction:column;align-items:center;color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
-  #SceneRail-{{ section.id }} .scene-rail__link--unlinked{cursor:default}
-  #SceneRail-{{ section.id }} .scene-rail__tag{position:absolute;z-index:3;top:8px;left:50%;transform:translateX(-50%) rotate(-5deg);padding:6px 10px;border-radius:4px;background:{{ section.settings.tag_background }};color:{{ section.settings.tag_text }};font-size:11px;font-weight:750;line-height:1;white-space:nowrap;box-shadow:0 2px 7px #0002}
-  #SceneRail-{{ section.id }} .scene-rail__garment{position:relative;display:grid;grid-template-columns:max-content;grid-template-rows:var(--sr-garment-height);justify-items:center;align-items:start;width:max-content;max-width:var(--sr-max-width);overflow:visible}
-  #SceneRail-{{ section.id }} .scene-rail__image,#SceneRail-{{ section.id }} .scene-rail__placeholder{grid-area:1/1;display:block;width:auto;height:var(--sr-garment-height);max-width:var(--sr-max-width);object-fit:contain;object-position:top center;background:transparent;border:0;border-radius:0;box-shadow:none;filter:drop-shadow(0 5px 7px #00000016);transition:opacity .32s ease,filter .32s ease}
-  #SceneRail-{{ section.id }} .scene-rail__image--initial{opacity:1}
-  #SceneRail-{{ section.id }} .scene-rail__image--hover{opacity:0}
-  #SceneRail-{{ section.id }} .scene-rail__link:hover .scene-rail__image--initial,#SceneRail-{{ section.id }} .scene-rail__link:focus-visible .scene-rail__image--initial{opacity:0}
-  #SceneRail-{{ section.id }} .scene-rail__link:hover .scene-rail__image--hover,#SceneRail-{{ section.id }} .scene-rail__link:focus-visible .scene-rail__image--hover{opacity:1}
-  #SceneRail-{{ section.id }} .scene-rail__link:hover .scene-rail__image,#SceneRail-{{ section.id }} .scene-rail__link:focus-visible .scene-rail__image{filter:drop-shadow(0 9px 10px #00000024)}
-  #SceneRail-{{ section.id }} .scene-rail__title{margin-top:10px;font-size:12px;line-height:1.3;text-align:center}
-  #SceneRail-{{ section.id }} .scene-rail__footer{position:relative;z-index:3;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-top:14px}
-  #SceneRail-{{ section.id }} .scene-rail__hint{font-size:12px;opacity:.8}
-  #SceneRail-{{ section.id }} .scene-rail__hint span{display:inline-block;width:22px;height:1px;margin:0 9px 4px 0;background:currentColor}
-  #SceneRail-{{ section.id }} .scene-rail__cta{max-width:340px;text-align:right}
-  #SceneRail-{{ section.id }} .scene-rail__cta p{margin:0 0 13px;font-size:14px;font-weight:650;line-height:1.35}
-  #SceneRail-{{ section.id }} .scene-rail__cta a{display:inline-flex;align-items:center;gap:12px;padding-bottom:5px;border-bottom:1px solid currentColor;color:inherit;text-decoration:none;font-size:12px}
-  #SceneRail-{{ section.id }} .scene-rail__link:focus-visible{outline:2px solid currentColor;outline-offset:6px}
-  @keyframes srSway-{{ section.id }}{from{rotate:calc(var(--sr-swing) * -1)}to{rotate:var(--sr-swing)}}
-  @media(prefers-reduced-motion:reduce){#SceneRail-{{ section.id }} .scene-rail__item{animation:none!important}#SceneRail-{{ section.id }} .scene-rail__image{transition:none!important}}
-  @media(max-width:749px){
-    #SceneRail-{{ section.id }}{min-height:{{ section.settings.mobile_height }}vh;padding:{{ section.settings.mobile_padding_top }}px 14px {{ section.settings.mobile_padding_bottom }}px}
-    #SceneRail-{{ section.id }} .scene-rail__header h2{font-size:clamp(22px,7vw,32px)}
-    #SceneRail-{{ section.id }} .scene-rail__stage{min-height:340px}
-    #SceneRail-{{ section.id }} .scene-rail__track{justify-content:flex-start;gap:calc(var(--sr-gap)*.75);padding:90px 24px 24px}
-    #SceneRail-{{ section.id }} .scene-rail__garment{grid-template-rows:calc(var(--sr-garment-height)*.82)}
-    #SceneRail-{{ section.id }} .scene-rail__image,#SceneRail-{{ section.id }} .scene-rail__placeholder{height:calc(var(--sr-garment-height)*.82);max-width:min(var(--sr-max-width),68vw)}
-    #SceneRail-{{ section.id }} .scene-rail__link{max-width:min(var(--sr-max-width),68vw)}
-    #SceneRail-{{ section.id }} .scene-rail__footer{flex-direction:column;align-items:flex-start;gap:15px}
-    #SceneRail-{{ section.id }} .scene-rail__cta{text-align:left}
-    #SceneRail-{{ section.id }} .scene-rail__rod{height:112px}
+  /* 1. Container & Lighting */
+  .hanging-rail-section {
+    position: relative;
+    width: 100%;
+    background-color: var(--hr-bg);
+    color: var(--hr-text);
+    padding-top: var(--hr-pt);
+    padding-bottom: var(--hr-pb);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
   }
+
+  .hanging-rail-bg-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hanging-rail-ambient {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 1500px;
+    height: 420px;
+    background: radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.90) 0%, rgba(240, 243, 246, 0.50) 50%, rgba(255, 255, 255, 0) 75%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* 2. Optional Editorial Header */
+  .hanging-rail-header {
+    position: relative;
+    z-index: 4;
+    max-width: 820px;
+    margin: 0 auto 24px auto;
+    padding: 0 24px;
+  }
+  .hanging-rail-header.text-left { text-align: left; }
+  .hanging-rail-header.text-center { text-align: center; }
+  .hanging-rail-header.text-right { text-align: right; }
+
+  .hanging-rail-eyebrow {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--hr-text);
+    opacity: 0.75;
+    margin-bottom: 8px;
+  }
+  .hanging-rail-title {
+    font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 8px 0;
+  }
+  .hanging-rail-subheading {
+    font-size: 0.96rem;
+    opacity: 0.72;
+    margin: 0;
+  }
+
+  /* 3. Curved Stage & SVG Rail */
+  .hanging-rail-stage {
+    position: relative;
+    width: 100%;
+    z-index: 4;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hanging-rail-svg-wrap {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    pointer-events: none;
+    z-index: 4;
+    overflow: visible;
+  }
+  .hanging-rail-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* 4. Horizontal Viewport & Track */
+  .hanging-rail-viewport {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    touch-action: pan-y pinch-zoom;
+    padding-top: 36px;
+    padding-bottom: 30px;
+  }
+  .hanging-rail-viewport::-webkit-scrollbar { display: none; }
+  .hanging-rail-viewport.is-dragging { cursor: grabbing; }
+
+  .hanging-rail-track {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: max-content;
+    gap: var(--hr-gap);
+    padding: 0 max(30px, 4vw);
+  }
+
+  /* 5. Hanging Garment Items (NO CARDS, NO BOXES) */
+  .hanging-rail-item {
+    position: relative;
+    flex-shrink: 0;
+    width: auto;
+    min-width: 0;
+    user-select: none;
+  }
+
+  .hanger-assembly {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: 50% 0%;
+    transform: translate3d(0, calc(var(--curve-y, 0px) + var(--item-drop, 0px)), 0) rotate(var(--curve-tilt, 0deg));
+    transition: transform 0.08s linear;
+    will-change: transform;
+  }
+
+  /* Gentle Organic Breeze Sway */
+  .sway-active .hanger-assembly {
+    animation: hrBreeze 4.8s ease-in-out infinite alternate;
+  }
+  .sway-active .hanging-rail-item:nth-child(2n) .hanger-assembly {
+    animation-duration: 5.4s;
+    animation-delay: -1.4s;
+  }
+  .sway-active .hanging-rail-item:nth-child(3n) .hanger-assembly {
+    animation-duration: 4.4s;
+    animation-delay: -2.8s;
+  }
+  .sway-active .hanging-rail-item:nth-child(4n) .hanger-assembly {
+    animation-duration: 5.8s;
+    animation-delay: -0.6s;
+  }
+
+  @keyframes hrBreeze {
+    0%   { transform: translate3d(0, calc(var(--curve-y, 0px) + var(--item-drop, 0px)), 0) rotate(calc(var(--curve-tilt, 0deg) - 1.2deg)); }
+    100% { transform: translate3d(0, calc(var(--curve-y, 0px) + var(--item-drop, 0px)), 0) rotate(calc(var(--curve-tilt, 0deg) + 1.2deg)); }
+  }
+
+  /* 6. Realistic Hanger Hardware */
+  .hanger-hardware {
+    position: relative;
+    width: 28px;
+    height: 44px;
+    margin-top: -38px;
+    z-index: 6;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hanger-hook-svg {
+    width: 28px;
+    height: 44px;
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22));
+  }
+
+  .hanger-wood-neck {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 8px;
+    background: linear-gradient(180deg, #4d382c 0%, #2b1d16 100%);
+    border-radius: 2px 2px 4px 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  /* 7. Floating Price Tag with Hole & Thread */
+  .hanging-tag {
+    position: absolute;
+    top: 6px;
+    right: -10px;
+    z-index: 10;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: 50% 0%;
+    transform: rotate(var(--tag-rot, -2deg));
+    transition: transform 0.3s ease;
+  }
+
+  .tag-thread {
+    display: block;
+    width: 1px;
+    height: 12px;
+    background: rgba(80, 80, 80, 0.65);
+  }
+
+  .tag-card {
+    position: relative;
+    background-color: var(--hr-tag-bg);
+    color: var(--hr-tag-text);
+    padding: 5px 9px 4px 9px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tag-eyelet {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #ffffff;
+    border: 1px solid #444444;
+    border-radius: 50%;
+    margin-right: 2px;
+  }
+
+  .tag-amount {
+    font-size: 0.82rem;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* 8. Garment Presentation: Side View (Initial) -> Front View (Hovered) */
+  .garment-anchor {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    outline: none;
+  }
+
+  .garment-view-box {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: var(--hr-garment-h);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .garment-img {
+    display: block;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: top center;
+    background: transparent;
+    filter: drop-shadow(0 6px 12px rgba(25, 20, 15, 0.10));
+    transition: opacity 0.32s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.32s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Initial Image (Side View) */
+  .garment-img.img-initial {
+    position: relative;
+    max-width: 140px;
+    opacity: 1;
+    z-index: 2;
+  }
+
+  /* Hovered Image (Front View) */
+  .garment-img.img-hover {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 280px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* HOVER INTERACTION: Reveal Front View cleanly */
+  .hanging-rail-item:hover .garment-img.img-initial,
+  .hanging-rail-item:focus-within .garment-img.img-initial {
+    opacity: 0;
+  }
+  .hanging-rail-item:hover .garment-img.img-hover,
+  .hanging-rail-item:focus-within .garment-img.img-hover {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .hanging-rail-item:hover .garment-view-box,
+  .hanging-rail-item:focus-within .garment-view-box {
+    transform: translateY(-4px) scale(1.02);
+  }
+  .hanging-rail-item:hover .garment-img,
+  .hanging-rail-item:focus-within .garment-img {
+    filter: drop-shadow(0 14px 24px rgba(25, 20, 15, 0.18));
+  }
+
+  /* Center Demo Item preview in Theme Customizer */
+  .hanging-rail-item.is-demo-hovered .garment-img.img-initial { opacity: 0; }
+  .hanging-rail-item.is-demo-hovered .garment-img.img-hover { opacity: 1; pointer-events: auto; }
+  .hanging-rail-item.is-demo-hovered .garment-view-box { transform: translateY(-4px) scale(1.02); }
+
+  .garment-placeholder {
+    height: 100%;
+    width: 110px;
+    opacity: 0.3;
+  }
+
+  .garment-shadow {
+    width: 70%;
+    height: 12px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(20, 20, 20, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
+    margin: 6px auto 0 auto;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .garment-title {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    opacity: 0.85;
+  }
+
+  /* 9. Navigation Arrows */
+  .rail-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    color: var(--hr-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+    z-index: 12;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .rail-nav-arrow:hover {
+    background: #ffffff;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  }
+  .rail-nav-arrow.arrow-prev { left: max(14px, 2vw); }
+  .rail-nav-arrow.arrow-next { right: max(14px, 2vw); }
+
+  @media (max-width: 768px) {
+    .rail-nav-arrow { width: 36px; height: 36px; }
+  }
+
+  /* 10. Footer Hint & Progress Indicator */
+  .hanging-rail-footer {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    max-width: 1280px;
+    margin: 16px auto 0 auto;
+    padding: 0 var(--hr-side-pad);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  @media (max-width: 768px) {
+    .hanging-rail-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+
+  .hanging-rail-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    opacity: 0.72;
+  }
+  .hint-line {
+    display: inline-block;
+    width: 22px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  .hanging-rail-progress-bar {
+    flex-grow: 1;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .progress-rail-track {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+  }
+  .progress-rail-bead {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: var(--hr-text);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.20);
+    transition: left 0.1s linear;
+  }
+
+  .rail-cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.84rem;
+    font-weight: 650;
+    color: var(--hr-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: opacity 0.2s ease;
+  }
+  .rail-cta-link:hover { opacity: 0.75; }
 </style>
 
+{% comment %}
+  ==============================================================================
+  JAVASCRIPT: Dynamic Parabolic Curve Geometry, Real-Time Sync & Drag Physics
+  ==============================================================================
+{% endcomment %}
 <script>
-(() => {
-  const root = document.getElementById('SceneRail-{{ section.id }}');
-  if (!root || root.dataset.initialized === 'true') return;
-  root.dataset.initialized = 'true';
-  const viewport = root.querySelector('.scene-rail__viewport');
-  if (!viewport) return;
-  let down = false, dragged = false, startX = 0, startScroll = 0;
-  viewport.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
-    down = true; dragged = false; startX = event.clientX; startScroll = viewport.scrollLeft;
-    viewport.classList.add('is-dragging');
-    if (event.pointerType === 'mouse') viewport.setPointerCapture(event.pointerId);
-  });
-  viewport.addEventListener('pointermove', (event) => {
-    if (!down) return;
-    const delta = event.clientX - startX;
-    if (Math.abs(delta) > 6) dragged = true;
-    if (dragged) viewport.scrollLeft = startScroll - delta;
-  });
-  const stop = () => {
-    down = false; viewport.classList.remove('is-dragging');
-    window.setTimeout(() => { dragged = false; }, 80);
-  };
-  viewport.addEventListener('pointerup', stop);
-  viewport.addEventListener('pointercancel', stop);
-  viewport.addEventListener('lostpointercapture', stop);
-  viewport.querySelectorAll('.scene-rail__link[href]').forEach((link) => {
-    link.addEventListener('click', (event) => {
-      if (dragged) { event.preventDefault(); event.stopPropagation(); }
+  (function() {
+    function initHangingRail(sectionId) {
+      var root = document.getElementById("HangingRail-" + sectionId);
+      if (!root) return;
+
+      var stage = root.querySelector("[data-rail-stage]");
+      var viewport = root.querySelector("[data-rail-viewport]");
+      var track = root.querySelector("[data-rail-track]");
+      var prevBtn = root.querySelector("[data-rail-prev]");
+      var nextBtn = root.querySelector("[data-rail-next]");
+      var progressBead = root.querySelector("[data-progress-bead]");
+
+      var railSvg = root.querySelector("[data-rail-svg]");
+      var railCore = root.querySelector("[data-rail-core]");
+      var railShadow = root.querySelector("[data-rail-shadow]");
+      var railSpecular = root.querySelector("[data-rail-specular]");
+
+      if (!stage || !viewport || !track) return;
+
+      var sagDepth = parseFloat(root.dataset.sag) || 55;
+      var enableTilt = root.dataset.tilt === "true";
+      var yAnchor = 32; // Vertical anchor at the posts/edges
+      var items = Array.prototype.slice.call(track.querySelectorAll("[data-rail-item]"));
+
+      // 1. UPDATE SVG CURVE PATH DYNAMICALLY
+      function updateSvgCurve() {
+        var w = stage.clientWidth || 1400;
+        var h = Math.max(160, yAnchor + sagDepth + 50);
+
+        if (railSvg) {
+          railSvg.setAttribute("viewBox", "0 0 " + w + " " + h);
+          railSvg.style.height = h + "px";
+        }
+
+        // Quadratic Bézier: passes exactly through yAnchor + sagDepth at center (x = w/2)
+        var p1Y = yAnchor + (2.0 * sagDepth);
+        var pathData = "M 0," + yAnchor + " Q " + (w * 0.5) + "," + p1Y + " " + w + "," + yAnchor;
+        var shadowData = "M 0," + (yAnchor + 6) + " Q " + (w * 0.5) + "," + (p1Y + 6) + " " + w + "," + (yAnchor + 6);
+        var specularData = "M 0," + (yAnchor - 1) + " Q " + (w * 0.5) + "," + (p1Y - 1) + " " + w + "," + (yAnchor - 1);
+
+        if (railCore) railCore.setAttribute("d", pathData);
+        if (railShadow) railShadow.setAttribute("d", shadowData);
+        if (railSpecular) railSpecular.setAttribute("d", specularData);
+      }
+
+      // 2. REAL-TIME CURVE TRAJECTORY FOR HANGING PRODUCTS
+      var isTicking = false;
+
+      function updateItemsAlongCurve() {
+        isTicking = false;
+        var stageRect = stage.getBoundingClientRect();
+        var stageW = stageRect.width || 1400;
+        var stageCenterX = stageRect.left + (stageW * 0.5);
+        var halfW = Math.max(1, stageW * 0.5);
+
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i];
+          var rect = item.getBoundingClientRect();
+          var itemCenterX = rect.left + (rect.width * 0.5);
+          var relX = itemCenterX - stageCenterX;
+
+          // Normalized coordinate: -1 (left), 0 (center dip), +1 (right)
+          var u = relX / halfW;
+          u = Math.max(-1.3, Math.min(1.3, u));
+
+          // Parabolic dip matching the SVG curve: y = sagDepth * (1 - u^2)
+          var yDip = Math.max(0, sagDepth * (1.0 - (u * u)));
+
+          // Tangent slope: dy/dx = - (2 * sagDepth * u) / halfW
+          var slope = - (2.0 * sagDepth * u) / halfW;
+          var angleDeg = (Math.atan(slope) * 180) / Math.PI;
+          var tilt = enableTilt ? Math.max(-8, Math.min(8, angleDeg)) : 0;
+
+          var assembly = item.querySelector(".hanger-assembly");
+          if (assembly) {
+            assembly.style.setProperty("--curve-y", yDip.toFixed(1) + "px");
+            assembly.style.setProperty("--curve-tilt", tilt.toFixed(2) + "deg");
+          }
+        }
+
+        // Update progress bead
+        if (progressBead) {
+          var maxScroll = viewport.scrollWidth - viewport.clientWidth;
+          if (maxScroll <= 0) {
+            progressBead.style.left = "0%";
+          } else {
+            var prog = Math.min(1.0, Math.max(0.0, viewport.scrollLeft / maxScroll));
+            progressBead.style.left = (prog * 100) + "%";
+          }
+        }
+      }
+
+      function requestCurveUpdate() {
+        if (!isTicking) {
+          isTicking = true;
+          requestAnimationFrame(updateItemsAlongCurve);
+        }
+      }
+
+      // 3. MOUSE DRAG & TOUCH SWIPE MECHANICS
+      var isDown = false;
+      var startX = 0;
+      var scrollLeft = 0;
+      var isDragging = false;
+
+      viewport.addEventListener("mousedown", function(e) {
+        isDown = true;
+        isDragging = false;
+        startX = e.pageX - viewport.offsetLeft;
+        scrollLeft = viewport.scrollLeft;
+        viewport.style.scrollBehavior = "auto";
+        viewport.classList.add("is-dragging");
+      });
+
+      window.addEventListener("mouseup", function() {
+        if (!isDown) return;
+        isDown = false;
+        viewport.classList.remove("is-dragging");
+        viewport.style.scrollBehavior = "smooth";
+        setTimeout(function() { isDragging = false; }, 60);
+      });
+
+      viewport.addEventListener("mousemove", function(e) {
+        if (!isDown) return;
+        e.preventDefault();
+        var x = e.pageX - viewport.offsetLeft;
+        var walk = (x - startX) * 1.35;
+        if (Math.abs(walk) > 5) isDragging = true;
+        viewport.scrollLeft = scrollLeft - walk;
+        requestCurveUpdate();
+      });
+
+      viewport.addEventListener("click", function(e) {
+        if (isDragging) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, true);
+
+      // 4. NAVIGATION ARROWS
+      function getStep() {
+        var firstItem = track.querySelector(".hanging-rail-item");
+        if (firstItem) {
+          return firstItem.offsetWidth + 34;
+        }
+        return viewport.clientWidth * 0.75;
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", function() {
+          viewport.scrollBy({ left: -getStep(), behavior: "smooth" });
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", function() {
+          viewport.scrollBy({ left: getStep(), behavior: "smooth" });
+        });
+      }
+
+      // Listeners
+      viewport.addEventListener("scroll", requestCurveUpdate, { passive: true });
+      window.addEventListener("resize", function() {
+        updateSvgCurve();
+        requestCurveUpdate();
+      }, { passive: true });
+
+      // Initial execution
+      updateSvgCurve();
+      updateItemsAlongCurve();
+      setTimeout(function() {
+        updateSvgCurve();
+        updateItemsAlongCurve();
+      }, 100);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() {
+        initHangingRail("{{ section_id }}");
+      });
+    } else {
+      initHangingRail("{{ section_id }}");
+    }
+
+    document.addEventListener("shopify:section:load", function(e) {
+      if (e.detail && e.detail.sectionId === "{{ section_id }}") {
+        initHangingRail("{{ section_id }}");
+      }
     });
-  });
-})();
+  })();
 </script>
 
 {% schema %}
 {
-  "name": "Scene rail hanging slider",
+  "name": "Hanging Slider Rail",
   "tag": "section",
-  "class": "section-scene-rail",
+  "class": "hanging-slider-rail-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
   "settings": [
-    { "type": "header", "content": "Heading" },
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "NEW COLLECTION" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "PREMIUM STREETWEAR" },
-    { "type": "text", "id": "subheading", "label": "Subheading" },
-    { "type": "header", "content": "Background and colors" },
-    { "type": "color", "id": "background_color", "label": "Background color", "default": "#E5EBED" },
-    { "type": "image_picker", "id": "background_image", "label": "Background image" },
-    { "type": "color", "id": "text_color", "label": "Text color", "default": "#FFFFFF" },
-    { "type": "color", "id": "rail_color", "label": "Rail metal color", "default": "#AEB5BA" },
-    { "type": "header", "content": "Curved rail" },
-    { "type": "range", "id": "rail_thickness", "label": "Rail thickness", "min": 2, "max": 14, "step": 1, "default": 7 },
-    { "type": "header", "content": "Garment display" },
-    { "type": "range", "id": "garment_height", "label": "Garment height", "min": 140, "max": 460, "step": 10, "default": 270 },
-    { "type": "range", "id": "garment_max_width", "label": "Maximum garment width", "min": 90, "max": 360, "step": 10, "default": 230 },
-    { "type": "range", "id": "product_gap", "label": "Space between products", "min": 8, "max": 90, "step": 2, "default": 38 },
-    { "type": "range", "id": "swing_intensity", "label": "Swing intensity", "min": 0, "max": 8, "step": 1, "default": 1 },
-    { "type": "range", "id": "swing_duration", "label": "Swing duration", "min": 3, "max": 14, "step": 1, "default": 7 },
-    { "type": "header", "content": "Price tags" },
-    { "type": "checkbox", "id": "show_price_tags", "label": "Show price tags", "default": true },
-    { "type": "color", "id": "tag_background", "label": "Tag background", "default": "#F8F6EF" },
-    { "type": "color", "id": "tag_text", "label": "Tag text", "default": "#252525" },
-    { "type": "checkbox", "id": "show_product_titles", "label": "Show product titles", "default": false },
-    { "type": "header", "content": "Footer" },
-    { "type": "text", "id": "footer_hint", "label": "Bottom-left hint", "default": "Hover a piece · click to shop" },
-    { "type": "text", "id": "footer_text", "label": "Bottom-right text", "default": "Crafted with care. Designed to last." },
-    { "type": "text", "id": "button_label", "label": "Collection button label", "default": "Shop the Collection" },
-    { "type": "url", "id": "button_link", "label": "Collection button link" },
-    { "type": "header", "content": "Desktop layout" },
-    { "type": "range", "id": "desktop_height", "label": "Section height", "min": 60, "max": 100, "step": 5, "default": 100 },
-    { "type": "range", "id": "side_padding", "label": "Side padding", "min": 0, "max": 100, "step": 4, "default": 40 },
-    { "type": "range", "id": "padding_top", "label": "Top padding", "min": 0, "max": 120, "step": 4, "default": 24 },
-    { "type": "range", "id": "padding_bottom", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "default": 24 },
-    { "type": "header", "content": "Mobile layout" },
-    { "type": "range", "id": "mobile_height", "label": "Mobile section height", "min": 60, "max": 100, "step": 5, "default": 90 },
-    { "type": "range", "id": "mobile_padding_top", "label": "Mobile top padding", "min": 0, "max": 80, "step": 4, "default": 20 },
-    { "type": "range", "id": "mobile_padding_bottom", "label": "Mobile bottom padding", "min": 0, "max": 80, "step": 4, "default": 20 }
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "NEW COLLECTION"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "PREMIUM STREETWEAR"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Header Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Background & Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#F8F9FA"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#1A1815"
+    },
+    {
+      "type": "color",
+      "id": "rail_color",
+      "label": "Rail Metal Color",
+      "default": "#9DA3A8"
+    },
+    {
+      "type": "header",
+      "content": "Curved Rail System"
+    },
+    {
+      "type": "range",
+      "id": "rail_thickness",
+      "min": 4,
+      "max": 14,
+      "step": 1,
+      "default": 9,
+      "unit": "px",
+      "label": "Rail Thickness"
+    },
+    {
+      "type": "range",
+      "id": "rail_sag",
+      "min": 20,
+      "max": 120,
+      "step": 5,
+      "default": 55,
+      "unit": "px",
+      "label": "Rail Curvature / Sag Amount",
+      "info": "Controls how deep the metallic rail droops in the center."
+    },
+    {
+      "type": "header",
+      "content": "Garment Display"
+    },
+    {
+      "type": "range",
+      "id": "garment_height",
+      "min": 200,
+      "max": 460,
+      "step": 10,
+      "default": 320,
+      "unit": "px",
+      "label": "Garment Height"
+    },
+    {
+      "type": "range",
+      "id": "product_spacing",
+      "min": 14,
+      "max": 70,
+      "step": 2,
+      "default": 34,
+      "unit": "px",
+      "label": "Space Between Garments"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_breeze_sway",
+      "label": "Enable Subtle Breeze Sway",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_curve_tilt",
+      "label": "Tilt Garments Along Rail Slope",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Floating Price Tags"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price_tags",
+      "label": "Show Price Tags",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "tag_background",
+      "label": "Tag Background Color",
+      "default": "#FAF9F5"
+    },
+    {
+      "type": "color",
+      "id": "tag_text",
+      "label": "Tag Text Color",
+      "default": "#111111"
+    },
+    {
+      "type": "text",
+      "id": "default_tag_price",
+      "label": "Default Tag Price Text",
+      "default": "$199"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_titles",
+      "label": "Show Product Titles Below Garments",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Navigation & Footer"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Navigation Arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "Show Progress Indicator Rail",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "footer_hint",
+      "label": "Bottom Hint Text",
+      "default": "Hover a piece · click to view"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "CTA Button Label",
+      "default": "Shop the Collection"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "CTA Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Dimensions & Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 40,
+      "unit": "px",
+      "label": "Top Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 50,
+      "unit": "px",
+      "label": "Bottom Padding"
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 40,
+      "unit": "px",
+      "label": "Side Padding"
+    }
   ],
   "blocks": [
     {
       "type": "hanging_product",
-      "name": "Hanging product",
+      "name": "Hanging Garment",
       "settings": [
-        { "type": "image_picker", "id": "initial_image", "label": "Initial image", "info": "Visible before hover. Use a side or angled garment view." },
-        { "type": "image_picker", "id": "hover_image", "label": "Hover image", "info": "Revealed on hover or keyboard focus. Use a straight front-facing view." },
-        { "type": "product", "id": "product", "label": "Linked Shopify product" },
-        { "type": "url", "id": "custom_link", "label": "Custom link override", "info": "Optional. If blank, the selected product URL is used." },
-        { "type": "text", "id": "custom_title", "label": "Accessible product title" },
-        { "type": "text", "id": "custom_price", "label": "Price tag text override", "info": "Optional. If blank, the linked product price is used." },
-        { "type": "range", "id": "drop_offset", "label": "Hanging position offset", "min": 0, "max": 70, "step": 2, "default": 0 }
+        {
+          "type": "image_picker",
+          "id": "initial_image",
+          "label": "Initial Image (Side/Profile View)",
+          "info": "Displayed naturally on the rail. Use a side or angled garment profile view."
+        },
+        {
+          "type": "image_picker",
+          "id": "hover_image",
+          "label": "Hovered Image (Front-Facing View)",
+          "info": "Smoothly revealed when hovering over the garment. Use a full front-facing view."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Linked Shopify Product"
+        },
+        {
+          "type": "url",
+          "id": "custom_link",
+          "label": "Custom Link Override",
+          "info": "Optional. If left blank, the linked Shopify product URL is used."
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Custom Title Override"
+        },
+        {
+          "type": "text",
+          "id": "custom_price",
+          "label": "Price Tag Text (e.g. $199)",
+          "info": "Optional. If left blank, the linked Shopify product price is used."
+        },
+        {
+          "type": "range",
+          "id": "drop_offset",
+          "min": -30,
+          "max": 40,
+          "step": 2,
+          "default": 0,
+          "unit": "px",
+          "label": "Individual Hanging Drop Offset"
+        }
       ]
     }
   ],
-  "max_blocks": 24,
+  "max_blocks": 30,
   "presets": [
     {
-      "name": "Scene rail hanging slider",
+      "name": "Hanging Slider Rail",
       "blocks": [
+        { "type": "hanging_product" },
+        { "type": "hanging_product" },
         { "type": "hanging_product" },
         { "type": "hanging_product" },
         { "type": "hanging_product" },

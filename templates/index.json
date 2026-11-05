@@ -43,7 +43,7 @@
       ],
       "name": "Scene rail",
       "settings": {
-        "background_color": "#FFFFFF",
+        "background_color": "transparent",
         "text_color": "#FFFFFF",
         "accent_color": "#FFFFFF",
         "image_focus": "center",

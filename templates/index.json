@@ -21,7 +21,65 @@
             "custom_title": "",
             "custom_price": "",
             "custom_link": "",
-            "drop_offset": 0
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_tihfNA": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Red_Urban_Culture_Striped_T-Shirt_Mockup.png",
+            "hover_image": "shopify://shop_images/Deep_Red_Urban_Culture_T-Shirt.png",
+            "product": "mustard-festive-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_cdVymU": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Urban_Culture_Green_Striped_Tee.png",
+            "hover_image": "shopify://shop_images/Olive_Green_Urban_Culture_T-Shirt_Mockup.png",
+            "product": "emerald-green-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_Dx9LwC": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Cream_Urban_Culture_Striped_T-Shirt_Mockup.png",
+            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
+            "product": "ivory-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_NtVmxf": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Navy_Urban_Culture_Striped_T-Shirt.png",
+            "hover_image": "shopify://shop_images/Navy_Urban_Culture_Graphic_T-Shirt.png",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
           }
         },
         "product_W3hqmG": {
@@ -33,33 +91,103 @@
             "custom_title": "",
             "custom_price": "",
             "custom_link": "",
-            "drop_offset": 0
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_cjPngL": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Red_Urban_Culture_Striped_T-Shirt_Mockup.png",
+            "hover_image": "shopify://shop_images/Deep_Red_Urban_Culture_T-Shirt.png",
+            "product": "mustard-festive-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_LQirRK": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Urban_Culture_Green_Striped_Tee.png",
+            "hover_image": "shopify://shop_images/Olive_Green_Urban_Culture_T-Shirt_Mockup.png",
+            "product": "emerald-green-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_DiJEAE": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Cream_Urban_Culture_Striped_T-Shirt_Mockup.png",
+            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
+            "product": "ivory-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_UjqQye": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Navy_Urban_Culture_Striped_T-Shirt.png",
+            "hover_image": "shopify://shop_images/Navy_Urban_Culture_Graphic_T-Shirt.png",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
           }
         }
       },
       "block_order": [
         "product_pUUUtB",
-        "product_W3hqmG"
+        "product_tihfNA",
+        "product_cdVymU",
+        "product_Dx9LwC",
+        "product_NtVmxf",
+        "product_W3hqmG",
+        "product_cjPngL",
+        "product_LQirRK",
+        "product_DiJEAE",
+        "product_UjqQye"
       ],
       "name": "Scene rail",
       "settings": {
-        "background_color": "transparent",
-        "text_color": "#FFFFFF",
-        "accent_color": "#FFFFFF",
+        "show_background_image": false,
         "image_focus": "center",
         "overlay_opacity": 0,
+        "blend_white_mockups": false,
+        "text_color": "#ffffff",
+        "accent_color": "#FFFFFF",
         "rail_sag": 40,
         "rail_thickness": 7,
         "eyebrow": "NEW COLLECTION",
         "eyebrow_sub": "PREMIUM STREETWEAR",
         "heading": "Layers that hang right.",
         "garment_height": 320,
+        "initial_width": 110,
+        "hover_width": 260,
         "product_gap": 20,
-        "hover_speed": 850,
+        "hover_speed": 300,
         "enable_breeze": true,
+        "sway_intensity": 2.5,
         "enable_tilt": 3,
         "show_tags": true,
-        "tag_background": "#FAF9F5",
+        "tag_background": "#faf9f5",
         "tag_text": "#000000",
         "default_tag_price": "$199",
         "show_progress": true,

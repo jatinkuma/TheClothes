@@ -2,14 +2,24 @@
   ==============================================================================
   SCENE RAIL: HANGING PRODUCT SLIDER (CURVED METALLIC RAIL)
   ------------------------------------------------------------------------------
-  - Large curved horizontal metallic rod across the viewport.
-  - Hanging garments with INITIAL IMAGE (side view) and HOVERED IMAGE (front view).
-  - Smooth turning 3D transition on hover with flex width expansion.
+  - Transparent background by default.
+  - Initial and hovered images display at the EXACT SAME SIZE (no small initial image).
+  - Smooth hover transition reveals hover image at identical scale.
   - Realistic left-to-right pendulum sway ("kapde jaise hilte hain").
-  - Hovered garment lifts up, turns front, and expands; unhovered clothes continue swaying.
+  - Hovered garment lifts up slightly and pauses sway; unhovered clothes keep swaying.
+  - Large curved horizontal metallic rod across the viewport.
   - Floating paper price tags with hole grommet and clean pricing.
   ==============================================================================
 {% endcomment %}
+
+{% assign sec_bg = 'transparent' %}
+{% unless section.settings.transparent_background %}
+  {% if section.settings.background_color != blank and section.settings.background_color != 'rgba(0,0,0,0)' and section.settings.background_color != '#ffffff' and section.settings.background_color != '#FFFFFF' %}
+    {% assign sec_bg = section.settings.background_color %}
+  {% endif %}
+{% endunless %}
+
+{% assign item_width = section.settings.item_width | default: section.settings.hover_width | default: 240 %}
 
 <section
   id="sr-{{ section.id }}"
@@ -19,21 +29,22 @@
   data-tilt="{{ section.settings.enable_tilt }}"
   data-hover-speed="{{ section.settings.hover_speed }}"
   style="
-    --sr-bg: {{ section.settings.background_color }};
-    --sr-txt: {{ section.settings.text_color }};
-    --sr-acc: {{ section.settings.accent_color }};
+    --sr-bg: {{ sec_bg }};
+    --sr-txt: {{ section.settings.text_color | default: '#000000' }};
+    --sr-acc: {{ section.settings.accent_color | default: '#000000' }};
     --sr-hspd: {{ section.settings.hover_speed }}ms;
-    --sr-w-init: {{ section.settings.initial_width }}px;
-    --sr-w-hov: {{ section.settings.hover_width }}px;
+    --sr-item-w: {{ item_width }}px;
     --sr-gap: {{ section.settings.product_gap }}px;
     --sr-h-desk: {{ section.settings.garment_height }}px;
-    --sr-h-slide: {{ section.settings.garment_height | times: 0.82 | round }}px;
+    --sr-h-slide: {{ section.settings.garment_height | times: 0.80 | round }}px;
     --sr-sway: {{ section.settings.sway_intensity }}deg;
     --sr-pt: {{ section.settings.padding_top }}px;
     --sr-pb: {{ section.settings.padding_bottom }}px;
     --sr-ov: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
     --sr-tag-bg: {{ section.settings.tag_background }};
     --sr-tag-tx: {{ section.settings.tag_text }};
+    background-color: {{ sec_bg }};
+    background: {{ sec_bg }};
   "
 >
   {% if section.settings.background_image != blank %}
@@ -44,9 +55,10 @@
         background-position: {{ section.settings.image_focus }};
       "
     ></div>
+    {% if section.settings.overlay_opacity > 0 %}
+      <div class="sr-ov" aria-hidden="true"></div>
+    {% endif %}
   {% endif %}
-
-  <div class="sr-ov" aria-hidden="true"></div>
 
   <div class="sr-wrap">
     <!-- Top Bar: Eyebrow Caption & Heading -->
@@ -130,7 +142,7 @@
         {% assign block_count = section.blocks.size %}
 
         {% if block_count > 0 %}
-          <!-- MERCHANT BLOCKS: Initial Side View + Hover Front View -->
+          <!-- MERCHANT BLOCKS: Both Images at the Exact Same Size -->
           {% for block in section.blocks %}
             {% assign linked_product = block.settings.product %}
             {% assign item_url = block.settings.custom_link | default: linked_product.url | default: '#' %}
@@ -184,14 +196,14 @@
                   </div>
                 {% endif %}
 
-                <!-- Hanging Garment Images (Side vs Front) -->
+                <!-- Hanging Garment Images (Both Initial & Hover at Exact Same Size) -->
                 <div class="sr-garment">
-                  <!-- Initial Image (Side View) -->
+                  <!-- Initial Image -->
                   <div class="sr-view" data-sr-pos="0">
                     {% if initial_img != blank %}
                       <img
-                        src="{{ initial_img | image_url: width: 800 }}"
-                        alt="{{ item_title | escape }} – side"
+                        src="{{ initial_img | image_url: width: 1000 }}"
+                        alt="{{ item_title | escape }} – view 1"
                         loading="lazy"
                         decoding="async"
                       >
@@ -200,12 +212,12 @@
                     {% endif %}
                   </div>
 
-                  <!-- Hovered Image (Front View - Large & Prominent) -->
+                  <!-- Hovered Image (Same Size as Initial Image) -->
                   <div class="sr-view" data-sr-pos="1">
                     {% if hover_img != blank %}
                       <img
                         src="{{ hover_img | image_url: width: 1000 }}"
-                        alt="{{ item_title | escape }} – front"
+                        alt="{{ item_title | escape }} – view 2"
                         loading="lazy"
                         decoding="async"
                       >
@@ -232,7 +244,7 @@
           {% endfor %}
 
         {% else %}
-          <!-- EXACT DEFAULT PREVIEW (Nike / Streetwear Reference Pieces) -->
+          <!-- DEFAULT PREVIEW (Nike / Streetwear Reference Pieces) -->
           {% assign demo_items = "Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Hoodie Black|$199.00|2610071101516777|2610071101472773#Sweatshirt|$199.00|2610071517384792|2610071517318112#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Tshirt|$199.00|2610071516549024|2610071515314737#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Sweatshirt|$199.00|2610071517384792|2610071517318112#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552" | split: "#" %}
 
           {% for d_str in demo_items %}
@@ -241,11 +253,9 @@
             {% assign d_price = d_parts[1] %}
             {% assign d_side_id = d_parts[2] %}
             {% assign d_front_id = d_parts[3] %}
-            {% assign is_center_demo = false %}
-            {% if forloop.index == 8 %}{% assign is_center_demo = true %}{% endif %}
 
             <div
-              class="sr-item{% if is_center_demo %} is-demo-center{% endif %}"
+              class="sr-item"
               data-sr-item=""
               role="button"
               tabindex="0"
@@ -275,12 +285,12 @@
                   </div>
                 </div>
 
-                <!-- Garment -->
+                <!-- Garment (Both Initial & Hover at Same Size) -->
                 <div class="sr-garment">
                   <div class="sr-view" data-sr-pos="0">
                     <img
                       src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_side_id }}.webp?height=640"
-                      alt="{{ d_name }} – side"
+                      alt="{{ d_name }} – view 1"
                       loading="lazy"
                       decoding="async"
                     >
@@ -288,7 +298,7 @@
                   <div class="sr-view" data-sr-pos="1">
                     <img
                       src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_front_id }}.webp?height=640"
-                      alt="{{ d_name }} – front"
+                      alt="{{ d_name }} – view 2"
                       loading="lazy"
                       decoding="async"
                     >
@@ -345,12 +355,13 @@
 
 <style>
   /* ========================================================================= */
-  /* BASE SECTION STYLING                                                      */
+  /* BASE SECTION STYLING (Transparent Background)                             */
   /* ========================================================================= */
   .sr-sec {
     position: relative;
-    background-color: var(--sr-bg, #ffffff);
-    color: var(--sr-txt, #000000);
+    background-color: var(--sr-bg, transparent);
+    background: transparent;
+    color: var(--sr-txt, inherit);
     overflow: hidden;
     padding-top: var(--sr-pt, 60px);
     padding-bottom: var(--sr-pb, 48px);
@@ -389,6 +400,7 @@
     justify-content: space-between;
     flex-grow: 1;
     width: 100%;
+    background: transparent;
   }
 
   /* Top Caption & Header */
@@ -432,6 +444,7 @@
     width: 100%;
     margin: 20px 0 10px 0;
     overflow: visible;
+    background: transparent;
   }
   .sr-rodsvg {
     position: absolute;
@@ -449,7 +462,7 @@
     z-index: 5;
     display: flex;
     align-items: flex-start;
-    gap: var(--sr-gap, 20px);
+    gap: var(--sr-gap, 24px);
     width: 100%;
     overflow-x: auto;
     overflow-y: visible;
@@ -458,12 +471,13 @@
     cursor: grab;
     touch-action: pan-y;
     padding: 34px max(40px, 5vw) 26px max(40px, 5vw);
+    background: transparent;
   }
   .sr-rack::-webkit-scrollbar { display: none; }
   .sr-rack.is-dragging { cursor: grabbing; }
 
   /* ========================================================================= */
-  /* GARMENT ITEM CONTAINER (Flex Slot & Curved Rail Follower)                 */
+  /* GARMENT ITEM CONTAINER (Both Images Have the Exact Same Size)             */
   /* ========================================================================= */
   .sr-item {
     position: relative;
@@ -473,24 +487,17 @@
     align-items: center;
     outline: none;
     cursor: pointer;
-    width: var(--sr-w-init, 92px);
+    width: var(--sr-item-w, 240px); /* Both images share this identical full width */
     transform-origin: 50% 0%;
     transform: translate3d(0, calc(var(--curve-y, 0px) + var(--sr-drop, 0px)), 0) rotate(var(--curve-tilt, 0deg));
-    transition: width var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1), transform 0.08s linear;
-    will-change: width, transform;
+    transition: transform 0.08s linear;
+    will-change: transform;
+    background: transparent;
   }
 
-  /* Hover & Active: Width smoothly expands, parting neighbor clothes */
   .sr-item:hover,
   .sr-item:focus-visible,
   .sr-item.is-active {
-    width: var(--sr-w-hov, 280px);
-    z-index: 10;
-  }
-
-  /* Initial Hero state for center demo item when rack is untouched */
-  .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center {
-    width: var(--sr-w-hov, 280px);
     z-index: 10;
   }
 
@@ -506,15 +513,16 @@
     transform-origin: 50% 6px; /* Pivots from hanger hook contact on the rod */
     will-change: transform;
     transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    background: transparent;
   }
 
   /* Breeze Sway Keyframe: Sinusoidal Left-to-Right Pendulum Motion */
   @keyframes srHangSway {
     0% {
-      transform: rotate(calc(-1 * var(--sr-sway, 2.8deg)));
+      transform: rotate(calc(-1 * var(--sr-sway, 2.6deg)));
     }
     100% {
-      transform: rotate(calc(1 * var(--sr-sway, 2.8deg)));
+      transform: rotate(calc(1 * var(--sr-sway, 2.6deg)));
     }
   }
 
@@ -551,17 +559,12 @@
     animation-delay: -3.9s;
   }
 
-  /* On Hover: Garment straightens upright (0deg), lifts up slightly (-8px) */
+  /* On Hover: Garment straightens upright (0deg) and lifts slightly (-8px) */
   .sr-item:hover .sr-hang-sway,
   .sr-item:focus-visible .sr-hang-sway,
   .sr-item.is-active .sr-hang-sway {
     animation: none !important;
     transform: translateY(-8px) rotate(0deg) !important;
-  }
-
-  .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-hang-sway {
-    animation: none !important;
-    transform: translateY(-4px) rotate(0deg) !important;
   }
 
   /* ========================================================================= */
@@ -628,7 +631,7 @@
   }
 
   /* ========================================================================= */
-  /* GARMENT DISPLAY & SMOOTH 3D TURNING TRANSITION                            */
+  /* GARMENT DISPLAY: Both Images Same Size with Smooth Reveal Transition       */
   /* ========================================================================= */
   .sr-garment {
     position: relative;
@@ -637,10 +640,11 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    perspective: 800px; /* Gives realistic depth when turning from side to front */
+    perspective: 800px;
+    background: transparent;
   }
 
-  /* Each View (Side vs Front) */
+  /* Both Views Share Identical Absolute Positioning and Dimensions */
   .sr-view {
     position: absolute;
     top: 0;
@@ -656,61 +660,55 @@
     transition: opacity var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1),
                 transform var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1);
     will-change: opacity, transform;
+    background: transparent;
   }
 
+  /* Both Images Have Identical Sizing (Full Height, Contain, Same Aspect Match) */
   .sr-view img {
     display: block;
     height: 100%;
     width: auto;
+    max-width: 100%;
     max-height: 100%;
     object-fit: contain;
     object-position: top center;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.14));
     transition: filter var(--sr-hspd) ease;
     user-select: none;
     -webkit-user-drag: none;
+    background: transparent;
   }
 
-  /* Initial Image (Side/Profile View) - Narrow */
+  /* Initial Image: Visible by default at full size */
   .sr-view[data-sr-pos="0"] {
     opacity: 1;
     transform: translateX(-50%) rotateY(0deg) scale(1);
     z-index: 2;
     pointer-events: auto;
   }
-  .sr-view[data-sr-pos="0"] img {
-    max-width: 130px;
-  }
 
-  /* Hovered Image (Front-Facing View) - Broad, Large & Prominent */
+  /* Hovered Image: Same size, revealed on hover */
   .sr-view[data-sr-pos="1"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(-65deg) scale(0.92);
+    transform: translateX(-50%) rotateY(-20deg) scale(1);
     z-index: 3;
     pointer-events: none;
   }
-  .sr-view[data-sr-pos="1"] img {
-    max-width: var(--sr-w-hov, 280px);
-    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.22));
-  }
 
-  /* Back View (Optional) */
+  /* Optional Back View */
   .sr-view[data-sr-pos="-1"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(65deg) scale(0.92);
+    transform: translateX(-50%) rotateY(20deg) scale(1);
     z-index: 1;
     pointer-events: none;
   }
-  .sr-view[data-sr-pos="-1"] img {
-    max-width: var(--sr-w-hov, 280px);
-  }
 
-  /* HOVER TRANSITION: Cross-fade & 3D Turning to Front View */
+  /* HOVER TRANSITION: Smooth Cross-fade between Identical Sized Views */
   .sr-item:hover .sr-view[data-sr-pos="0"],
   .sr-item:focus-visible .sr-view[data-sr-pos="0"],
   .sr-item.is-active .sr-view[data-sr-pos="0"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(65deg) scale(0.90);
+    transform: translateX(-50%) rotateY(20deg) scale(1);
     pointer-events: none;
   }
 
@@ -718,20 +716,9 @@
   .sr-item:focus-visible .sr-view[data-sr-pos="1"],
   .sr-item.is-active .sr-view[data-sr-pos="1"] {
     opacity: 1;
-    transform: translateX(-50%) rotateY(0deg) scale(1.08); /* Pop out large and prominent */
+    transform: translateX(-50%) rotateY(0deg) scale(1);
     pointer-events: auto;
-  }
-
-  /* Center demo item in default state */
-  .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-view[data-sr-pos="0"] {
-    opacity: 0;
-    transform: translateX(-50%) rotateY(65deg) scale(0.90);
-    pointer-events: none;
-  }
-  .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-view[data-sr-pos="1"] {
-    opacity: 1;
-    transform: translateX(-50%) rotateY(0deg) scale(1.08);
-    pointer-events: auto;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.22));
   }
 
   /* Floor Shadow */
@@ -748,9 +735,8 @@
     transition: transform var(--sr-hspd) ease, opacity var(--sr-hspd) ease;
   }
   .sr-item:hover .sr-item-shadow,
-  .sr-item.is-active .sr-item-shadow,
-  .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-item-shadow {
-    transform: translateX(-50%) scale(1.4);
+  .sr-item.is-active .sr-item-shadow {
+    transform: translateX(-50%) scale(1.3);
     opacity: 0.85;
   }
 
@@ -765,6 +751,7 @@
     justify-content: space-between;
     padding: 16px max(40px, 5vw) 0 max(40px, 5vw);
     gap: 24px;
+    background: transparent;
   }
   @media (max-width: 768px) {
     .sr-foot {
@@ -778,16 +765,7 @@
       height: var(--sr-h-slide, 270px);
     }
     .sr-item {
-      width: 76px;
-    }
-    .sr-item:hover,
-    .sr-item:focus-visible,
-    .sr-item.is-active,
-    .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center {
-      width: 220px;
-    }
-    .sr-view[data-sr-pos="1"] img {
-      max-width: 220px;
+      width: 180px; /* Both images same size on mobile */
     }
   }
 
@@ -1003,7 +981,7 @@
       items.forEach(function(item) {
         item.addEventListener("mouseenter", function() {
           rack.classList.add("has-active-item");
-          items.forEach(function(it) { it.classList.remove("is-active", "is-demo-center"); });
+          items.forEach(function(it) { it.classList.remove("is-active"); });
           item.classList.add("is-active");
           setPeek(item);
           setTimeout(requestCurveUpdate, 60);
@@ -1020,9 +998,7 @@
       rack.addEventListener("mouseleave", function() {
         rack.classList.remove("has-active-item");
         items.forEach(function(it) { it.classList.remove("is-active"); });
-        // Restore center demo preview
-        var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
-        if (centerDemo) setPeek(centerDemo);
+        if (items.length > 0) setPeek(items[0]);
         setTimeout(requestCurveUpdate, 60);
       });
 
@@ -1065,8 +1041,7 @@
       setTimeout(function() {
         updateRodCurve();
         updateItemTrajectory();
-        var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
-        if (centerDemo) setPeek(centerDemo);
+        if (items.length > 0) setPeek(items[0]);
       }, 50);
     }
 
@@ -1095,32 +1070,38 @@
       "content": "Scene Colors"
     },
     {
+      "type": "checkbox",
+      "id": "transparent_background",
+      "label": "Transparent background",
+      "default": true,
+      "info": "Keeps the section background completely transparent."
+    },
+    {
       "type": "color",
       "id": "background_color",
-      "label": "Background colour",
-      "default": "#FFFFFF"
+      "label": "Background colour (if not transparent)"
     },
     {
       "type": "color",
       "id": "text_color",
       "label": "Text colour",
-      "default": "#FFFFFF"
+      "default": "#000000"
     },
     {
       "type": "color",
       "id": "accent_color",
       "label": "Accent colour",
-      "default": "#FFFFFF"
+      "default": "#000000"
     },
     {
       "type": "header",
-      "content": "Background Image"
+      "content": "Background Image (Optional)"
     },
     {
       "type": "image_picker",
       "id": "background_image",
       "label": "Background image",
-      "info": "A wide photo behind the rail: a winter street, a stadium, your shop. 2400px wide or more."
+      "info": "Optional wide photo behind the rail. Leave empty for transparent background."
     },
     {
       "type": "image_picker",
@@ -1207,47 +1188,39 @@
       "max": 520,
       "step": 10,
       "unit": "px",
-      "default": 340
+      "default": 340,
+      "info": "Sets the height for both initial and hovered images."
     },
     {
       "type": "range",
-      "id": "initial_width",
-      "label": "Initial item width (side view)",
-      "min": 60,
-      "max": 140,
-      "step": 2,
-      "unit": "px",
-      "default": 92
-    },
-    {
-      "type": "range",
-      "id": "hover_width",
-      "label": "Hovered item width (front view)",
-      "min": 180,
-      "max": 400,
+      "id": "item_width",
+      "label": "Garment item width",
+      "min": 140,
+      "max": 380,
       "step": 10,
       "unit": "px",
-      "default": 280
+      "default": 240,
+      "info": "Both initial and hovered images display at this same width."
     },
     {
       "type": "range",
       "id": "product_gap",
       "label": "Gap between clothes",
       "min": 10,
-      "max": 40,
+      "max": 50,
       "step": 2,
       "unit": "px",
-      "default": 20
+      "default": 24
     },
     {
       "type": "range",
       "id": "hover_speed",
-      "label": "Hover turn transition duration",
+      "label": "Hover transition duration",
       "min": 200,
       "max": 800,
       "step": 50,
       "unit": "ms",
-      "default": 450
+      "default": 400
     },
     {
       "type": "checkbox",
@@ -1374,14 +1347,14 @@
         {
           "type": "image_picker",
           "id": "initial_image",
-          "label": "Initial Image (Side/Profile View)",
-          "info": "Upload a narrow side profile or angled photo of the hanging piece with transparent background."
+          "label": "Initial Image",
+          "info": "Upload the initial photo of the hanging piece. Displays at the same size as the hover image."
         },
         {
           "type": "image_picker",
           "id": "hover_image",
-          "label": "Hovered Image (Front-Facing View)",
-          "info": "Upload the full front view photo of the garment that appears when hovered/active."
+          "label": "Hovered Image",
+          "info": "Upload the alternate/hovered photo. Displays at the exact same size as the initial image."
         },
         {
           "type": "image_picker",

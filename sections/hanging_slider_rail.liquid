@@ -2,63 +2,55 @@
   ==============================================================================
   SCENE RAIL: HANGING PRODUCT SLIDER (CURVED METALLIC RAIL)
   ------------------------------------------------------------------------------
-  - 100% Transparent background (no white box).
+  - 100% Transparent background (no white box or unwanted image background).
+  - Both initial and hover images have the EXACT SAME HEIGHT (guaranteed equal height).
   - Left / Side view (Initial) has narrow width (width km).
   - Front view (Hovered) expands to broad width.
-  - BOTH views have the EXACT SAME vertical height (no shrunken initial image).
   - Smooth flex width expansion on hover; neighboring clothes part aside.
   - Realistic left-to-right pendulum sway ("kapde jaise hilte hain").
-  - Hovered garment lifts up slightly, faces front; unhovered clothes keep swaying.
   - Curved SVG metallic rail across viewport.
   - Floating paper price tags with hole grommet.
   ==============================================================================
 {% endcomment %}
 
-{% assign sec_bg = 'transparent' %}
-{% if section.settings.background_color != blank and section.settings.background_color != '#ffffff' and section.settings.background_color != '#FFFFFF' and section.settings.background_color != 'rgba(0,0,0,0)' and section.settings.background_color != 'transparent' %}
-  {% assign sec_bg = section.settings.background_color %}
-{% endif %}
-
 {% assign garment_h = section.settings.garment_height | default: 320 %}
-{% assign base_init_w = section.settings.initial_width | default: 105 %}
+{% assign base_init_w = section.settings.initial_width | default: 110 %}
 {% assign base_hov_w = section.settings.hover_width | default: 260 %}
 
 <section
   id="sr-{{ section.id }}"
-  class="sr-sec sr-vh-d sr-vh-m sr-shaped"
+  class="sr-sec sr-vh-d sr-vh-m sr-shaped{% if section.settings.blend_white_mockups %} sr-blend-mode{% endif %}"
   data-sr-section=""
-  data-sag="{{ section.settings.rail_sag }}"
-  data-tilt="{{ section.settings.enable_tilt }}"
-  data-hover-speed="{{ section.settings.hover_speed }}"
+  data-sag="{{ section.settings.rail_sag | default: 40 }}"
+  data-tilt="{{ section.settings.enable_tilt | default: 3 }}"
+  data-hover-speed="{{ section.settings.hover_speed | default: 400 }}"
   data-garment-h="{{ garment_h }}"
   style="
-    --sr-bg: {{ sec_bg }};
     --sr-txt: {{ section.settings.text_color | default: 'inherit' }};
     --sr-acc: {{ section.settings.accent_color | default: 'inherit' }};
-    --sr-hspd: {{ section.settings.hover_speed }}ms;
+    --sr-hspd: {{ section.settings.hover_speed | default: 400 }}ms;
     --sr-w-init: {{ base_init_w }}px;
     --sr-w-hov: {{ base_hov_w }}px;
-    --sr-gap: {{ section.settings.product_gap }}px;
+    --sr-gap: {{ section.settings.product_gap | default: 20 }}px;
     --sr-h-desk: {{ garment_h }}px;
     --sr-h-slide: {{ garment_h | times: 0.82 | round }}px;
-    --sr-sway: {{ section.settings.sway_intensity }}deg;
-    --sr-pt: {{ section.settings.padding_top }}px;
-    --sr-pb: {{ section.settings.padding_bottom }}px;
-    --sr-ov: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
-    --sr-tag-bg: {{ section.settings.tag_background }};
-    --sr-tag-tx: {{ section.settings.tag_text }};
+    --sr-sway: {{ section.settings.sway_intensity | default: 2.5 }}deg;
+    --sr-pt: {{ section.settings.padding_top | default: 60 }}px;
+    --sr-pb: {{ section.settings.padding_bottom | default: 48 }}px;
+    --sr-tag-bg: {{ section.settings.tag_background | default: '#FAF9F5' }};
+    --sr-tag-tx: {{ section.settings.tag_text | default: '#000000' }};
   "
 >
-  {% if section.settings.background_image != blank %}
+  {% if section.settings.show_background_image and section.settings.background_image != blank %}
     <div
       class="sr-bg-image"
       style="
         background-image: url('{{ section.settings.background_image | image_url: width: 2400 }}');
-        background-position: {{ section.settings.image_focus }};
+        background-position: {{ section.settings.image_focus | default: 'center' }};
       "
     ></div>
     {% if section.settings.overlay_opacity > 0 %}
-      <div class="sr-ov" aria-hidden="true"></div>
+      <div class="sr-ov" style="background: rgba(0,0,0, {{ section.settings.overlay_opacity | divided_by: 100.0 }});" aria-hidden="true"></div>
     {% endif %}
   {% endif %}
 
@@ -144,7 +136,7 @@
         {% assign block_count = section.blocks.size %}
 
         {% if block_count > 0 %}
-          <!-- MERCHANT BLOCKS: Same Height, Auto Width (Side View Narrow, Front View Broad) -->
+          <!-- MERCHANT BLOCKS: Exact Same Height, Auto Width -->
           {% for block in section.blocks %}
             {% assign linked_product = block.settings.product %}
             {% assign item_url = block.settings.custom_link | default: linked_product.url | default: '#' %}
@@ -163,16 +155,8 @@
             {% assign back_img = block.settings.back_image | default: linked_product.images[2] %}
             {% assign offset_y = block.settings.drop_offset | default: 0 %}
 
-            {% comment %} Calculate auto width if aspect ratio exists, while guaranteeing same height {% endcomment %}
-            {% assign item_init_w = base_init_w %}
-            {% if initial_img.aspect_ratio and initial_img.aspect_ratio < 0.65 %}
-              {% assign item_init_w = garment_h | times: initial_img.aspect_ratio | round | at_least: 80 | at_most: 160 %}
-            {% endif %}
-
-            {% assign item_hov_w = base_hov_w %}
-            {% if hover_img.aspect_ratio and hover_img.aspect_ratio > 0.45 %}
-              {% assign item_hov_w = garment_h | times: hover_img.aspect_ratio | round | at_least: 200 | at_most: 340 %}
-            {% endif %}
+            {% assign init_scale = block.settings.initial_scale | default: 100 | divided_by: 100.0 %}
+            {% assign hover_scale = block.settings.hover_scale | default: 100 | divided_by: 100.0 %}
 
             <div
               class="sr-item"
@@ -186,12 +170,12 @@
               data-idx="{{ forloop.index }}"
               style="
                 --sr-drop: {{ offset_y }}px;
-                --item-w-init: {{ item_init_w }}px;
-                --item-w-hov: {{ item_hov_w }}px;
+                --item-w-init: {{ base_init_w }}px;
+                --item-w-hov: {{ base_hov_w }}px;
               "
               {{ block.shopify_attributes }}
             >
-              <!-- Dedicated Hanging Sway Container (Hook + Tag + Garment sway together) -->
+              <!-- Dedicated Hanging Sway Container -->
               <div class="sr-hang-sway">
                 <!-- Metallic Hanger Hook -->
                 <div class="sr-hanger-hook" aria-hidden="true">
@@ -213,30 +197,32 @@
                   </div>
                 {% endif %}
 
-                <!-- Hanging Garment Images (Same Height, Width Expands on Hover) -->
+                <!-- Hanging Garment Images (Guaranteed Identical Height) -->
                 <div class="sr-garment">
-                  <!-- Initial Image (Left / Side View - Narrow Width, Full Height) -->
+                  <!-- Initial Image (Side View - Narrow Width, Full 100% Height) -->
                   <div class="sr-view" data-sr-pos="0">
                     {% if initial_img != blank %}
                       <img
-                        src="{{ initial_img | image_url: height: 700 }}"
+                        src="{{ initial_img | image_url: height: 800 }}"
                         alt="{{ item_title | escape }} – side"
                         loading="lazy"
                         decoding="async"
+                        style="{% if init_scale != 1.0 %}transform: scale({{ init_scale }});{% endif %}"
                       >
                     {% else %}
                       {{ 'product-1' | placeholder_svg_tag: 'sr-placeholder' }}
                     {% endif %}
                   </div>
 
-                  <!-- Hovered Image (Front View - Broad Width, Full Height) -->
+                  <!-- Hovered Image (Front View - Broad Width, Full 100% Height) -->
                   <div class="sr-view" data-sr-pos="1">
                     {% if hover_img != blank %}
                       <img
-                        src="{{ hover_img | image_url: height: 700 }}"
+                        src="{{ hover_img | image_url: height: 800 }}"
                         alt="{{ item_title | escape }} – front"
                         loading="lazy"
                         decoding="async"
+                        style="{% if hover_scale != 1.0 %}transform: scale({{ hover_scale }});{% endif %}"
                       >
                     {% endif %}
                   </div>
@@ -245,7 +231,7 @@
                   {% if back_img != blank %}
                     <div class="sr-view" data-sr-pos="-1">
                       <img
-                        src="{{ back_img | image_url: height: 700 }}"
+                        src="{{ back_img | image_url: height: 800 }}"
                         alt="{{ item_title | escape }} – back"
                         loading="lazy"
                         decoding="async"
@@ -308,9 +294,9 @@
                   </div>
                 </div>
 
-                <!-- Garment: Same Height (320px), Width Auto Based on View -->
+                <!-- Garment: Exact Same Height for Both Views -->
                 <div class="sr-garment">
-                  <!-- Side View: Narrow Width, Full 320px Height -->
+                  <!-- Side View -->
                   <div class="sr-view" data-sr-pos="0">
                     <img
                       src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_side_id }}.webp?height=640"
@@ -319,7 +305,7 @@
                       decoding="async"
                     >
                   </div>
-                  <!-- Front View: Broad Width, Full 320px Height -->
+                  <!-- Front View -->
                   <div class="sr-view" data-sr-pos="1">
                     <img
                       src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_front_id }}.webp?height=640"
@@ -380,12 +366,22 @@
 
 <style>
   /* ========================================================================= */
-  /* BASE SECTION STYLING (100% Transparent Background)                        */
+  /* 100% TRANSPARENT BACKGROUND (No White Box, No Overlays)                   */
   /* ========================================================================= */
-  .sr-sec {
-    position: relative;
+  .sr-sec,
+  .sr-wrap,
+  .sr-stage,
+  .sr-rack,
+  .sr-item,
+  .sr-hang-sway,
+  .sr-garment,
+  .sr-view {
     background: transparent !important;
     background-color: transparent !important;
+  }
+
+  .sr-sec {
+    position: relative;
     color: var(--sr-txt, inherit);
     overflow: hidden;
     padding-top: var(--sr-pt, 60px);
@@ -412,7 +408,6 @@
   .sr-ov {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, var(--sr-ov, 0));
     pointer-events: none;
     z-index: 2;
   }
@@ -425,7 +420,6 @@
     justify-content: space-between;
     flex-grow: 1;
     width: 100%;
-    background: transparent !important;
   }
 
   /* Top Caption & Header */
@@ -469,7 +463,6 @@
     width: 100%;
     margin: 20px 0 10px 0;
     overflow: visible;
-    background: transparent !important;
   }
   .sr-rodsvg {
     position: absolute;
@@ -496,13 +489,12 @@
     cursor: grab;
     touch-action: pan-y;
     padding: 34px max(40px, 5vw) 26px max(40px, 5vw);
-    background: transparent !important;
   }
   .sr-rack::-webkit-scrollbar { display: none; }
   .sr-rack.is-dragging { cursor: grabbing; }
 
   /* ========================================================================= */
-  /* GARMENT ITEM CONTAINER (Initial Narrow Side View -> Hover Broad Front)    */
+  /* GARMENT ITEM CONTAINER (Narrow Side Width -> Expands on Hover)            */
   /* ========================================================================= */
   .sr-item {
     position: relative;
@@ -512,16 +504,15 @@
     align-items: center;
     outline: none;
     cursor: pointer;
-    /* Side view width is narrow (width km) */
-    width: var(--item-w-init, var(--sr-w-init, 105px));
+    /* Narrow side width */
+    width: var(--item-w-init, var(--sr-w-init, 110px));
     transform-origin: 50% 0%;
     transform: translate3d(0, calc(var(--curve-y, 0px) + var(--sr-drop, 0px)), 0) rotate(var(--curve-tilt, 0deg));
     transition: width var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1), transform 0.08s linear;
     will-change: width, transform;
-    background: transparent !important;
   }
 
-  /* Hover & Active: Width expands to broad front view, parting adjacent clothes */
+  /* Hover & Active: Width smoothly expands, parting neighbor clothes */
   .sr-item:hover,
   .sr-item:focus-visible,
   .sr-item.is-active {
@@ -547,7 +538,6 @@
     transform-origin: 50% 6px; /* Pivots from hanger hook contact on the rod */
     will-change: transform;
     transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
-    background: transparent !important;
   }
 
   /* Breeze Sway Keyframe: Sinusoidal Left-to-Right Pendulum Motion */
@@ -670,7 +660,7 @@
   }
 
   /* ========================================================================= */
-  /* GARMENT DISPLAY (Same Height for Both Views, Auto Width)                  */
+  /* GARMENT DISPLAY (GUARANTEED IDENTICAL HEIGHT FOR BOTH INITIAL & HOVER)    */
   /* ========================================================================= */
   .sr-garment {
     position: relative;
@@ -681,16 +671,16 @@
     align-items: flex-start;
     justify-content: center;
     perspective: 800px;
-    background: transparent !important;
   }
 
+  /* Views are centered absolutely without width clamping */
   .sr-view {
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    height: 100%;
-    width: 100%;
+    height: var(--sr-h-desk, 320px);
+    width: max-content;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -699,46 +689,52 @@
     transition: opacity var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1),
                 transform var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1);
     will-change: opacity, transform;
-    background: transparent !important;
+    pointer-events: none;
   }
 
-  /* Image: 100% Height at all times, width auto to preserve natural proportions */
+  /* 
+   * CRITICAL FIX FOR EQUAL HEIGHT:
+   * Both images are locked to the EXACT same vertical height (var(--sr-h-desk)).
+   * max-width: none ensures neither image shrinks vertically in narrow containers!
+   */
   .sr-view img {
     display: block;
-    height: 100%;
-    width: auto;
-    max-height: 100%;
+    height: var(--sr-h-desk, 320px) !important;
+    width: auto !important;
+    max-height: var(--sr-h-desk, 320px) !important;
+    max-width: none !important;
     object-fit: contain;
     object-position: top center;
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
     transition: filter var(--sr-hspd) ease;
     user-select: none;
     -webkit-user-drag: none;
-    background: transparent !important;
   }
 
-  /* Initial Image (Side View): Full height, naturally narrow */
+  /* Blend mode to knock out white backgrounds from mockups if enabled */
+  .sr-blend-mode .sr-view img {
+    mix-blend-mode: multiply;
+  }
+
+  /* Initial Image (Side View): Visible by default, full height */
   .sr-view[data-sr-pos="0"] {
     opacity: 1;
-    transform: translateX(-50%) rotateY(0deg) scale(1);
+    transform: translateX(-50%) rotateY(0deg);
     z-index: 2;
-    pointer-events: auto;
   }
 
-  /* Hovered Image (Front View): Full height, naturally broad */
+  /* Hovered Image (Front View): Hidden by default, full height */
   .sr-view[data-sr-pos="1"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(-25deg) scale(1);
+    transform: translateX(-50%) rotateY(-25deg);
     z-index: 3;
-    pointer-events: none;
   }
 
   /* Optional Back View */
   .sr-view[data-sr-pos="-1"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(25deg) scale(1);
+    transform: translateX(-50%) rotateY(25deg);
     z-index: 1;
-    pointer-events: none;
   }
 
   /* HOVER TRANSITION: Cross-fade & Turn into Front View */
@@ -746,29 +742,25 @@
   .sr-item:focus-visible .sr-view[data-sr-pos="0"],
   .sr-item.is-active .sr-view[data-sr-pos="0"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(25deg) scale(0.96);
-    pointer-events: none;
+    transform: translateX(-50%) rotateY(25deg);
   }
 
   .sr-item:hover .sr-view[data-sr-pos="1"],
   .sr-item:focus-visible .sr-view[data-sr-pos="1"],
   .sr-item.is-active .sr-view[data-sr-pos="1"] {
     opacity: 1;
-    transform: translateX(-50%) rotateY(0deg) scale(1);
-    pointer-events: auto;
+    transform: translateX(-50%) rotateY(0deg);
     filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.22));
   }
 
   /* Center demo item in default state */
   .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-view[data-sr-pos="0"] {
     opacity: 0;
-    transform: translateX(-50%) rotateY(25deg) scale(0.96);
-    pointer-events: none;
+    transform: translateX(-50%) rotateY(25deg);
   }
   .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-view[data-sr-pos="1"] {
     opacity: 1;
-    transform: translateX(-50%) rotateY(0deg) scale(1);
-    pointer-events: auto;
+    transform: translateX(-50%) rotateY(0deg);
   }
 
   /* Floor Shadow */
@@ -802,7 +794,6 @@
     justify-content: space-between;
     padding: 16px max(40px, 5vw) 0 max(40px, 5vw);
     gap: 24px;
-    background: transparent !important;
   }
   @media (max-width: 768px) {
     .sr-foot {
@@ -812,8 +803,11 @@
       padding-left: 20px;
       padding-right: 20px;
     }
-    .sr-garment {
-      height: var(--sr-h-slide, 260px);
+    .sr-garment,
+    .sr-view,
+    .sr-view img {
+      height: var(--sr-h-slide, 260px) !important;
+      max-height: var(--sr-h-slide, 260px) !important;
     }
     .sr-item {
       width: var(--item-w-init, 90px);
@@ -961,44 +955,7 @@
       var items = Array.prototype.slice.call(rack.querySelectorAll("[data-sr-item]"));
       var yAnchor = 17;
 
-      // 1. AUTO-DETECT NATURAL WIDTHS BASED ON IMAGE PROPORTIONS
-      function updateAutoWidths() {
-        items.forEach(function(item) {
-          var sideImg = item.querySelector('.sr-view[data-sr-pos="0"] img');
-          var frontImg = item.querySelector('.sr-view[data-sr-pos="1"] img');
-
-          if (sideImg && sideImg.naturalHeight > 0) {
-            var sideRatio = sideImg.naturalWidth / sideImg.naturalHeight;
-            if (sideRatio > 0.1 && sideRatio < 0.65) {
-              var sideW = Math.round(garmentH * sideRatio);
-              item.style.setProperty('--item-w-init', Math.max(80, Math.min(160, sideW)) + 'px');
-            }
-          }
-
-          if (frontImg && frontImg.naturalHeight > 0) {
-            var frontRatio = frontImg.naturalWidth / frontImg.naturalHeight;
-            if (frontRatio > 0.35) {
-              var frontW = Math.round(garmentH * frontRatio);
-              item.style.setProperty('--item-w-hov', Math.max(200, Math.min(340, frontW)) + 'px');
-            }
-          }
-        });
-        requestCurveUpdate();
-      }
-
-      // Check on image load
-      items.forEach(function(item) {
-        var imgs = item.querySelectorAll('img');
-        imgs.forEach(function(img) {
-          if (img.complete) {
-            updateAutoWidths();
-          } else {
-            img.addEventListener('load', updateAutoWidths, { once: true });
-          }
-        });
-      });
-
-      // 2. DYNAMIC SVG CURVED ROD
+      // 1. DYNAMIC SVG CURVED ROD
       function updateRodCurve() {
         var w = stage.clientWidth || 1400;
         var h = Math.max(160, yAnchor + sag + 50);
@@ -1018,7 +975,7 @@
         if (rodHighlight) rodHighlight.setAttribute("d", highlightData);
       }
 
-      // 3. REAL-TIME CURVE TRAJECTORY
+      // 2. REAL-TIME CURVE TRAJECTORY
       var isTicking = false;
 
       function updateItemTrajectory() {
@@ -1065,7 +1022,7 @@
         }
       }
 
-      // 4. HOVER & PEEK INFO
+      // 3. HOVER & PEEK INFO
       function setPeek(item) {
         var name = item.dataset.name;
         var price = item.dataset.price;
@@ -1093,13 +1050,12 @@
       rack.addEventListener("mouseleave", function() {
         rack.classList.remove("has-active-item");
         items.forEach(function(it) { it.classList.remove("is-active"); });
-        // Restore center demo preview
         var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
         if (centerDemo) setPeek(centerDemo);
         setTimeout(requestCurveUpdate, 60);
       });
 
-      // 5. MOUSE DRAG TO SCROLL
+      // 4. MOUSE DRAG TO SCROLL
       var isDragging = false;
       var startX = 0;
       var scrollStart = 0;
@@ -1135,10 +1091,8 @@
 
       // Initialize
       updateRodCurve();
-      updateAutoWidths();
       setTimeout(function() {
         updateRodCurve();
-        updateAutoWidths();
         updateItemTrajectory();
         var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
         if (centerDemo) setPeek(centerDemo);
@@ -1167,40 +1121,20 @@
   "settings": [
     {
       "type": "header",
-      "content": "Scene Colors"
+      "content": "Background Settings"
     },
     {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background colour (leave empty for transparent)"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text colour",
-      "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "accent_color",
-      "label": "Accent colour",
-      "default": "#000000"
-    },
-    {
-      "type": "header",
-      "content": "Background Image (Optional)"
+      "type": "checkbox",
+      "id": "show_background_image",
+      "label": "Enable background image",
+      "default": false,
+      "info": "Leave disabled for 100% transparent background."
     },
     {
       "type": "image_picker",
       "id": "background_image",
       "label": "Background image",
-      "info": "Optional wide photo behind the rail. Leave empty for transparent background."
-    },
-    {
-      "type": "image_picker",
-      "id": "mobile_background_image",
-      "label": "Mobile background image (optional)",
-      "info": "A taller crop for phones. Uses main image if empty."
+      "info": "Optional wide photo behind rail."
     },
     {
       "type": "select",
@@ -1222,6 +1156,25 @@
       "step": 5,
       "unit": "%",
       "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "blend_white_mockups",
+      "label": "Knock out white mockup backgrounds",
+      "default": false,
+      "info": "Blends out white solid backgrounds from product mockups."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text colour",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent colour",
+      "default": "#000000"
     },
     {
       "type": "header",
@@ -1276,7 +1229,7 @@
     {
       "type": "range",
       "id": "garment_height",
-      "label": "Garment height (same for all views)",
+      "label": "Garment height (same for both views)",
       "min": 240,
       "max": 520,
       "step": 10,
@@ -1289,10 +1242,10 @@
       "id": "initial_width",
       "label": "Side view width (narrow)",
       "min": 70,
-      "max": 160,
+      "max": 180,
       "step": 5,
       "unit": "px",
-      "default": 105,
+      "default": 110,
       "info": "Width for unhovered side/left profile garments."
     },
     {
@@ -1300,7 +1253,7 @@
       "id": "hover_width",
       "label": "Front view width (broad)",
       "min": 180,
-      "max": 360,
+      "max": 380,
       "step": 10,
       "unit": "px",
       "default": 260,
@@ -1452,13 +1405,13 @@
           "type": "image_picker",
           "id": "initial_image",
           "label": "Initial Image (Left / Side View)",
-          "info": "Upload the side/left view. Displays at full height with narrow width."
+          "info": "Upload the side/left view. Displays at full 100% height with narrow width."
         },
         {
           "type": "image_picker",
           "id": "hover_image",
           "label": "Hovered Image (Front View)",
-          "info": "Upload the front view. Displays at full height with broad width on hover."
+          "info": "Upload the front view. Displays at the exact same 100% height with broad width on hover."
         },
         {
           "type": "image_picker",
@@ -1495,6 +1448,28 @@
           "step": 2,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "initial_scale",
+          "label": "Side view scale adjustment",
+          "min": 70,
+          "max": 130,
+          "step": 5,
+          "unit": "%",
+          "default": 100,
+          "info": "Fine-tune size if mockup has extra transparent padding."
+        },
+        {
+          "type": "range",
+          "id": "hover_scale",
+          "label": "Front view scale adjustment",
+          "min": 70,
+          "max": 130,
+          "step": 5,
+          "unit": "%",
+          "default": 100,
+          "info": "Fine-tune size if mockup has extra transparent padding."
         }
       ]
     }

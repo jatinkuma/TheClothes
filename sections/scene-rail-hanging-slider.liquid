@@ -1,0 +1,2506 @@
+{% comment %}
+  ==============================================================================
+  SCENE RAIL HANGING PRODUCT SLIDER (Shopify Online Store 2.0)
+  ------------------------------------------------------------------------------
+  A full-width, immersive fashion product display.
+  - Large curved horizontal metallic rail spanning the viewport (SVG with Chrome,
+    Brushed Metal, Obsidian Gunmetal, Champagne Brass, or Custom shaders).
+  - Realistic hanging clothing items suspended freely without cards or containers.
+  - Metallic hanger hooks/connectors locked onto the rail curve.
+  - Floating price tags with natural rotation and cord physics.
+  - Two sourcing modes: Mode A (Repeatable Blocks) & Mode B (Collection Picker).
+  - Interactive Desktop & Mobile: Hover highlights & lifts garments, updates
+    bottom editorial bar; Click opens luxury Product Detail Drawer with
+    multi-angle (Front/Back/Side) image switching, variant selection,
+    and native Shopify Ajax Add-to-Cart.
+  - Smooth horizontal carousel (touch swipe, mouse drag, arrows, progress bead).
+  ==============================================================================
+{% endcomment %}
+
+{% liquid
+  assign section_id = section.id
+  assign product_source = section.settings.product_source | default: 'collection'
+  assign collection = section.settings.collection
+  assign products_limit = section.settings.products_to_show | default: 8
+  assign rail_style = section.settings.rail_style | default: 'chrome'
+  assign rail_thickness = section.settings.rail_thickness | default: 6
+  assign rail_sag = section.settings.rail_sag | default: 65
+  assign rail_top = section.settings.rail_top_position | default: 45
+  assign enable_swing = section.settings.enable_swing
+  assign swing_intensity = section.settings.swing_intensity | default: 3
+  assign enable_tilt = section.settings.enable_curve_tilt
+  assign hover_lift = section.settings.hover_lift
+  assign show_price_tags = section.settings.enable_price_tags
+  assign tag_size = section.settings.tag_size | default: 'medium'
+  assign blend_mode = section.settings.blend_mode | default: 'normal'
+  assign garment_w = section.settings.garment_width | default: 270
+  assign garment_h = section.settings.garment_height | default: 360
+  assign spacing = section.settings.product_spacing | default: 40
+  assign hanging_len = section.settings.hanging_length | default: 55
+  assign height_mode = section.settings.section_height | default: 'viewport'
+%}
+
+<div
+  id="scene-rail-{{ section_id }}"
+  class="scene-rail-section height-mode-{{ height_mode }}{% if enable_swing %} swing-active{% endif %}"
+  data-section-id="{{ section_id }}"
+  data-rail-sag="{{ rail_sag }}"
+  data-rail-top="{{ rail_top }}"
+  data-tilt="{{ enable_tilt }}"
+  data-swing-intensity="{{ swing_intensity }}"
+  style="
+    --sr-bg: {{ section.settings.bg_color | default: '#F5F2EB' }};
+    --sr-text: {{ section.settings.text_color | default: '#1A1815' }};
+    --sr-accent: {{ section.settings.accent_color | default: '#93672E' }};
+    --sr-rail-thickness: {{ rail_thickness }}px;
+    --sr-rail-sag: {{ rail_sag }}px;
+    --sr-rail-top: {{ rail_top }}px;
+    --sr-garment-w: {{ garment_w }}px;
+    --sr-garment-h: {{ garment_h }}px;
+    --sr-gap: {{ spacing }}px;
+    --sr-hang-len: {{ hanging_len }}px;
+    --sr-blend: {{ blend_mode }};
+    --sr-tag-bg: {{ section.settings.tag_bg_color | default: '#1A1815' }};
+    --sr-tag-color: {{ section.settings.tag_text_color | default: '#FFFFFF' }};
+    --sr-pt: {{ section.settings.padding_top | default: 40 }}px;
+    --sr-pb: {{ section.settings.padding_bottom | default: 50 }}px;
+    --sr-h-desktop: {{ section.settings.custom_height_desktop | default: 720 }}px;
+    --sr-h-mobile: {{ section.settings.custom_height_mobile | default: 580 }}px;
+  "
+>
+  {% if section.settings.bg_image != blank %}
+    <div
+      class="scene-bg-image"
+      style="background-image: url('{{ section.settings.bg_image | image_url: width: 2000 }}');"
+      aria-hidden="true"
+    ></div>
+  {% endif %}
+
+  <!-- Ambient Editorial Vignette & Lighting -->
+  <div class="scene-ambient-lighting" aria-hidden="true"></div>
+
+  <!-- Section Header -->
+  {% if section.settings.heading != blank or section.settings.subheading != blank or section.settings.description != blank %}
+    <header class="scene-header text-{{ section.settings.header_alignment | default: 'center' }}">
+      <div class="scene-header-inner">
+        {% if section.settings.subheading != blank %}
+          <span class="scene-subheading-badge">{{ section.settings.subheading }}</span>
+        {% endif %}
+        {% if section.settings.heading != blank %}
+          <h2 class="scene-heading-title">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.description != blank %}
+          <p class="scene-heading-desc">{{ section.settings.description }}</p>
+        {% endif %}
+      </div>
+    </header>
+  {% endif %}
+
+  <!-- Architectural Curved Scene Rail Stage -->
+  <div class="scene-stage" data-scene-stage>
+    
+    <!-- Left & Right Architectural Wall Mounting Brackets -->
+    {% if section.settings.show_end_brackets %}
+      <div class="scene-wall-bracket bracket-left" aria-hidden="true">
+        <div class="bracket-flange"></div>
+        <div class="bracket-pin"></div>
+        <div class="bracket-fastener"></div>
+      </div>
+      <div class="scene-wall-bracket bracket-right" aria-hidden="true">
+        <div class="bracket-flange"></div>
+        <div class="bracket-pin"></div>
+        <div class="bracket-fastener"></div>
+      </div>
+    {% endif %}
+
+    <!-- Continuous Curved SVG Metallic Rail -->
+    <div class="scene-rail-svg-wrapper" aria-hidden="true">
+      <svg class="scene-rail-svg" data-rail-svg viewBox="0 0 1400 240" preserveAspectRatio="none">
+        <defs>
+          <!-- 1. Chrome Finish (Bright High-Gloss Specular Highlights) -->
+          <linearGradient id="chromeRailGrad-{{ section_id }}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="25%" stop-color="#cfcfcf"/>
+            <stop offset="48%" stop-color="#828282"/>
+            <stop offset="52%" stop-color="#f8f8f8"/>
+            <stop offset="78%" stop-color="#adadad"/>
+            <stop offset="100%" stop-color="#4e4e4e"/>
+          </linearGradient>
+
+          <!-- 2. Brushed Metal (Matte Architectural Titanium / Steel) -->
+          <linearGradient id="brushedMetalGrad-{{ section_id }}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#d4cec7"/>
+            <stop offset="35%" stop-color="#aba399"/>
+            <stop offset="70%" stop-color="#736c64"/>
+            <stop offset="100%" stop-color="#544e47"/>
+          </linearGradient>
+
+          <!-- 3. Obsidian Gunmetal (Sleek Deep Charcoal Noir) -->
+          <linearGradient id="blackMetalGrad-{{ section_id }}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#3a3a40"/>
+            <stop offset="30%" stop-color="#1f1f22"/>
+            <stop offset="70%" stop-color="#111113"/>
+            <stop offset="100%" stop-color="#080809"/>
+          </linearGradient>
+
+          <!-- 4. Satin Champagne Brass (Warm Royal Atelier Gold) -->
+          <linearGradient id="brassGoldGrad-{{ section_id }}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fef4d4"/>
+            <stop offset="30%" stop-color="#dfbe72"/>
+            <stop offset="65%" stop-color="#9d7d3b"/>
+            <stop offset="100%" stop-color="#6e501d"/>
+          </linearGradient>
+
+          <!-- 5. Custom Color Shader -->
+          <linearGradient id="customRailGrad-{{ section_id }}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+            <stop offset="45%" stop-color="{{ section.settings.custom_rail_color | default: '#C0C0C0' }}"/>
+            <stop offset="100%" stop-color="#151515" stop-opacity="0.85"/>
+          </linearGradient>
+
+          <!-- 3D Rail Drop Shadow Filter -->
+          <filter id="railShadow-{{ section_id }}" x="-10%" y="-30%" width="120%" height="220%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+            <feOffset dx="0" dy="8" result="offsetblur"/>
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.30"/>
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        {% liquid
+          case rail_style
+            when 'chrome'
+              assign active_grad = 'chromeRailGrad-' | append: section_id
+            when 'brushed'
+              assign active_grad = 'brushedMetalGrad-' | append: section_id
+            when 'black_metal'
+              assign active_grad = 'blackMetalGrad-' | append: section_id
+            when 'brass_gold'
+              assign active_grad = 'brassGoldGrad-' | append: section_id
+            when 'custom'
+              assign active_grad = 'customRailGrad-' | append: section_id
+            else
+              assign active_grad = 'chromeRailGrad-' | append: section_id
+          endcase
+        %}
+
+        <!-- Ambient Shadow Curve beneath Rail -->
+        <path
+          class="scene-rail-shadow-path"
+          data-rail-shadow
+          d="M 0,53 Q 700,183 1400,53"
+          fill="none"
+          stroke="rgba(0, 0, 0, 0.28)"
+          stroke-width="{{ rail_thickness | plus: 4 }}"
+          stroke-linecap="round"
+        />
+
+        <!-- Core Sculpted Rail Curve -->
+        <path
+          class="scene-rail-core-path"
+          data-rail-core
+          d="M 0,45 Q 700,175 1400,45"
+          fill="none"
+          stroke="url(#{{ active_grad }})"
+          stroke-width="{{ rail_thickness }}"
+          stroke-linecap="round"
+          filter="url(#railShadow-{{ section_id }})"
+        />
+
+        <!-- Specular Highlight Line (Top Lip of Cylinder) -->
+        <path
+          class="scene-rail-specular-path"
+          data-rail-specular
+          d="M 0,44 Q 700,174 1400,44"
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.65)"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </svg>
+    </div>
+
+    <!-- Horizontal Interactive Viewport -->
+    <div
+      class="scene-viewport"
+      data-scene-viewport
+      tabindex="0"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="{{ section.settings.heading | default: 'Scene Rail Product Slider' }}"
+    >
+      <ul class="scene-track" data-scene-track>
+        {% assign items_rendered = 0 %}
+
+        {% if product_source == 'collection' and collection != blank and collection.products.size > 0 %}
+          <!-- =============================================================== -->
+          <!-- MODE B: DYNAMIC SHOPIFY COLLECTION INTEGRATION                  -->
+          <!-- =============================================================== -->
+          {% for product in collection.products limit: products_limit %}
+            {% assign items_rendered = items_rendered | plus: 1 %}
+            {% assign mod_idx = forloop.index | modulo: 5 %}
+            {% assign rot_seed = forloop.index | times: 7 | modulo: 11 | minus: 5 %}
+            
+            {% comment %} Extract multi-angle images {% endcomment %}
+            {% assign front_image = product.featured_image %}
+            {% assign back_image = product.images[1] | default: front_image %}
+            {% assign side_image = product.images[2] | default: front_image %}
+            
+            <li
+              class="scene-slide"
+              data-scene-slide
+              data-item-index="{{ forloop.index0 }}"
+              data-product-id="{{ product.id }}"
+              data-title="{{ product.title | escape }}"
+              data-price="{{ product.price | money }}"
+              data-compare="{{ product.compare_at_price | money }}"
+              data-url="{{ product.url }}"
+              data-desc="{{ product.description | strip_html | truncate: 140 | escape }}"
+              data-front-img="{{ front_image | image_url: width: 900 }}"
+              data-back-img="{{ back_image | image_url: width: 900 }}"
+              data-side-img="{{ side_image | image_url: width: 900 }}"
+              data-variants='{{ product.variants | json | escape }}'
+              style="--item-idx: {{ forloop.index0 }}; --tag-rot: {{ rot_seed }}deg;"
+            >
+              <div class="scene-hanger-assembly sway-variant-{{ mod_idx }}">
+                
+                <!-- Metallic Hanger Hook -->
+                <div class="scene-hook-wrap" aria-hidden="true">
+                  <svg class="scene-hook-svg" viewBox="0 0 44 64" fill="none">
+                    <path
+                      d="M 22 24 C 22 10 32 4 32 14 C 32 18 29 21 24 23 C 22 24 22 27 22 34"
+                      stroke="url(#{{ active_grad }})"
+                      stroke-width="3.2"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="32" cy="14" r="2.4" fill="url(#{{ active_grad }})" />
+                    <path d="M 18 34 L 26 34 L 24 38 L 20 38 Z" fill="url(#{{ active_grad }})" />
+                    <path
+                      d="M 22 38 L 8 58 C 14 56 30 56 36 58 Z"
+                      fill="none"
+                      stroke="url(#{{ active_grad }})"
+                      stroke-width="2.4"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Floating Price Tag -->
+                {% if show_price_tags %}
+                  <div class="scene-floating-tag tag-{{ tag_size }}" data-tag>
+                    <span class="tag-pin-string"></span>
+                    <span class="tag-pill-body">
+                      <span class="tag-price-main">{{ product.price | money }}</span>
+                      {% if product.compare_at_price > product.price and section.settings.show_compare_price %}
+                        <span class="tag-price-compare">{{ product.compare_at_price | money }}</span>
+                      {% endif %}
+                    </span>
+                  </div>
+                {% endif %}
+
+                <!-- Garment Direct Display (No Cards, No Containers) -->
+                <div class="scene-garment-clickable" data-open-drawer tabindex="0" role="button" aria-label="Inspect {{ product.title | escape }}">
+                  <div class="scene-garment-frame">
+                    <img
+                      src="{{ front_image | image_url: width: 700 }}"
+                      alt="{{ product.title | escape }}"
+                      class="scene-garment-img front-view"
+                      loading="lazy"
+                    >
+                    {% if section.settings.enable_image_switcher and product.images.size > 1 %}
+                      <img
+                        src="{{ back_image | image_url: width: 700 }}"
+                        alt="{{ product.title | escape }} alternate view"
+                        class="scene-garment-img back-view"
+                        loading="lazy"
+                      >
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Garment Floor/Ambient Drop Shadow -->
+                <div class="scene-garment-drop-shadow" aria-hidden="true"></div>
+              </div>
+            </li>
+          {% endfor %}
+
+        {% elsif product_source == 'blocks' and section.blocks.size > 0 %}
+          <!-- =============================================================== -->
+          <!-- MODE A: INDIVIDUAL REPEATABLE PRODUCT BLOCKS                    -->
+          <!-- =============================================================== -->
+          {% for block in section.blocks %}
+            {% assign items_rendered = items_rendered | plus: 1 %}
+            {% assign b_product = block.settings.product %}
+            {% assign mod_idx = forloop.index | modulo: 5 %}
+            {% assign rot_seed = forloop.index | times: 9 | modulo: 13 | minus: 6 %}
+            {% assign offset_y = block.settings.hanging_offset | default: 0 %}
+
+            {% assign b_title = block.settings.custom_title | default: b_product.title | default: 'Bespoke Atelier Piece' %}
+            {% assign b_price = block.settings.custom_price | default: b_product.price | money | default: '$380' %}
+            {% assign b_url = block.settings.custom_url | default: b_product.url | default: '#' %}
+            {% assign b_subtitle = block.settings.custom_subtitle | default: 'Hand-loomed Heritage Fabric' %}
+
+            {% assign b_front = block.settings.custom_image | default: b_product.featured_image %}
+            {% assign b_back = block.settings.back_image | default: b_product.images[1] | default: b_front %}
+            {% assign b_side = block.settings.side_image | default: b_product.images[2] | default: b_front %}
+
+            <li
+              class="scene-slide"
+              data-scene-slide
+              data-item-index="{{ forloop.index0 }}"
+              data-product-id="{{ b_product.id | default: block.id }}"
+              data-title="{{ b_title | escape }}"
+              data-price="{{ b_price }}"
+              data-compare="{% if b_product.compare_at_price > b_product.price %}{{ b_product.compare_at_price | money }}{% endif %}"
+              data-url="{{ b_url }}"
+              data-desc="{{ b_subtitle | escape }}"
+              data-front-img="{% if b_front != blank %}{{ b_front | image_url: width: 900 }}{% endif %}"
+              data-back-img="{% if b_back != blank %}{{ b_back | image_url: width: 900 }}{% endif %}"
+              data-side-img="{% if b_side != blank %}{{ b_side | image_url: width: 900 }}{% endif %}"
+              data-variants='{% if b_product.variants %}{{ b_product.variants | json | escape }}{% else %}[]{% endif %}'
+              style="--item-idx: {{ forloop.index0 }}; --tag-rot: {{ rot_seed }}deg; --hang-offset: {{ offset_y }}px;"
+              {{ block.shopify_attributes }}
+            >
+              <div class="scene-hanger-assembly sway-variant-{{ mod_idx }}">
+                
+                <!-- Metallic Hanger Hook -->
+                <div class="scene-hook-wrap" aria-hidden="true">
+                  <svg class="scene-hook-svg" viewBox="0 0 44 64" fill="none">
+                    <path
+                      d="M 22 24 C 22 10 32 4 32 14 C 32 18 29 21 24 23 C 22 24 22 27 22 34"
+                      stroke="url(#{{ active_grad }})"
+                      stroke-width="3.2"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="32" cy="14" r="2.4" fill="url(#{{ active_grad }})" />
+                    <path d="M 18 34 L 26 34 L 24 38 L 20 38 Z" fill="url(#{{ active_grad }})" />
+                    <path
+                      d="M 22 38 L 8 58 C 14 56 30 56 36 58 Z"
+                      fill="none"
+                      stroke="url(#{{ active_grad }})"
+                      stroke-width="2.4"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Floating Price Tag -->
+                {% if show_price_tags %}
+                  <div class="scene-floating-tag tag-{{ tag_size }}" data-tag>
+                    <span class="tag-pin-string"></span>
+                    <span class="tag-pill-body">
+                      <span class="tag-price-main">{{ b_price }}</span>
+                    </span>
+                  </div>
+                {% endif %}
+
+                <!-- Direct Garment View -->
+                <div class="scene-garment-clickable" data-open-drawer tabindex="0" role="button" aria-label="Inspect {{ b_title | escape }}">
+                  <div class="scene-garment-frame">
+                    {% if b_front != blank %}
+                      <img
+                        src="{{ b_front | image_url: width: 700 }}"
+                        alt="{{ b_title | escape }}"
+                        class="scene-garment-img front-view"
+                        loading="lazy"
+                      >
+                      {% if b_back != blank and b_back != b_front %}
+                        <img
+                          src="{{ b_back | image_url: width: 700 }}"
+                          alt="{{ b_title | escape }} alternate view"
+                          class="scene-garment-img back-view"
+                          loading="lazy"
+                        >
+                      {% endif %}
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag: 'scene-garment-placeholder' }}
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="scene-garment-drop-shadow" aria-hidden="true"></div>
+              </div>
+            </li>
+          {% endfor %}
+
+        {% endif %}
+
+        {% if items_rendered == 0 %}
+          <!-- =============================================================== -->
+          <!-- FALLBACK / DEMONSTRATION EDITORIAL ATELIER PIECES               -->
+          <!-- =============================================================== -->
+          {% assign demo_titles = "Imperial Cream & Gold Sherwani|Sapphire Blue Jodhpuri Suit|Emerald Heritage Bandhgala|Ruby Sovereign Achkan|Royal Sovereign Brocade Coat|Ivory Velvet Angrakha" | split: "|" %}
+          {% assign demo_prices = "Rs. 48,000|Rs. 54,000|Rs. 42,000|Rs. 58,000|Rs. 62,000|Rs. 39,000" | split: "|" %}
+          {% assign demo_compares = "Rs. 60,000|Rs. 68,000||Rs. 72,000|Rs. 78,000|" | split: "|" %}
+          {% assign demo_subs = "Pure Chanderi silk with antique gold dabka needlework|Midnight royal velvet with silver resham embroidery|Italian wool blend with hand-cast bronze medallion buttons|Deep ruby raw silk with heirloom zardozi borders|Woven Banarasi zari with pearl fastenings|Fine mulberry silk with pearl beaded collar piping" | split: "|" %}
+          {% assign demo_assets = "royal-doll-cream.png|royal-doll-blue.png|royal-doll-green.png|royal-doll-red.png|royal-cat-mascot.png|royal-doll-cream.png" | split: "|" %}
+
+          {% for d_title in demo_titles %}
+            {% assign idx = forloop.index0 %}
+            {% assign d_price = demo_prices[idx] %}
+            {% assign d_compare = demo_compares[idx] %}
+            {% assign d_sub = demo_subs[idx] %}
+            {% assign d_asset = demo_assets[idx] %}
+            {% assign mod_idx = forloop.index | modulo: 5 %}
+            {% assign rot_seed = forloop.index | times: 7 | modulo: 11 | minus: 5 %}
+
+            <li
+              class="scene-slide"
+              data-scene-slide
+              data-item-index="{{ idx }}"
+              data-product-id="demo-{{ idx }}"
+              data-title="{{ d_title }}"
+              data-price="{{ d_price }}"
+              data-compare="{{ d_compare }}"
+              data-url="#"
+              data-desc="{{ d_sub }}"
+              data-front-img="{{ d_asset | asset_url }}"
+              data-back-img="{{ d_asset | asset_url }}"
+              data-side-img="{{ d_asset | asset_url }}"
+              data-variants='[{"id":"demo-{{ idx }}-s","title":"Custom Tailored / S - 38"},{"id":"demo-{{ idx }}-m","title":"Custom Tailored / M - 40"},{"id":"demo-{{ idx }}-l","title":"Custom Tailored / L - 42"}]'
+              style="--item-idx: {{ idx }}; --tag-rot: {{ rot_seed }}deg;"
+            >
+              <div class="scene-hanger-assembly sway-variant-{{ mod_idx }}">
+                
+                <!-- Hook -->
+                <div class="scene-hook-wrap" aria-hidden="true">
+                  <svg class="scene-hook-svg" viewBox="0 0 44 64" fill="none">
+                    <path
+                      d="M 22 24 C 22 10 32 4 32 14 C 32 18 29 21 24 23 C 22 24 22 27 22 34"
+                      stroke="url(#{{ active_grad }})"
+                      stroke-width="3.2"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="32" cy="14" r="2.4" fill="url(#{{ active_grad }})" />
+                    <path d="M 18 34 L 26 34 L 24 38 L 20 38 Z" fill="url(#{{ active_grad }})" />
+                    <path
+                      d="M 22 38 L 8 58 C 14 56 30 56 36 58 Z"
+                      fill="none"
+                      stroke="url(#{{ active_grad }})"
+                      stroke-width="2.4"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Price Tag -->
+                {% if show_price_tags %}
+                  <div class="scene-floating-tag tag-{{ tag_size }}" data-tag>
+                    <span class="tag-pin-string"></span>
+                    <span class="tag-pill-body">
+                      <span class="tag-price-main">{{ d_price }}</span>
+                      {% if d_compare != blank and section.settings.show_compare_price %}
+                        <span class="tag-price-compare">{{ d_compare }}</span>
+                      {% endif %}
+                    </span>
+                  </div>
+                {% endif %}
+
+                <!-- Garment Direct Display -->
+                <div class="scene-garment-clickable" data-open-drawer tabindex="0" role="button" aria-label="Inspect {{ d_title }}">
+                  <div class="scene-garment-frame">
+                    <img
+                      src="{{ d_asset | asset_url }}"
+                      alt="{{ d_title }}"
+                      class="scene-garment-img front-view"
+                      loading="lazy"
+                    >
+                  </div>
+                </div>
+
+                <div class="scene-garment-drop-shadow" aria-hidden="true"></div>
+              </div>
+            </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Navigation Arrows -->
+    {% if section.settings.show_arrows %}
+      <button
+        type="button"
+        class="scene-nav-btn btn-prev"
+        data-scene-prev
+        aria-label="Previous garments"
+      >
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="scene-nav-btn btn-next"
+        data-scene-next
+        aria-label="Next garments"
+      >
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Bottom Editorial Information Bar -->
+  {% if section.settings.show_bottom_bar %}
+    <footer class="scene-bottom-bar" data-bottom-bar>
+      <div class="scene-bottom-inner">
+        
+        <!-- Left: Interactive Hint & Active Product Metadata -->
+        <div class="scene-bottom-left">
+          <div class="scene-hint-badge">
+            <span class="scene-hint-desktop">{{ section.settings.desktop_hint | default: 'Hover a piece · click to look closer' }}</span>
+            <span class="scene-hint-mobile">{{ section.settings.mobile_hint | default: 'Tap a piece to turn it' }}</span>
+          </div>
+          <div class="scene-active-product-info" data-active-info>
+            <h4 class="scene-active-title" data-active-title>Imperial Cream & Gold Sherwani</h4>
+            <div class="scene-active-pricing">
+              <span class="scene-active-price" data-active-price>Rs. 48,000</span>
+              <span class="scene-active-compare" data-active-compare>Rs. 60,000</span>
+            </div>
+            <p class="scene-active-subtitle" data-active-subtitle>Chanderi silk woven with intricate ivory needlework</p>
+          </div>
+        </div>
+
+        <!-- Right: Promotional Tagline & CTA Button -->
+        <div class="scene-bottom-right">
+          {% if section.settings.bottom_promo_heading != blank %}
+            <div class="scene-promo-heading">{{ section.settings.bottom_promo_heading }}</div>
+          {% endif %}
+          {% if section.settings.bottom_promo_desc != blank %}
+            <div class="scene-promo-desc">{{ section.settings.bottom_promo_desc }}</div>
+          {% endif %}
+          {% if section.settings.cta_label != blank %}
+            <a href="{{ section.settings.cta_url | default: '#' }}" class="scene-cta-btn">
+              <span>{{ section.settings.cta_label }}</span>
+              {% if section.settings.show_cta_arrow %}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              {% endif %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Minimal Slider Progress Indicator -->
+      {% if section.settings.show_progress_bar %}
+        <div class="scene-progress-container" aria-hidden="true">
+          <div class="scene-progress-track">
+            <div class="scene-progress-pill" data-progress-pill></div>
+          </div>
+        </div>
+      {% endif %}
+    </footer>
+  {% endif %}
+
+  <!-- ===================================================================== -->
+  <!-- PREMIUM PRODUCT DETAIL DRAWER / MODAL FOCUS VIEW                      -->
+  <!-- ===================================================================== -->
+  {% if section.settings.enable_product_drawer %}
+    <div class="scene-drawer-backdrop" data-drawer-backdrop aria-hidden="true"></div>
+    <aside
+      class="scene-drawer"
+      data-drawer
+      aria-modal="true"
+      role="dialog"
+      aria-hidden="true"
+      aria-label="Atelier Garment Detail"
+    >
+      <button type="button" class="scene-drawer-close" data-drawer-close aria-label="Close detail view">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="scene-drawer-scrollable">
+        <div class="scene-drawer-grid">
+          
+          <!-- Drawer Image Viewer with Multi-Angle Tabs -->
+          <div class="scene-drawer-media-zone">
+            <div class="scene-drawer-main-image-wrap">
+              <img src="" alt="" class="scene-drawer-main-img" data-drawer-main-img>
+            </div>
+            {% if section.settings.enable_image_switcher %}
+              <div class="scene-drawer-angle-tabs" data-drawer-angle-tabs>
+                <button type="button" class="scene-angle-tab is-active" data-angle="front">Front View</button>
+                <button type="button" class="scene-angle-tab" data-angle="back">Back View</button>
+                <button type="button" class="scene-angle-tab" data-angle="side">Side Angle</button>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Drawer Information & Actions -->
+          <div class="scene-drawer-info-zone">
+            <span class="scene-drawer-badge">Atelier Haute Couture</span>
+            <h3 class="scene-drawer-title" data-drawer-title>Garment Title</h3>
+            
+            <div class="scene-drawer-price-wrap">
+              <span class="scene-drawer-price" data-drawer-price>Rs. 48,000</span>
+              <span class="scene-drawer-compare" data-drawer-compare>Rs. 60,000</span>
+            </div>
+
+            <p class="scene-drawer-desc" data-drawer-desc>
+              Handcrafted with bullion zardozi embroidery and heirloom silk.
+            </p>
+
+            <!-- Dynamic Variant Picker -->
+            <div class="scene-drawer-variants-wrap" data-drawer-variants-wrap>
+              <label class="scene-variant-label" for="scene-drawer-variant-select-{{ section_id }}">Select Size / Edition:</label>
+              <select id="scene-drawer-variant-select-{{ section_id }}" class="scene-variant-select" data-drawer-variant-select>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <!-- Quantity & Native Ajax Add to Cart -->
+            {% if section.settings.enable_quick_add %}
+              <div class="scene-drawer-actions">
+                <div class="scene-qty-control">
+                  <button type="button" class="scene-qty-btn" data-qty-minus aria-label="Decrease quantity">−</button>
+                  <input type="number" class="scene-qty-input" data-qty-input value="1" min="1" max="99" aria-label="Quantity">
+                  <button type="button" class="scene-qty-btn" data-qty-plus aria-label="Increase quantity">+</button>
+                </div>
+                <button type="button" class="scene-btn-add-cart" data-drawer-add-btn>
+                  <span class="btn-text">Add to Cart</span>
+                  <span class="btn-spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div class="scene-drawer-feedback" data-drawer-feedback role="status" aria-live="polite"></div>
+            {% endif %}
+
+            <a href="#" class="scene-drawer-full-link" data-drawer-full-link>
+              <span>View Full Atelier Specifications</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </aside>
+  {% endif %}
+</div>
+
+{% comment %}
+  ==============================================================================
+  SCOPED STYLES: Sculpted Rail, Hangers, Floating Tags & Physics
+  ==============================================================================
+{% endcomment %}
+<style>
+  /* 1. Base Container & Dimensions */
+  .scene-rail-section {
+    position: relative;
+    width: 100%;
+    background-color: var(--sr-bg);
+    color: var(--sr-text);
+    padding-top: var(--sr-pt);
+    padding-bottom: var(--sr-pb);
+    overflow: hidden;
+    font-family: inherit;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .scene-rail-section.height-mode-viewport {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .scene-rail-section.height-mode-custom {
+    min-height: var(--sr-h-desktop);
+  }
+  @media (max-width: 768px) {
+    .scene-rail-section.height-mode-custom {
+      min-height: var(--sr-h-mobile);
+    }
+  }
+
+  .scene-bg-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.16;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .scene-ambient-lighting {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 1300px;
+    height: 480px;
+    background: radial-gradient(ellipse at 50% 15%, rgba(255, 235, 205, 0.40) 0%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* 2. Header */
+  .scene-header {
+    position: relative;
+    z-index: 4;
+    max-width: 840px;
+    margin: 0 auto 28px auto;
+    padding: 0 24px;
+  }
+  .scene-header.text-left { text-align: left; margin-left: max(24px, 5vw); margin-right: auto; }
+  .scene-header.text-center { text-align: center; }
+  .scene-header.text-right { text-align: right; margin-right: max(24px, 5vw); margin-left: auto; }
+
+  .scene-subheading-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sr-accent);
+    background: rgba(147, 103, 46, 0.10);
+    border: 1px solid rgba(147, 103, 46, 0.24);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+
+  .scene-heading-title {
+    font-size: clamp(1.9rem, 3.6vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.018em;
+    line-height: 1.15;
+    color: var(--sr-text);
+    margin: 0 0 10px 0;
+  }
+
+  .scene-heading-desc {
+    font-size: 1.02rem;
+    line-height: 1.55;
+    color: var(--sr-text);
+    opacity: 0.76;
+    margin: 0;
+  }
+
+  /* 3. Stage & Curved Rail */
+  .scene-stage {
+    position: relative;
+    width: 100%;
+    z-index: 4;
+    padding-top: 10px;
+    padding-bottom: 30px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .scene-rail-svg-wrapper {
+    position: absolute;
+    top: var(--sr-rail-top);
+    left: 0;
+    width: 100%;
+    height: 220px;
+    pointer-events: none;
+    z-index: 5;
+    overflow: visible;
+  }
+
+  .scene-rail-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Wall Mount Brackets */
+  .scene-wall-bracket {
+    position: absolute;
+    top: calc(var(--sr-rail-top) - 8px);
+    width: 32px;
+    height: 48px;
+    z-index: 8;
+    pointer-events: none;
+  }
+  .scene-wall-bracket.bracket-left { left: 0; }
+  .scene-wall-bracket.bracket-right { right: 0; transform: scaleX(-1); }
+
+  .bracket-flange {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 44px;
+    background: linear-gradient(90deg, #1b1b1e 0%, #3e3e44 60%, #202024 100%);
+    border-radius: 0 4px 4px 0;
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.40);
+  }
+  .bracket-pin {
+    position: absolute;
+    top: 14px;
+    left: 12px;
+    width: 18px;
+    height: 14px;
+    background: linear-gradient(180deg, #c0c0c0 0%, #585858 100%);
+    border-radius: 3px;
+    box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.35);
+  }
+  .bracket-fastener {
+    position: absolute;
+    top: 17px;
+    left: 20px;
+    width: 8px;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 50%;
+  }
+
+  /* 4. Viewport & Track */
+  .scene-viewport {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+    touch-action: pan-y pinch-zoom;
+    padding-top: calc(var(--sr-rail-top) + 20px);
+    padding-bottom: 30px;
+  }
+  .scene-viewport::-webkit-scrollbar { display: none; }
+  .scene-viewport:active { cursor: grabbing; }
+
+  .scene-track {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0 max(30px, 8vw);
+    gap: var(--sr-gap);
+    width: max-content;
+    align-items: flex-start;
+  }
+
+  /* 5. Hanging Garment Items (NO CARDS, NO BOXES) */
+  .scene-slide {
+    flex-shrink: 0;
+    width: var(--sr-garment-w);
+    position: relative;
+    user-select: none;
+  }
+
+  .scene-hanger-assembly {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: 50% 0%;
+    transform: translate3d(0, var(--curve-y, 0px), 0) rotate(var(--curve-tilt, 0deg));
+    transition: transform 0.08s linear;
+    will-change: transform;
+  }
+
+  /* Natural Pendulum Swing Physics */
+  .swing-active .scene-hanger-assembly.sway-variant-0 { animation: scenePendulum 4.6s ease-in-out infinite alternate; }
+  .swing-active .scene-hanger-assembly.sway-variant-1 { animation: scenePendulum 5.2s ease-in-out infinite alternate -1.2s; }
+  .swing-active .scene-hanger-assembly.sway-variant-2 { animation: scenePendulum 4.2s ease-in-out infinite alternate -2.4s; }
+  .swing-active .scene-hanger-assembly.sway-variant-3 { animation: scenePendulum 5.6s ease-in-out infinite alternate -3.1s; }
+  .swing-active .scene-hanger-assembly.sway-variant-4 { animation: scenePendulum 4.8s ease-in-out infinite alternate -0.8s; }
+
+  @keyframes scenePendulum {
+    0%   { transform: translate3d(0, var(--curve-y, 0px), 0) rotate(calc(var(--curve-tilt, 0deg) - 1.4deg)); }
+    100% { transform: translate3d(0, var(--curve-y, 0px), 0) rotate(calc(var(--curve-tilt, 0deg) + 1.4deg)); }
+  }
+
+  /* Hover Lift & Focus */
+  .scene-slide:hover .scene-hanger-assembly {
+    filter: drop-shadow(0 14px 28px rgba(35, 20, 8, 0.16));
+  }
+  .scene-slide:hover .scene-garment-frame {
+    transform: translateY(-6px) scale(1.025);
+  }
+
+  /* 6. Realistic Metallic Hanger Hook */
+  .scene-hook-wrap {
+    position: relative;
+    width: 44px;
+    height: var(--sr-hang-len);
+    margin-top: calc(-1 * var(--sr-hang-len) + 12px);
+    z-index: 6;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .scene-hook-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  }
+
+  /* 7. Floating Price Tag */
+  .scene-floating-tag {
+    position: absolute;
+    top: calc(var(--sr-hang-len) - 22px);
+    right: 18px;
+    z-index: 10;
+    pointer-events: none;
+    transform-origin: 50% 0%;
+    transform: rotate(var(--tag-rot, 0deg));
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .tag-pin-string {
+    display: block;
+    width: 1px;
+    height: 14px;
+    background: rgba(140, 100, 50, 0.55);
+    margin: 0 auto;
+  }
+  .tag-pill-body {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--sr-tag-bg);
+    color: var(--sr-tag-color);
+    padding: 4px 10px;
+    border-radius: 999px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .tag-size-small .tag-pill-body { font-size: 0.72rem; padding: 3px 8px; }
+  .tag-size-medium .tag-pill-body { font-size: 0.82rem; padding: 4px 11px; }
+  .tag-size-large .tag-pill-body { font-size: 0.94rem; padding: 6px 14px; }
+
+  .tag-price-main { font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+  .tag-price-compare {
+    font-size: 0.82em;
+    text-decoration: line-through;
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+
+  /* 8. Garment Presentation */
+  .scene-garment-clickable {
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    width: 100%;
+    display: block;
+  }
+  .scene-garment-frame {
+    position: relative;
+    width: 100%;
+    height: var(--sr-garment-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .scene-garment-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    mix-blend-mode: var(--sr-blend);
+    filter: drop-shadow(0 10px 20px rgba(40, 20, 5, 0.12));
+    transition: opacity 0.3s ease, transform 0.35s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Multi-angle hover flip */
+  .scene-garment-img.back-view {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .scene-slide:hover .scene-garment-img.front-view.has-back {
+    opacity: 0;
+  }
+  .scene-slide:hover .scene-garment-img.back-view {
+    opacity: 1;
+  }
+
+  .scene-garment-placeholder {
+    width: 80%;
+    height: 80%;
+    opacity: 0.35;
+  }
+
+  .scene-garment-drop-shadow {
+    width: 60%;
+    height: 14px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(25, 15, 5, 0.20) 0%, rgba(0, 0, 0, 0) 70%);
+    margin: 8px auto 0 auto;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* 9. Navigation Arrows */
+  .scene-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(147, 103, 46, 0.22);
+    color: var(--sr-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(40, 20, 8, 0.14);
+    z-index: 12;
+    transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  }
+  .scene-nav-btn:hover {
+    background: #ffffff;
+    color: var(--sr-accent);
+    transform: translateY(-50%) scale(1.08);
+  }
+  .scene-nav-btn.btn-prev { left: max(16px, 2.5vw); }
+  .scene-nav-btn.btn-next { right: max(16px, 2.5vw); }
+
+  @media (max-width: 768px) {
+    .scene-nav-btn {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  /* 10. Bottom Editorial Information Bar */
+  .scene-bottom-bar {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    max-width: 1280px;
+    margin: 20px auto 0 auto;
+    padding: 0 max(24px, 4vw);
+  }
+  .scene-bottom-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    border-top: 1px solid rgba(147, 103, 46, 0.16);
+    padding-top: 20px;
+  }
+  @media (max-width: 768px) {
+    .scene-bottom-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+    }
+  }
+
+  .scene-hint-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sr-accent);
+    background: rgba(147, 103, 46, 0.08);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .scene-hint-mobile { display: none; }
+  @media (max-width: 768px) {
+    .scene-hint-desktop { display: none; }
+    .scene-hint-mobile { display: inline; }
+  }
+
+  .scene-active-title {
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 0 0 4px 0;
+    color: var(--sr-text);
+    transition: opacity 0.2s ease;
+  }
+  .scene-active-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .scene-active-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--sr-accent);
+  }
+  .scene-active-compare {
+    font-size: 0.92rem;
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  .scene-active-subtitle {
+    font-size: 0.88rem;
+    opacity: 0.72;
+    margin: 0;
+    max-width: 480px;
+  }
+
+  .scene-bottom-right {
+    text-align: right;
+    max-width: 420px;
+  }
+  @media (max-width: 768px) {
+    .scene-bottom-right { text-align: left; }
+  }
+
+  .scene-promo-heading {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sr-text);
+    margin-bottom: 4px;
+  }
+  .scene-promo-desc {
+    font-size: 0.88rem;
+    opacity: 0.75;
+    line-height: 1.45;
+    margin: 0 0 12px 0;
+  }
+  .scene-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--sr-text);
+    padding: 10px 22px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+  .scene-cta-btn:hover {
+    background-color: var(--sr-accent);
+    transform: translateY(-2px);
+  }
+
+  /* Progress Track */
+  .scene-progress-container {
+    width: min(320px, 100%);
+    margin: 18px auto 0 auto;
+  }
+  .scene-progress-track {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    background: rgba(147, 103, 46, 0.18);
+    border-radius: 2px;
+  }
+  .scene-progress-pill {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background: var(--sr-accent);
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    transition: left 0.1s linear;
+  }
+
+  /* ===================================================================== */
+  /* PRODUCT DETAIL DRAWER / FOCUS MODAL                                   */
+  /* ===================================================================== */
+  .scene-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 15, 10, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .scene-drawer-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .scene-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(540px, 100vw);
+    height: 100vh;
+    background: #ffffff;
+    color: #1a1815;
+    z-index: 1001;
+    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.25);
+    transform: translate3d(105%, 0, 0);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .scene-drawer.is-open {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .scene-drawer-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #f4f1ea;
+    border: none;
+    color: #1a1815;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .scene-drawer-close:hover {
+    background: #e6e2d8;
+    transform: rotate(90deg);
+  }
+
+  .scene-drawer-scrollable {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 40px 32px;
+  }
+  @media (max-width: 480px) {
+    .scene-drawer-scrollable { padding: 30px 20px; }
+  }
+
+  .scene-drawer-main-image-wrap {
+    width: 100%;
+    height: 380px;
+    background: #fbf9f5;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .scene-drawer-main-img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    transition: opacity 0.25s ease;
+  }
+
+  .scene-drawer-angle-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    justify-content: center;
+  }
+  .scene-angle-tab {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 14px;
+    background: #f4f1ea;
+    border: 1px solid #e5dfd3;
+    border-radius: 999px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .scene-angle-tab.is-active,
+  .scene-angle-tab:hover {
+    background: var(--sr-accent);
+    color: #ffffff;
+    border-color: var(--sr-accent);
+  }
+
+  .scene-drawer-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sr-accent);
+    margin-bottom: 8px;
+  }
+  .scene-drawer-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.25;
+    margin: 0 0 10px 0;
+  }
+  .scene-drawer-price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .scene-drawer-price {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--sr-accent);
+  }
+  .scene-drawer-compare {
+    font-size: 1.05rem;
+    text-decoration: line-through;
+    opacity: 0.55;
+  }
+  .scene-drawer-desc {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #4a453f;
+    margin: 0 0 24px 0;
+  }
+
+  .scene-drawer-variants-wrap {
+    margin-bottom: 22px;
+  }
+  .scene-variant-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .scene-variant-select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #d8d2c4;
+    background: #ffffff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #1a1815;
+    outline: none;
+    cursor: pointer;
+  }
+  .scene-variant-select:focus {
+    border-color: var(--sr-accent);
+  }
+
+  .scene-drawer-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .scene-qty-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d8d2c4;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+  .scene-qty-btn {
+    width: 36px;
+    height: 48px;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #1a1815;
+    cursor: pointer;
+  }
+  .scene-qty-input {
+    width: 44px;
+    height: 48px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1815;
+    -moz-appearance: textfield;
+  }
+  .scene-qty-input::-webkit-outer-spin-button,
+  .scene-qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .scene-btn-add-cart {
+    flex-grow: 1;
+    height: 48px;
+    background: var(--sr-accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .scene-btn-add-cart:hover {
+    background: #7d5420;
+    transform: translateY(-1px);
+  }
+  .scene-btn-add-cart.is-loading .btn-text { opacity: 0; }
+  .scene-btn-add-cart.is-loading .btn-spinner {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spinBtn 0.7s linear infinite;
+  }
+  .btn-spinner { display: none; }
+  @keyframes spinBtn { to { transform: rotate(360deg); } }
+
+  .scene-drawer-feedback {
+    font-size: 0.88rem;
+    min-height: 22px;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .scene-drawer-feedback.is-success { color: #227038; }
+  .scene-drawer-feedback.is-error { color: #b52c2c; }
+
+  .scene-drawer-full-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1a1815;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease;
+  }
+  .scene-drawer-full-link:hover { color: var(--sr-accent); }
+</style>
+
+{% comment %}
+  ==============================================================================
+  JAVASCRIPT: Curved Rail Physics, Real-Time Trajectory, Drawer & Cart API
+  ==============================================================================
+{% endcomment %}
+<script>
+  (function() {
+    function initSceneRail(sectionId) {
+      var root = document.getElementById("scene-rail-" + sectionId);
+      if (!root) return;
+
+      var stage = root.querySelector("[data-scene-stage]");
+      var viewport = root.querySelector("[data-scene-viewport]");
+      var track = root.querySelector("[data-scene-track]");
+      var prevBtn = root.querySelector("[data-scene-prev]");
+      var nextBtn = root.querySelector("[data-scene-next]");
+      var progressPill = root.querySelector("[data-progress-pill]");
+
+      var railSvg = root.querySelector("[data-rail-svg]");
+      var railCore = root.querySelector("[data-rail-core]");
+      var railShadow = root.querySelector("[data-rail-shadow]");
+      var railSpecular = root.querySelector("[data-rail-specular]");
+
+      // Bottom info bindings
+      var activeTitle = root.querySelector("[data-active-title]");
+      var activePrice = root.querySelector("[data-active-price]");
+      var activeCompare = root.querySelector("[data-active-compare]");
+      var activeSubtitle = root.querySelector("[data-active-subtitle]");
+
+      // Drawer bindings
+      var backdrop = root.querySelector("[data-drawer-backdrop]");
+      var drawer = root.querySelector("[data-drawer]");
+      var drawerClose = root.querySelector("[data-drawer-close]");
+      var drawerMainImg = root.querySelector("[data-drawer-main-img]");
+      var drawerTitle = root.querySelector("[data-drawer-title]");
+      var drawerPrice = root.querySelector("[data-drawer-price]");
+      var drawerCompare = root.querySelector("[data-drawer-compare]");
+      var drawerDesc = root.querySelector("[data-drawer-desc]");
+      var drawerVariantSelect = root.querySelector("[data-drawer-variant-select]");
+      var drawerVariantsWrap = root.querySelector("[data-drawer-variants-wrap]");
+      var drawerFullLink = root.querySelector("[data-drawer-full-link]");
+      var drawerAddBtn = root.querySelector("[data-drawer-add-btn]");
+      var drawerFeedback = root.querySelector("[data-drawer-feedback]");
+      var angleTabs = root.querySelectorAll("[data-angle]");
+      var qtyInput = root.querySelector("[data-qty-input]");
+      var qtyMinus = root.querySelector("[data-qty-minus]");
+      var qtyPlus = root.querySelector("[data-qty-plus]");
+
+      if (!stage || !viewport || !track) return;
+
+      var sagDepth = parseFloat(root.dataset.railSag) || 65;
+      var yAnchor = parseFloat(root.dataset.railTop) || 45;
+      var enableTilt = root.dataset.tilt === "true";
+      var slides = Array.prototype.slice.call(track.querySelectorAll("[data-scene-slide]"));
+
+      var currentDrawerItem = null;
+
+      // 1. DYNAMIC SVG CURVED RAIL GEOMETRY
+      function updateRailSvg() {
+        var w = stage.clientWidth || 1400;
+        var h = Math.max(180, yAnchor + sagDepth + 60);
+
+        if (railSvg) {
+          railSvg.setAttribute("viewBox", "0 0 " + w + " " + h);
+          railSvg.style.height = h + "px";
+        }
+
+        // Quadratic Bézier: M 0,yAnchor Q (w/2),(yAnchor + 2*sagDepth) w,yAnchor
+        // Exactly matches parabolic sagDepth at center
+        var p1Y = yAnchor + (2.0 * sagDepth);
+        var pathData = "M 0," + yAnchor + " Q " + (w * 0.5) + "," + p1Y + " " + w + "," + yAnchor;
+        var shadowData = "M 0," + (yAnchor + 8) + " Q " + (w * 0.5) + "," + (p1Y + 8) + " " + w + "," + (yAnchor + 8);
+        var specularData = "M 0," + (yAnchor - 1) + " Q " + (w * 0.5) + "," + (p1Y - 1) + " " + w + "," + (yAnchor - 1);
+
+        if (railCore) railCore.setAttribute("d", pathData);
+        if (railShadow) railShadow.setAttribute("d", shadowData);
+        if (railSpecular) railSpecular.setAttribute("d", specularData);
+      }
+
+      // 2. REAL-TIME CURVE TRAJECTORY FOR HANGING PRODUCTS
+      var isTicking = false;
+
+      function updateItemsAlongCurve() {
+        isTicking = false;
+        var stageRect = stage.getBoundingClientRect();
+        var stageW = stageRect.width || 1400;
+        var stageCenterX = stageRect.left + (stageW * 0.5);
+        var halfW = Math.max(1, stageW * 0.5);
+
+        for (var i = 0; i < slides.length; i++) {
+          var slide = slides[i];
+          var rect = slide.getBoundingClientRect();
+          var slideCenterX = rect.left + (rect.width * 0.5);
+          var relX = slideCenterX - stageCenterX;
+
+          // Normalized coordinate: -1 (left), 0 (center dip), +1 (right)
+          var u = relX / halfW;
+          u = Math.max(-1.3, Math.min(1.3, u));
+
+          // Parabolic dip: y = sagDepth * (1 - u^2)
+          var yDip = Math.max(0, sagDepth * (1.0 - (u * u)));
+
+          // Tangent slope: dy/dx = - (2 * sagDepth * u) / halfW
+          var slope = - (2.0 * sagDepth * u) / halfW;
+          var angleDeg = (Math.atan(slope) * 180) / Math.PI;
+          var tilt = enableTilt ? Math.max(-11, Math.min(11, angleDeg)) : 0;
+
+          var assembly = slide.querySelector(".scene-hanger-assembly");
+          if (assembly) {
+            assembly.style.setProperty("--curve-y", yDip.toFixed(1) + "px");
+            assembly.style.setProperty("--curve-tilt", tilt.toFixed(2) + "deg");
+          }
+        }
+
+        // Update progress rail
+        if (progressPill) {
+          var maxScroll = viewport.scrollWidth - viewport.clientWidth;
+          if (maxScroll <= 0) {
+            progressPill.style.left = "0%";
+          } else {
+            var prog = Math.min(1.0, Math.max(0.0, viewport.scrollLeft / maxScroll));
+            progressPill.style.left = (prog * 100) + "%";
+          }
+        }
+      }
+
+      function requestCurveUpdate() {
+        if (!isTicking) {
+          isTicking = true;
+          requestAnimationFrame(updateItemsAlongCurve);
+        }
+      }
+
+      // 3. EDITORIAL HOVER HIGHLIGHT & BOTTOM INFO UPDATES
+      function setActiveProductInfo(slide) {
+        if (!slide) return;
+        var title = slide.dataset.title;
+        var price = slide.dataset.price;
+        var compare = slide.dataset.compare;
+        var desc = slide.dataset.desc;
+
+        if (activeTitle && title) activeTitle.textContent = title;
+        if (activePrice && price) activePrice.textContent = price;
+        if (activeCompare) {
+          if (compare && compare !== "") {
+            activeCompare.textContent = compare;
+            activeCompare.style.display = "inline";
+          } else {
+            activeCompare.style.display = "none";
+          }
+        }
+        if (activeSubtitle && desc) activeSubtitle.textContent = desc;
+      }
+
+      slides.forEach(function(slide) {
+        slide.addEventListener("mouseenter", function() {
+          setActiveProductInfo(slide);
+        });
+
+        // Click to Open Focused Detail Drawer
+        var clickable = slide.querySelector("[data-open-drawer]");
+        if (clickable) {
+          clickable.addEventListener("click", function(e) {
+            if (isDragging) return;
+            e.preventDefault();
+            openDrawer(slide);
+          });
+        }
+      });
+
+      // 4. PRODUCT DETAIL DRAWER OPEN / CLOSE / MULTI-ANGLE SWITCHER
+      function openDrawer(slide) {
+        if (!drawer || !backdrop) return;
+        currentDrawerItem = slide;
+
+        var title = slide.dataset.title || "";
+        var price = slide.dataset.price || "";
+        var compare = slide.dataset.compare || "";
+        var desc = slide.dataset.desc || "";
+        var url = slide.dataset.url || "#";
+        var frontImg = slide.dataset.frontImg || "";
+        var backImg = slide.dataset.backImg || frontImg;
+        var sideImg = slide.dataset.sideImg || frontImg;
+
+        if (drawerTitle) drawerTitle.textContent = title;
+        if (drawerPrice) drawerPrice.textContent = price;
+        if (drawerCompare) {
+          if (compare && compare !== "") {
+            drawerCompare.textContent = compare;
+            drawerCompare.style.display = "inline";
+          } else {
+            drawerCompare.style.display = "none";
+          }
+        }
+        if (drawerDesc) drawerDesc.textContent = desc;
+        if (drawerFullLink) drawerFullLink.setAttribute("href", url);
+
+        // Main Image & Angle Tabs
+        if (drawerMainImg) {
+          drawerMainImg.src = frontImg;
+          drawerMainImg.alt = title;
+        }
+
+        angleTabs.forEach(function(tab) {
+          tab.classList.remove("is-active");
+          if (tab.dataset.angle === "front") tab.classList.add("is-active");
+        });
+
+        // Variants dropdown
+        if (drawerVariantSelect && drawerVariantsWrap) {
+          drawerVariantSelect.innerHTML = "";
+          var rawVariants = slide.dataset.variants;
+          var variants = [];
+          try {
+            if (rawVariants) variants = JSON.parse(rawVariants);
+          } catch (e) {
+            variants = [];
+          }
+
+          if (variants && variants.length > 0) {
+            variants.forEach(function(v) {
+              var opt = document.createElement("option");
+              opt.value = v.id;
+              opt.textContent = v.title + (v.available === false ? " (Sold Out)" : "");
+              if (v.available === false) opt.disabled = true;
+              drawerVariantSelect.appendChild(opt);
+            });
+            drawerVariantsWrap.style.display = "block";
+          } else {
+            drawerVariantsWrap.style.display = "none";
+          }
+        }
+
+        if (qtyInput) qtyInput.value = "1";
+        if (drawerFeedback) {
+          drawerFeedback.textContent = "";
+          drawerFeedback.className = "scene-drawer-feedback";
+        }
+
+        drawer.classList.add("is-open");
+        backdrop.classList.add("is-open");
+        drawer.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeDrawer() {
+        if (!drawer || !backdrop) return;
+        drawer.classList.remove("is-open");
+        backdrop.classList.remove("is-open");
+        drawer.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      if (drawerClose) drawerClose.addEventListener("click", closeDrawer);
+      if (backdrop) backdrop.addEventListener("click", closeDrawer);
+      window.addEventListener("keydown", function(e) {
+        if (e.key === "Escape" && drawer && drawer.classList.contains("is-open")) {
+          closeDrawer();
+        }
+      });
+
+      // Angle tab switcher
+      angleTabs.forEach(function(tab) {
+        tab.addEventListener("click", function() {
+          if (!currentDrawerItem) return;
+          angleTabs.forEach(function(t) { t.classList.remove("is-active"); });
+          tab.classList.add("is-active");
+
+          var angle = tab.dataset.angle;
+          var targetSrc = currentDrawerItem.dataset.frontImg;
+          if (angle === "back") targetSrc = currentDrawerItem.dataset.backImg || targetSrc;
+          if (angle === "side") targetSrc = currentDrawerItem.dataset.sideImg || targetSrc;
+
+          if (drawerMainImg && targetSrc) {
+            drawerMainImg.style.opacity = "0.4";
+            setTimeout(function() {
+              drawerMainImg.src = targetSrc;
+              drawerMainImg.style.opacity = "1";
+            }, 120);
+          }
+        });
+      });
+
+      // Quantity controls
+      if (qtyMinus && qtyInput) {
+        qtyMinus.addEventListener("click", function() {
+          var val = parseInt(qtyInput.value) || 1;
+          if (val > 1) qtyInput.value = val - 1;
+        });
+      }
+      if (qtyPlus && qtyInput) {
+        qtyPlus.addEventListener("click", function() {
+          var val = parseInt(qtyInput.value) || 1;
+          qtyInput.value = val + 1;
+        });
+      }
+
+      // Native Shopify Ajax Add to Cart (/cart/add.js)
+      if (drawerAddBtn) {
+        drawerAddBtn.addEventListener("click", function() {
+          if (!currentDrawerItem) return;
+          var variantId = drawerVariantSelect ? drawerVariantSelect.value : null;
+          var qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+
+          if (!variantId && currentDrawerItem.dataset.productId) {
+            variantId = currentDrawerItem.dataset.productId;
+          }
+
+          drawerAddBtn.classList.add("is-loading");
+          if (drawerFeedback) {
+            drawerFeedback.textContent = "";
+            drawerFeedback.className = "scene-drawer-feedback";
+          }
+
+          // If demonstration item
+          if (!variantId || variantId.indexOf("demo") !== -1) {
+            setTimeout(function() {
+              drawerAddBtn.classList.remove("is-loading");
+              if (drawerFeedback) {
+                drawerFeedback.textContent = "✓ Atelier piece added to preview bag!";
+                drawerFeedback.classList.add("is-success");
+              }
+            }, 500);
+            return;
+          }
+
+          fetch("/cart/add.js", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify({
+              id: variantId,
+              quantity: qty
+            })
+          })
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            drawerAddBtn.classList.remove("is-loading");
+            if (data.status && data.status !== 200) {
+              if (drawerFeedback) {
+                drawerFeedback.textContent = data.description || "Could not add item.";
+                drawerFeedback.classList.add("is-error");
+              }
+            } else {
+              if (drawerFeedback) {
+                drawerFeedback.textContent = "✓ Added to your shopping bag!";
+                drawerFeedback.classList.add("is-success");
+              }
+              // Dispatch native Shopify theme events
+              document.dispatchEvent(new CustomEvent("cart:refresh", { bubbles: true }));
+              document.dispatchEvent(new CustomEvent("theme:cart:update", { bubbles: true }));
+            }
+          })
+          .catch(function(err) {
+            drawerAddBtn.classList.remove("is-loading");
+            if (drawerFeedback) {
+              drawerFeedback.textContent = "Error adding to cart.";
+              drawerFeedback.classList.add("is-error");
+            }
+          });
+        });
+      }
+
+      // 5. MOUSE DRAG & TOUCH SWIPE MECHANICS
+      var isDown = false;
+      var startX = 0;
+      var scrollLeft = 0;
+      var isDragging = false;
+
+      viewport.addEventListener("mousedown", function(e) {
+        isDown = true;
+        isDragging = false;
+        startX = e.pageX - viewport.offsetLeft;
+        scrollLeft = viewport.scrollLeft;
+        viewport.style.scrollBehavior = "auto";
+      });
+
+      window.addEventListener("mouseup", function() {
+        if (!isDown) return;
+        isDown = false;
+        viewport.style.scrollBehavior = "smooth";
+        setTimeout(function() { isDragging = false; }, 60);
+      });
+
+      viewport.addEventListener("mousemove", function(e) {
+        if (!isDown) return;
+        e.preventDefault();
+        var x = e.pageX - viewport.offsetLeft;
+        var walk = (x - startX) * 1.4;
+        if (Math.abs(walk) > 5) isDragging = true;
+        viewport.scrollLeft = scrollLeft - walk;
+        requestCurveUpdate();
+      });
+
+      // 6. BUTTON NAVIGATION
+      function getScrollDistance() {
+        var firstSlide = track.querySelector(".scene-slide");
+        if (firstSlide) {
+          return firstSlide.offsetWidth + 40;
+        }
+        return viewport.clientWidth * 0.75;
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", function() {
+          viewport.scrollBy({ left: -getScrollDistance(), behavior: "smooth" });
+        });
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", function() {
+          viewport.scrollBy({ left: getScrollDistance(), behavior: "smooth" });
+        });
+      }
+
+      // Keyboard & Scroll events
+      viewport.addEventListener("scroll", requestCurveUpdate, { passive: true });
+      window.addEventListener("resize", function() {
+        updateRailSvg();
+        requestCurveUpdate();
+      }, { passive: true });
+
+      viewport.addEventListener("keydown", function(e) {
+        if (e.key === "ArrowLeft") {
+          viewport.scrollBy({ left: -getScrollDistance(), behavior: "smooth" });
+        } else if (e.key === "ArrowRight") {
+          viewport.scrollBy({ left: getScrollDistance(), behavior: "smooth" });
+        }
+      });
+
+      // Autoplay
+      {% if section.settings.autoplay %}
+        var autoTimer = null;
+        var autoSpeed = ({{ section.settings.autoplay_speed | default: 5 }}) * 1000;
+
+        function startAutoplay() {
+          if (autoTimer) clearInterval(autoTimer);
+          autoTimer = setInterval(function() {
+            var maxScroll = viewport.scrollWidth - viewport.clientWidth;
+            if (viewport.scrollLeft >= maxScroll - 15) {
+              viewport.scrollTo({ left: 0, behavior: "smooth" });
+            } else {
+              viewport.scrollBy({ left: getScrollDistance(), behavior: "smooth" });
+            }
+          }, autoSpeed);
+        }
+
+        function stopAutoplay() {
+          if (autoTimer) clearInterval(autoTimer);
+        }
+
+        root.addEventListener("mouseenter", stopAutoplay);
+        root.addEventListener("mouseleave", startAutoplay);
+        root.addEventListener("touchstart", stopAutoplay, { passive: true });
+        startAutoplay();
+      {% endif %}
+
+      // Initial execution
+      updateRailSvg();
+      updateItemsAlongCurve();
+      if (slides.length > 0) setActiveProductInfo(slides[0]);
+
+      setTimeout(function() {
+        updateRailSvg();
+        updateItemsAlongCurve();
+      }, 100);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() {
+        initSceneRail("{{ section_id }}");
+      });
+    } else {
+      initSceneRail("{{ section_id }}");
+    }
+
+    // Shopify Theme Editor Integration
+    document.addEventListener("shopify:section:load", function(e) {
+      if (e.detail && e.detail.sectionId === "{{ section_id }}") {
+        initSceneRail("{{ section_id }}");
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Scene Rail Slider",
+  "tag": "section",
+  "class": "scene-rail-section-wrapper",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header & Editorial Text"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading / Badge",
+      "default": "HAUTE COUTURE 2026"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Royal Scene Rail"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Each bespoke garment hangs along a sculpted metallic architectural rail. Hover to inspect, click to open full tailoring details."
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Header Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Background & Dimensions"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F5F2EB"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image (Optional)"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Primary Text Color",
+      "default": "#1A1815"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent / Price Color",
+      "default": "#93672E"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "Section Height Mode",
+      "options": [
+        { "value": "auto", "label": "Auto / Fit Content" },
+        { "value": "viewport", "label": "Full Viewport (100vh)" },
+        { "value": "custom", "label": "Custom Pixel Height" }
+      ],
+      "default": "viewport"
+    },
+    {
+      "type": "range",
+      "id": "custom_height_desktop",
+      "min": 550,
+      "max": 950,
+      "step": 10,
+      "default": 720,
+      "unit": "px",
+      "label": "Desktop Custom Height"
+    },
+    {
+      "type": "range",
+      "id": "custom_height_mobile",
+      "min": 450,
+      "max": 800,
+      "step": 10,
+      "default": 580,
+      "unit": "px",
+      "label": "Mobile Custom Height"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "default": 40,
+      "unit": "px",
+      "label": "Top Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 5,
+      "default": 50,
+      "unit": "px",
+      "label": "Bottom Padding"
+    },
+    {
+      "type": "header",
+      "content": "Curved Metallic Rail"
+    },
+    {
+      "type": "select",
+      "id": "rail_style",
+      "label": "Rail Metallic Finish",
+      "options": [
+        { "value": "chrome", "label": "High-Gloss Polished Chrome" },
+        { "value": "brushed", "label": "Brushed Steel / Titanium" },
+        { "value": "black_metal", "label": "Obsidian Gunmetal" },
+        { "value": "brass_gold", "label": "Satin Champagne Brass" },
+        { "value": "custom", "label": "Custom Rail Color" }
+      ],
+      "default": "chrome"
+    },
+    {
+      "type": "color",
+      "id": "custom_rail_color",
+      "label": "Custom Rail Color (If selected above)",
+      "default": "#C0C0C0"
+    },
+    {
+      "type": "range",
+      "id": "rail_thickness",
+      "min": 3,
+      "max": 14,
+      "step": 1,
+      "default": 6,
+      "unit": "px",
+      "label": "Rail Thickness"
+    },
+    {
+      "type": "range",
+      "id": "rail_sag",
+      "min": 20,
+      "max": 160,
+      "step": 5,
+      "default": 65,
+      "unit": "px",
+      "label": "Rail Curvature / Sag Amount"
+    },
+    {
+      "type": "range",
+      "id": "rail_top_position",
+      "min": 10,
+      "max": 120,
+      "step": 5,
+      "default": 45,
+      "unit": "px",
+      "label": "Rail Vertical Position"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_end_brackets",
+      "label": "Show Architectural Wall Brackets",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Product Source & Integration"
+    },
+    {
+      "type": "select",
+      "id": "product_source",
+      "label": "Product Source Mode",
+      "options": [
+        { "value": "collection", "label": "Mode B: Dynamic Collection" },
+        { "value": "blocks", "label": "Mode A: Individual Product Blocks" }
+      ],
+      "default": "collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Shopify Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "default": 8,
+      "label": "Maximum Products to Show"
+    },
+    {
+      "type": "range",
+      "id": "garment_width",
+      "min": 180,
+      "max": 420,
+      "step": 10,
+      "default": 270,
+      "unit": "px",
+      "label": "Garment Width (Desktop)"
+    },
+    {
+      "type": "range",
+      "id": "garment_height",
+      "min": 240,
+      "max": 550,
+      "step": 10,
+      "default": 360,
+      "unit": "px",
+      "label": "Garment Height (Desktop)"
+    },
+    {
+      "type": "range",
+      "id": "product_spacing",
+      "min": 20,
+      "max": 90,
+      "step": 5,
+      "default": 40,
+      "unit": "px",
+      "label": "Spacing Between Garments"
+    },
+    {
+      "type": "range",
+      "id": "hanging_length",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "default": 55,
+      "unit": "px",
+      "label": "Hanging Hook Drop Length"
+    },
+    {
+      "type": "select",
+      "id": "blend_mode",
+      "label": "Garment Image Blend Mode",
+      "options": [
+        { "value": "normal", "label": "Normal (Transparent PNG)" },
+        { "value": "multiply", "label": "Multiply (Blends White Studio Background)" },
+        { "value": "darken", "label": "Darken" }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "header",
+      "content": "Hanging Garment Physics"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_swing",
+      "label": "Enable Natural Swing Animation",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "swing_intensity",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3,
+      "label": "Breeze Swing Intensity"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_curve_tilt",
+      "label": "Tilt Garments Along Rail Slope",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_lift",
+      "label": "Elevate & Highlight on Hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Floating Price Tags"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_price_tags",
+      "label": "Show Floating Price Tags",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "tag_bg_color",
+      "label": "Tag Background Color",
+      "default": "#1A1815"
+    },
+    {
+      "type": "color",
+      "id": "tag_text_color",
+      "label": "Tag Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "select",
+      "id": "tag_size",
+      "label": "Price Tag Size",
+      "options": [
+        { "value": "small", "label": "Compact" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Prominent" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Show Compare-At (Original) Price",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Slider & Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show Navigation Arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_mouse_drag",
+      "label": "Enable Mouse Drag-to-Scroll",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_touch_swipe",
+      "label": "Enable Mobile Touch Swipe",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable Gentle Autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 5,
+      "unit": "s",
+      "label": "Autoplay Interval"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "Show Slider Progress Rail",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Product Detail Drawer"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_product_drawer",
+      "label": "Open Focused Product Drawer on Click",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_add",
+      "label": "Enable Instant Add to Cart",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_image_switcher",
+      "label": "Enable Multi-Angle (Front/Back/Side) Switcher",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Bottom Editorial Bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_bar",
+      "label": "Display Bottom Editorial Bar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "desktop_hint",
+      "label": "Desktop Interaction Hint",
+      "default": "Hover a piece · click to look closer"
+    },
+    {
+      "type": "text",
+      "id": "mobile_hint",
+      "label": "Mobile Interaction Hint",
+      "default": "Tap a piece to turn it"
+    },
+    {
+      "type": "text",
+      "id": "bottom_promo_heading",
+      "label": "Promotional Tagline",
+      "default": "Architectural Atelier"
+    },
+    {
+      "type": "textarea",
+      "id": "bottom_promo_desc",
+      "label": "Promotional Excerpt",
+      "default": "Handcrafted imperial silhouettes, tailored in limited atelier editions."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Collection CTA Label",
+      "default": "Explore Full Collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_url",
+      "label": "Collection CTA Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta_arrow",
+      "label": "Show Arrow on CTA",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product Piece",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Shopify Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "Alternate Front Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "back_image",
+          "label": "Optional Back View Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "side_image",
+          "label": "Optional Side View Image"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Custom Title (Overrides Product)"
+        },
+        {
+          "type": "text",
+          "id": "custom_subtitle",
+          "label": "Custom Subtitle / Material Note"
+        },
+        {
+          "type": "text",
+          "id": "custom_price",
+          "label": "Custom Price Tag Text"
+        },
+        {
+          "type": "url",
+          "id": "custom_url",
+          "label": "Custom URL (Overrides Product)"
+        },
+        {
+          "type": "range",
+          "id": "hanging_offset",
+          "min": -30,
+          "max": 30,
+          "step": 5,
+          "default": 0,
+          "unit": "px",
+          "label": "Individual Hanging Drop Offset"
+        },
+        {
+          "type": "range",
+          "id": "swing_intensity_override",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 0,
+          "label": "Swing Override (0 = Use Section Default)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scene Rail Slider",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -24,12 +24,12 @@
             "drop_offset": 0
           }
         },
-        "product_FazLHz": {
+        "product_W3hqmG": {
           "type": "product",
           "settings": {
-            "initial_image": "shopify://shop_images/Floating_Burgundy_Oversized_T-Shirt.png",
-            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Burgundy_T-Shirt.png",
-            "product": "royal-blue-sherwani",
+            "initial_image": "shopify://shop_images/Black_Urban_Culture_Sport_Tee_Mockup.png",
+            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_Tee.png",
+            "product": "black-gold-sherwani",
             "custom_title": "",
             "custom_price": "",
             "custom_link": "",
@@ -39,7 +39,7 @@
       },
       "block_order": [
         "product_pUUUtB",
-        "product_FazLHz"
+        "product_W3hqmG"
       ],
       "name": "Scene rail",
       "settings": {

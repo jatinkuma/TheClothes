@@ -501,7 +501,7 @@
         "header_alignment": "center",
         "collection": "frontpage",
         "products_to_show": 20,
-        "rope_color": "#9E703B",
+        "rope_color": "#9e703b",
         "show_pegs": true,
         "peg_style": "natural_wood",
         "enable_breeze_sway": true,
@@ -518,11 +518,139 @@
         "show_vendor": false,
         "show_quick_buy": true,
         "quick_buy_text": "Explore Piece",
-        "bg_color": "#FAF7F2",
-        "text_color": "#1F1A16",
-        "price_color": "#845A25",
+        "bg_color": "#faf7f2",
+        "text_color": "#1f1a16",
+        "price_color": "#845a25",
         "padding_top": 60,
         "padding_bottom": 80
+      }
+    },
+    "scene_rail_hanging_slider_M4fUcC": {
+      "type": "scene-rail-hanging-slider",
+      "blocks": {
+        "product_NUVzD4": {
+          "type": "product",
+          "settings": {
+            "product": "black-gold-sherwani",
+            "custom_image": "shopify://shop_images/left-side-dress.png",
+            "custom_title": "",
+            "custom_subtitle": "",
+            "custom_price": "",
+            "custom_url": "",
+            "hanging_offset": 0,
+            "swing_intensity_override": 0
+          }
+        },
+        "product_9emGa3": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "custom_title": "",
+            "custom_subtitle": "",
+            "custom_price": "",
+            "custom_url": "",
+            "hanging_offset": 0,
+            "swing_intensity_override": 0
+          }
+        },
+        "product_Y3WKTB": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "custom_title": "",
+            "custom_subtitle": "",
+            "custom_price": "",
+            "custom_url": "",
+            "hanging_offset": 0,
+            "swing_intensity_override": 0
+          }
+        },
+        "product_Lme8rB": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "custom_title": "",
+            "custom_subtitle": "",
+            "custom_price": "",
+            "custom_url": "",
+            "hanging_offset": 0,
+            "swing_intensity_override": 0
+          }
+        },
+        "product_jd7LDp": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "custom_title": "",
+            "custom_subtitle": "",
+            "custom_price": "",
+            "custom_url": "",
+            "hanging_offset": 0,
+            "swing_intensity_override": 0
+          }
+        }
+      },
+      "block_order": [
+        "product_NUVzD4",
+        "product_9emGa3",
+        "product_Y3WKTB",
+        "product_Lme8rB",
+        "product_jd7LDp"
+      ],
+      "name": "Scene Rail Slider",
+      "settings": {
+        "subheading": "HAUTE COUTURE 2026",
+        "heading": "The Royal Scene Rail",
+        "description": "Each bespoke garment hangs along a sculpted metallic architectural rail. Hover to inspect, click to open full tailoring details.",
+        "header_alignment": "center",
+        "bg_color": "#F5F2EB",
+        "text_color": "#1A1815",
+        "accent_color": "#93672E",
+        "section_height": "viewport",
+        "custom_height_desktop": 720,
+        "custom_height_mobile": 580,
+        "padding_top": 40,
+        "padding_bottom": 50,
+        "rail_style": "chrome",
+        "custom_rail_color": "#C0C0C0",
+        "rail_thickness": 6,
+        "rail_sag": 65,
+        "rail_top_position": 45,
+        "show_end_brackets": true,
+        "product_source": "collection",
+        "collection": "",
+        "products_to_show": 24,
+        "garment_width": 270,
+        "garment_height": 360,
+        "product_spacing": 40,
+        "hanging_length": 55,
+        "blend_mode": "normal",
+        "enable_swing": true,
+        "swing_intensity": 3,
+        "enable_curve_tilt": true,
+        "hover_lift": true,
+        "enable_price_tags": true,
+        "tag_bg_color": "#1A1815",
+        "tag_text_color": "#FFFFFF",
+        "tag_size": "medium",
+        "show_compare_price": true,
+        "show_arrows": true,
+        "enable_mouse_drag": true,
+        "enable_touch_swipe": true,
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_progress_bar": true,
+        "enable_product_drawer": true,
+        "enable_quick_add": true,
+        "enable_image_switcher": true,
+        "show_bottom_bar": true,
+        "desktop_hint": "Hover a piece · click to look closer",
+        "mobile_hint": "Tap a piece to turn it",
+        "bottom_promo_heading": "Architectural Atelier",
+        "bottom_promo_desc": "Handcrafted imperial silhouettes, tailored in limited atelier editions.",
+        "cta_label": "Explore Full Collection",
+        "cta_url": "",
+        "show_cta_arrow": true
       }
     }
   },
@@ -533,6 +661,7 @@
     "the_royal_attire",
     "interactive_royal_doll_JwazkP",
     "interactive_hero_3d_QnGc3H",
-    "clothesline_hanging_slider_DAXMTg"
+    "clothesline_hanging_slider_DAXMTg",
+    "scene_rail_hanging_slider_M4fUcC"
   ]
 }

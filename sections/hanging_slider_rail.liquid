@@ -1,12 +1,13 @@
 {% comment %}
   ==============================================================================
-  SCENE RAIL: HANGING PRODUCT SLIDER (CURVED METALLIC RAIL)
+  SCENE RAIL: INFINITE HANGING PRODUCT SLIDER (CURVED METALLIC RAIL)
   ------------------------------------------------------------------------------
-  - 100% Transparent background (no white box or unwanted image background).
-  - Both initial and hover images have the EXACT SAME HEIGHT (guaranteed equal height).
+  - 100% Transparent background (no white card containers, no white boxes).
+  - Automatically knocks out white backgrounds from uploaded product mockups (mix-blend-mode: multiply).
+  - True infinite continuous looping slider (drifts & drags infinitely with zero seam).
+  - Both initial and hover images have the EXACT SAME 100% full height.
   - Left / Side view (Initial) has narrow width (width km).
-  - Front view (Hovered) expands to broad width.
-  - Smooth flex width expansion on hover; neighboring clothes part aside.
+  - Front view (Hovered) expands to broad width with smooth neighboring garment parting.
   - Realistic left-to-right pendulum sway ("kapde jaise hilte hain").
   - Curved SVG metallic rail across viewport.
   - Floating paper price tags with hole grommet.
@@ -16,15 +17,18 @@
 {% assign garment_h = section.settings.garment_height | default: 320 %}
 {% assign base_init_w = section.settings.initial_width | default: 110 %}
 {% assign base_hov_w = section.settings.hover_width | default: 260 %}
+{% assign auto_drift = section.settings.auto_drift_speed | default: 0.8 %}
 
 <section
   id="sr-{{ section.id }}"
-  class="sr-sec sr-vh-d sr-vh-m sr-shaped{% if section.settings.blend_white_mockups %} sr-blend-mode{% endif %}"
+  class="sr-sec sr-vh-d sr-vh-m sr-shaped"
   data-sr-section=""
   data-sag="{{ section.settings.rail_sag | default: 40 }}"
   data-tilt="{{ section.settings.enable_tilt | default: 3 }}"
   data-hover-speed="{{ section.settings.hover_speed | default: 400 }}"
   data-garment-h="{{ garment_h }}"
+  data-auto-drift="{{ auto_drift }}"
+  data-infinite="{{ section.settings.enable_infinite }}"
   style="
     --sr-txt: {{ section.settings.text_color | default: 'inherit' }};
     --sr-acc: {{ section.settings.accent_color | default: 'inherit' }};
@@ -136,191 +140,210 @@
         {% assign block_count = section.blocks.size %}
 
         {% if block_count > 0 %}
-          <!-- MERCHANT BLOCKS: Exact Same Height, Auto Width -->
-          {% for block in section.blocks %}
-            {% assign linked_product = block.settings.product %}
-            {% assign item_url = block.settings.custom_link | default: linked_product.url | default: '#' %}
-            {% assign item_title = block.settings.custom_title | default: linked_product.title | default: 'Atelier Piece' %}
-            
-            {% assign item_price = block.settings.custom_price %}
-            {% if item_price == blank and linked_product != blank %}
-              {% assign item_price = linked_product.price | money %}
-            {% endif %}
-            {% if item_price == blank %}
-              {% assign item_price = section.settings.default_tag_price | default: '$199' %}
-            {% endif %}
+          {% comment %} Repeat blocks 4-10 times for seamless infinite loop {% endcomment %}
+          {% assign repeat_count = 3 %}
+          {% if block_count == 1 %}
+            {% assign repeat_count = 16 %}
+          {% elsif block_count <= 2 %}
+            {% assign repeat_count = 10 %}
+          {% elsif block_count <= 4 %}
+            {% assign repeat_count = 6 %}
+          {% elsif block_count <= 8 %}
+            {% assign repeat_count = 4 %}
+          {% endif %}
 
-            {% assign initial_img = block.settings.initial_image | default: linked_product.featured_image %}
-            {% assign hover_img = block.settings.hover_image | default: linked_product.images[1] | default: initial_img %}
-            {% assign back_img = block.settings.back_image | default: linked_product.images[2] %}
-            {% assign offset_y = block.settings.drop_offset | default: 0 %}
-
-            {% assign init_scale = block.settings.initial_scale | default: 100 | divided_by: 100.0 %}
-            {% assign hover_scale = block.settings.hover_scale | default: 100 | divided_by: 100.0 %}
-
-            <div
-              class="sr-item"
-              data-sr-item=""
-              role="button"
-              tabindex="0"
-              aria-label="{{ item_title | escape }}"
-              data-name="{{ item_title | escape }}"
-              data-price="{{ item_price | escape }}"
-              data-url="{{ item_url }}"
-              data-idx="{{ forloop.index }}"
-              style="
-                --sr-drop: {{ offset_y }}px;
-                --item-w-init: {{ base_init_w }}px;
-                --item-w-hov: {{ base_hov_w }}px;
-              "
-              {{ block.shopify_attributes }}
-            >
-              <!-- Dedicated Hanging Sway Container -->
-              <div class="sr-hang-sway">
-                <!-- Metallic Hanger Hook -->
-                <div class="sr-hanger-hook" aria-hidden="true">
-                  <svg viewBox="0 0 24 38" fill="none">
-                    <path d="M 12 16 C 12 7 19 4 19 11 C 19 14 17 16 13 18 C 12 19 12 21 12 26" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
-                    <circle cx="19" cy="11" r="1.6" fill="#9da3a9"/>
-                    <rect x="10" y="26" width="4" height="4" rx="1" fill="#4d3a2c"/>
-                  </svg>
-                </div>
-
-                <!-- Price Tag -->
-                {% if section.settings.show_tags %}
-                  <div class="sr-tag sr-tag-single" aria-hidden="true">
-                    <span class="sr-tag-cord"></span>
-                    <div class="sr-tag-inner">
-                      <span class="sr-tag-eyelet"></span>
-                      <span class="sr-tag-face sr-tag-front">{{ item_price }}</span>
-                    </div>
-                  </div>
+          <div class="sr-track-inner" data-sr-track-inner="" data-repeat="{{ repeat_count }}">
+            {% for r in (1..repeat_count) %}
+              {% for block in section.blocks %}
+                {% assign linked_product = block.settings.product %}
+                {% assign item_url = block.settings.custom_link | default: linked_product.url | default: '#' %}
+                {% assign item_title = block.settings.custom_title | default: linked_product.title | default: 'Atelier Piece' %}
+                
+                {% assign item_price = block.settings.custom_price %}
+                {% if item_price == blank and linked_product != blank %}
+                  {% assign item_price = linked_product.price | money %}
+                {% endif %}
+                {% if item_price == blank %}
+                  {% assign item_price = section.settings.default_tag_price | default: '$199' %}
                 {% endif %}
 
-                <!-- Hanging Garment Images (Guaranteed Identical Height) -->
-                <div class="sr-garment">
-                  <!-- Initial Image (Side View - Narrow Width, Full 100% Height) -->
-                  <div class="sr-view" data-sr-pos="0">
-                    {% if initial_img != blank %}
-                      <img
-                        src="{{ initial_img | image_url: height: 800 }}"
-                        alt="{{ item_title | escape }} – side"
-                        loading="lazy"
-                        decoding="async"
-                        style="{% if init_scale != 1.0 %}transform: scale({{ init_scale }});{% endif %}"
-                      >
-                    {% else %}
-                      {{ 'product-1' | placeholder_svg_tag: 'sr-placeholder' }}
-                    {% endif %}
-                  </div>
+                {% assign initial_img = block.settings.initial_image | default: linked_product.featured_image %}
+                {% assign hover_img = block.settings.hover_image | default: linked_product.images[1] | default: initial_img %}
+                {% assign back_img = block.settings.back_image | default: linked_product.images[2] %}
+                {% assign offset_y = block.settings.drop_offset | default: 0 %}
 
-                  <!-- Hovered Image (Front View - Broad Width, Full 100% Height) -->
-                  <div class="sr-view" data-sr-pos="1">
-                    {% if hover_img != blank %}
-                      <img
-                        src="{{ hover_img | image_url: height: 800 }}"
-                        alt="{{ item_title | escape }} – front"
-                        loading="lazy"
-                        decoding="async"
-                        style="{% if hover_scale != 1.0 %}transform: scale({{ hover_scale }});{% endif %}"
-                      >
-                    {% endif %}
-                  </div>
+                {% assign init_scale = block.settings.initial_scale | default: 100 | divided_by: 100.0 %}
+                {% assign hover_scale = block.settings.hover_scale | default: 100 | divided_by: 100.0 %}
 
-                  <!-- Optional Back View -->
-                  {% if back_img != blank %}
-                    <div class="sr-view" data-sr-pos="-1">
-                      <img
-                        src="{{ back_img | image_url: height: 800 }}"
-                        alt="{{ item_title | escape }} – back"
-                        loading="lazy"
-                        decoding="async"
-                      >
+                <div
+                  class="sr-item"
+                  data-sr-item=""
+                  role="button"
+                  tabindex="0"
+                  aria-label="{{ item_title | escape }}"
+                  data-name="{{ item_title | escape }}"
+                  data-price="{{ item_price | escape }}"
+                  data-url="{{ item_url }}"
+                  data-idx="{{ forloop.index }}"
+                  style="
+                    --sr-drop: {{ offset_y }}px;
+                    --item-w-init: {{ base_init_w }}px;
+                    --item-w-hov: {{ base_hov_w }}px;
+                  "
+                  {% if r == 1 %}{{ block.shopify_attributes }}{% endif %}
+                >
+                  <!-- Dedicated Hanging Sway Container -->
+                  <div class="sr-hang-sway">
+                    <!-- Metallic Hanger Hook -->
+                    <div class="sr-hanger-hook" aria-hidden="true">
+                      <svg viewBox="0 0 24 38" fill="none">
+                        <path d="M 12 16 C 12 7 19 4 19 11 C 19 14 17 16 13 18 C 12 19 12 21 12 26" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
+                        <circle cx="19" cy="11" r="1.6" fill="#9da3a9"/>
+                        <rect x="10" y="26" width="4" height="4" rx="1" fill="#4d3a2c"/>
+                      </svg>
                     </div>
-                  {% endif %}
-                </div>
-              </div>
 
-              <!-- Floor Drop Shadow -->
-              <div class="sr-item-shadow" aria-hidden="true"></div>
-            </div>
-          {% endfor %}
+                    <!-- Price Tag -->
+                    {% if section.settings.show_tags %}
+                      <div class="sr-tag sr-tag-single" aria-hidden="true">
+                        <span class="sr-tag-cord"></span>
+                        <div class="sr-tag-inner">
+                          <span class="sr-tag-eyelet"></span>
+                          <span class="sr-tag-face sr-tag-front">{{ item_price }}</span>
+                        </div>
+                      </div>
+                    {% endif %}
+
+                    <!-- Hanging Garment (Exact Same 100% Full Height for Both Views) -->
+                    <div class="sr-garment">
+                      <!-- Initial Image (Side View) -->
+                      <div class="sr-view" data-sr-pos="0">
+                        {% if initial_img != blank %}
+                          <img
+                            src="{{ initial_img | image_url: height: 800 }}"
+                            alt="{{ item_title | escape }} – side"
+                            loading="lazy"
+                            decoding="async"
+                            style="{% if init_scale != 1.0 %}transform: scale({{ init_scale }});{% endif %}"
+                          >
+                        {% else %}
+                          {{ 'product-1' | placeholder_svg_tag: 'sr-placeholder' }}
+                        {% endif %}
+                      </div>
+
+                      <!-- Hovered Image (Front View) -->
+                      <div class="sr-view" data-sr-pos="1">
+                        {% if hover_img != blank %}
+                          <img
+                            src="{{ hover_img | image_url: height: 800 }}"
+                            alt="{{ item_title | escape }} – front"
+                            loading="lazy"
+                            decoding="async"
+                            style="{% if hover_scale != 1.0 %}transform: scale({{ hover_scale }});{% endif %}"
+                          >
+                        {% endif %}
+                      </div>
+
+                      <!-- Optional Back View -->
+                      {% if back_img != blank %}
+                        <div class="sr-view" data-sr-pos="-1">
+                          <img
+                            src="{{ back_img | image_url: height: 800 }}"
+                            alt="{{ item_title | escape }} – back"
+                            loading="lazy"
+                            decoding="async"
+                          >
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Floor Drop Shadow -->
+                  <div class="sr-item-shadow" aria-hidden="true"></div>
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
 
         {% else %}
           <!-- DEFAULT PREVIEW (Nike / Streetwear Reference Pieces) -->
           {% assign demo_items = "Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Hoodie Black|$199.00|2610071101516777|2610071101472773#Sweatshirt|$199.00|2610071517384792|2610071517318112#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Tshirt|$199.00|2610071516549024|2610071515314737#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Sweatshirt|$199.00|2610071517384792|2610071517318112#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552" | split: "#" %}
 
-          {% for d_str in demo_items %}
-            {% assign d_parts = d_str | split: "|" %}
-            {% assign d_name = d_parts[0] %}
-            {% assign d_price = d_parts[1] %}
-            {% assign d_side_id = d_parts[2] %}
-            {% assign d_front_id = d_parts[3] %}
-            {% assign is_center_demo = false %}
-            {% if forloop.index == 8 %}{% assign is_center_demo = true %}{% endif %}
+          <div class="sr-track-inner" data-sr-track-inner="" data-repeat="2">
+            {% for r in (1..2) %}
+              {% for d_str in demo_items %}
+                {% assign d_parts = d_str | split: "|" %}
+                {% assign d_name = d_parts[0] %}
+                {% assign d_price = d_parts[1] %}
+                {% assign d_side_id = d_parts[2] %}
+                {% assign d_front_id = d_parts[3] %}
+                {% assign is_center_demo = false %}
+                {% if r == 1 and forloop.index == 8 %}{% assign is_center_demo = true %}{% endif %}
 
-            <div
-              class="sr-item{% if is_center_demo %} is-demo-center{% endif %}"
-              data-sr-item=""
-              role="button"
-              tabindex="0"
-              aria-label="{{ d_name }}"
-              data-name="{{ d_name }}"
-              data-price="{{ d_price }}"
-              data-url="/collections/all"
-              data-idx="{{ forloop.index }}"
-              style="
-                --item-w-init: {{ base_init_w }}px;
-                --item-w-hov: {{ base_hov_w }}px;
-              "
-            >
-              <!-- Dedicated Hanging Sway Container -->
-              <div class="sr-hang-sway">
-                <!-- Hook -->
-                <div class="sr-hanger-hook" aria-hidden="true">
-                  <svg viewBox="0 0 24 38" fill="none">
-                    <path d="M 12 16 C 12 7 19 4 19 11 C 19 14 17 16 13 18 C 12 19 12 21 12 26" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
-                    <circle cx="19" cy="11" r="1.6" fill="#9da3a9"/>
-                    <rect x="10" y="26" width="4" height="4" rx="1" fill="#4d3a2c"/>
-                  </svg>
-                </div>
+                <div
+                  class="sr-item{% if is_center_demo %} is-demo-center{% endif %}"
+                  data-sr-item=""
+                  role="button"
+                  tabindex="0"
+                  aria-label="{{ d_name }}"
+                  data-name="{{ d_name }}"
+                  data-price="{{ d_price }}"
+                  data-url="/collections/all"
+                  data-idx="{{ forloop.index }}"
+                  style="
+                    --item-w-init: {{ base_init_w }}px;
+                    --item-w-hov: {{ base_hov_w }}px;
+                  "
+                >
+                  <!-- Dedicated Hanging Sway Container -->
+                  <div class="sr-hang-sway">
+                    <!-- Hook -->
+                    <div class="sr-hanger-hook" aria-hidden="true">
+                      <svg viewBox="0 0 24 38" fill="none">
+                        <path d="M 12 16 C 12 7 19 4 19 11 C 19 14 17 16 13 18 C 12 19 12 21 12 26" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
+                        <circle cx="19" cy="11" r="1.6" fill="#9da3a9"/>
+                        <rect x="10" y="26" width="4" height="4" rx="1" fill="#4d3a2c"/>
+                      </svg>
+                    </div>
 
-                <!-- Tag -->
-                <div class="sr-tag sr-tag-single" aria-hidden="true">
-                  <span class="sr-tag-cord"></span>
-                  <div class="sr-tag-inner">
-                    <span class="sr-tag-eyelet"></span>
-                    <span class="sr-tag-face sr-tag-front">{{ d_price | split: "." | first }}</span>
+                    <!-- Tag -->
+                    <div class="sr-tag sr-tag-single" aria-hidden="true">
+                      <span class="sr-tag-cord"></span>
+                      <div class="sr-tag-inner">
+                        <span class="sr-tag-eyelet"></span>
+                        <span class="sr-tag-face sr-tag-front">{{ d_price | split: "." | first }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Garment: Exact Same Height for Both Views -->
+                    <div class="sr-garment">
+                      <!-- Side View -->
+                      <div class="sr-view" data-sr-pos="0">
+                        <img
+                          src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_side_id }}.webp?height=640"
+                          alt="{{ d_name }} – side"
+                          loading="lazy"
+                          decoding="async"
+                        >
+                      </div>
+                      <!-- Front View -->
+                      <div class="sr-view" data-sr-pos="1">
+                        <img
+                          src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_front_id }}.webp?height=640"
+                          alt="{{ d_name }} – front"
+                          loading="lazy"
+                          decoding="async"
+                        >
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <!-- Garment: Exact Same Height for Both Views -->
-                <div class="sr-garment">
-                  <!-- Side View -->
-                  <div class="sr-view" data-sr-pos="0">
-                    <img
-                      src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_side_id }}.webp?height=640"
-                      alt="{{ d_name }} – side"
-                      loading="lazy"
-                      decoding="async"
-                    >
-                  </div>
-                  <!-- Front View -->
-                  <div class="sr-view" data-sr-pos="1">
-                    <img
-                      src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_front_id }}.webp?height=640"
-                      alt="{{ d_name }} – front"
-                      loading="lazy"
-                      decoding="async"
-                    >
-                  </div>
+                  <!-- Shadow -->
+                  <div class="sr-item-shadow" aria-hidden="true"></div>
                 </div>
-              </div>
-
-              <!-- Shadow -->
-              <div class="sr-item-shadow" aria-hidden="true"></div>
-            </div>
-          {% endfor %}
+              {% endfor %}
+            {% endfor %}
+          </div>
         {% endif %}
       </div>
     </div>
@@ -372,12 +395,15 @@
   .sr-wrap,
   .sr-stage,
   .sr-rack,
+  .sr-track-inner,
   .sr-item,
   .sr-hang-sway,
   .sr-garment,
   .sr-view {
     background: transparent !important;
     background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   .sr-sec {
@@ -474,13 +500,10 @@
     overflow: visible;
   }
 
-  /* Rack & Horizontal Track */
+  /* Rack & Horizontal Track (Infinite Scroll) */
   .sr-rack {
     position: relative;
     z-index: 5;
-    display: flex;
-    align-items: flex-start;
-    gap: var(--sr-gap, 20px);
     width: 100%;
     overflow-x: auto;
     overflow-y: visible;
@@ -488,10 +511,20 @@
     -ms-overflow-style: none;
     cursor: grab;
     touch-action: pan-y;
-    padding: 34px max(40px, 5vw) 26px max(40px, 5vw);
+    padding: 34px 0 26px 0;
+    user-select: none;
   }
   .sr-rack::-webkit-scrollbar { display: none; }
   .sr-rack.is-dragging { cursor: grabbing; }
+
+  /* Inner Flex Track that wraps cloned items */
+  .sr-track-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sr-gap, 20px);
+    width: max-content;
+    padding: 0 max(40px, 5vw);
+  }
 
   /* ========================================================================= */
   /* GARMENT ITEM CONTAINER (Narrow Side Width -> Expands on Hover)            */
@@ -535,7 +568,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    transform-origin: 50% 6px; /* Pivots from hanger hook contact on the rod */
+    transform-origin: 50% 6px;
     will-change: transform;
     transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
   }
@@ -660,11 +693,11 @@
   }
 
   /* ========================================================================= */
-  /* GARMENT DISPLAY (GUARANTEED IDENTICAL HEIGHT FOR BOTH INITIAL & HOVER)    */
+  /* GARMENT DISPLAY (GUARANTEED EQUAL HEIGHT, AUTO WHITE BACKGROUND REMOVAL)   */
   /* ========================================================================= */
   .sr-garment {
     position: relative;
-    /* Height is fixed and identical for both side and front views */
+    /* Fixed 100% equal height for all views */
     height: var(--sr-h-desk, 320px);
     width: 100%;
     display: flex;
@@ -673,7 +706,6 @@
     perspective: 800px;
   }
 
-  /* Views are centered absolutely without width clamping */
   .sr-view {
     position: absolute;
     top: 0;
@@ -692,10 +724,11 @@
     pointer-events: none;
   }
 
-  /* 
-   * CRITICAL FIX FOR EQUAL HEIGHT:
-   * Both images are locked to the EXACT same vertical height (var(--sr-h-desk)).
-   * max-width: none ensures neither image shrinks vertically in narrow containers!
+  /*
+   * 1. mix-blend-mode: multiply KNOCKS OUT THE WHITE BACKGROUND FROM MOCKUPS!
+   *    Any white pixels become 100% transparent so only the clothing is visible.
+   * 2. filter: none removes rectangular card outlines.
+   * 3. height: var(--sr-h-desk) !important guarantees identical height.
    */
   .sr-view img {
     display: block;
@@ -705,15 +738,11 @@
     max-width: none !important;
     object-fit: contain;
     object-position: top center;
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
-    transition: filter var(--sr-hspd) ease;
+    mix-blend-mode: multiply !important;
+    filter: none !important;
+    background: transparent !important;
     user-select: none;
     -webkit-user-drag: none;
-  }
-
-  /* Blend mode to knock out white backgrounds from mockups if enabled */
-  .sr-blend-mode .sr-view img {
-    mix-blend-mode: multiply;
   }
 
   /* Initial Image (Side View): Visible by default, full height */
@@ -750,7 +779,6 @@
   .sr-item.is-active .sr-view[data-sr-pos="1"] {
     opacity: 1;
     transform: translateX(-50%) rotateY(0deg);
-    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.22));
   }
 
   /* Center demo item in default state */
@@ -771,7 +799,7 @@
     transform: translateX(-50%);
     width: 60px;
     height: 12px;
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 70%);
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
     border-radius: 50%;
     pointer-events: none;
     transition: transform var(--sr-hspd) ease, opacity var(--sr-hspd) ease;
@@ -938,6 +966,7 @@
 
       var stage = root.querySelector("[data-sr-stage]");
       var rack = root.querySelector("[data-sr-rack]");
+      var trackInner = root.querySelector("[data-sr-track-inner]");
       var rodSvg = root.querySelector("[data-sr-rodsvg]");
       var rodCore = root.querySelector("[data-sr-rod-core]");
       var rodShadow = root.querySelector("[data-sr-rod-shadow]");
@@ -951,9 +980,21 @@
 
       var sag = parseFloat(root.dataset.sag) || 40;
       var tiltMult = parseFloat(root.dataset.tilt) || 3;
-      var garmentH = parseFloat(root.dataset.garmentH) || 320;
+      var autoDriftSpeed = parseFloat(root.dataset.autoDrift) || 0;
+      var isInfiniteEnabled = root.dataset.infinite !== "false";
       var items = Array.prototype.slice.call(rack.querySelectorAll("[data-sr-item]"));
       var yAnchor = 17;
+
+      var repeatCount = trackInner ? (parseInt(trackInner.dataset.repeat, 10) || 1) : 1;
+      var singleSetWidth = 0;
+
+      function updateSetWidth() {
+        if (trackInner && repeatCount > 1) {
+          singleSetWidth = trackInner.scrollWidth / repeatCount;
+        } else {
+          singleSetWidth = rack.scrollWidth;
+        }
+      }
 
       // 1. DYNAMIC SVG CURVED ROD
       function updateRodCurve() {
@@ -1003,15 +1044,10 @@
           item.style.setProperty("--curve-tilt", tilt.toFixed(2) + "deg");
         }
 
-        if (progBar) {
-          var maxScroll = rack.scrollWidth - rack.clientWidth;
-          if (maxScroll > 0) {
-            var ratio = rack.scrollLeft / maxScroll;
-            var thumbW = Math.max(18, (rack.clientWidth / rack.scrollWidth) * 100);
-            var leftPct = ratio * (100 - thumbW);
-            progBar.style.width = thumbW + "%";
-            progBar.style.left = leftPct + "%";
-          }
+        if (progBar && singleSetWidth > 0) {
+          var normPos = rack.scrollLeft % singleSetWidth;
+          var ratio = normPos / singleSetWidth;
+          progBar.style.left = (ratio * 75).toFixed(1) + "%";
         }
       }
 
@@ -1022,7 +1058,40 @@
         }
       }
 
-      // 3. HOVER & PEEK INFO
+      // 3. SEAMLESS INFINITE LOOP WRAPPER
+      function handleInfiniteWrap() {
+        if (!isInfiniteEnabled || singleSetWidth <= 10) return;
+        
+        // Wrap right
+        if (rack.scrollLeft >= singleSetWidth * 2) {
+          rack.scrollLeft -= singleSetWidth;
+        }
+        // Wrap left
+        else if (rack.scrollLeft <= singleSetWidth * 0.2) {
+          rack.scrollLeft += singleSetWidth;
+        }
+      }
+
+      // 4. CONTINUOUS INFINITE DRIFT (CONVEYOR)
+      var isHovered = false;
+      var isInteracting = false;
+      var driftAnimationId = null;
+
+      function startDrift() {
+        if (autoDriftSpeed <= 0 || !isInfiniteEnabled) return;
+        
+        function tickDrift() {
+          if (!isHovered && !isInteracting) {
+            rack.scrollLeft += autoDriftSpeed;
+            handleInfiniteWrap();
+            requestCurveUpdate();
+          }
+          driftAnimationId = requestAnimationFrame(tickDrift);
+        }
+        driftAnimationId = requestAnimationFrame(tickDrift);
+      }
+
+      // 5. HOVER & PEEK INFO
       function setPeek(item) {
         var name = item.dataset.name;
         var price = item.dataset.price;
@@ -1032,6 +1101,7 @@
 
       items.forEach(function(item) {
         item.addEventListener("mouseenter", function() {
+          isHovered = true;
           rack.classList.add("has-active-item");
           items.forEach(function(it) { it.classList.remove("is-active", "is-demo-center"); });
           item.classList.add("is-active");
@@ -1039,7 +1109,6 @@
           setTimeout(requestCurveUpdate, 60);
         });
 
-        // Click to navigate
         item.addEventListener("click", function(e) {
           if (isDragging) return;
           var url = item.dataset.url;
@@ -1047,7 +1116,12 @@
         });
       });
 
+      rack.addEventListener("mouseenter", function() {
+        isHovered = true;
+      });
+
       rack.addEventListener("mouseleave", function() {
+        isHovered = false;
         rack.classList.remove("has-active-item");
         items.forEach(function(it) { it.classList.remove("is-active"); });
         var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
@@ -1055,13 +1129,15 @@
         setTimeout(requestCurveUpdate, 60);
       });
 
-      // 4. MOUSE DRAG TO SCROLL
+      // 6. MOUSE & TOUCH DRAGGING
       var isDragging = false;
       var startX = 0;
       var scrollStart = 0;
 
+      // Mouse drag
       rack.addEventListener("mousedown", function(e) {
         isDragging = true;
+        isInteracting = true;
         rack.classList.add("is-dragging");
         startX = e.pageX - rack.offsetLeft;
         scrollStart = rack.scrollLeft;
@@ -1071,32 +1147,70 @@
         if (!isDragging) return;
         e.preventDefault();
         var x = e.pageX - rack.offsetLeft;
-        var walk = (x - startX) * 1.5;
+        var walk = (x - startX) * 1.6;
         rack.scrollLeft = scrollStart - walk;
+        handleInfiniteWrap();
         requestCurveUpdate();
       });
 
       window.addEventListener("mouseup", function() {
         if (isDragging) {
-          setTimeout(function() { isDragging = false; }, 50);
+          setTimeout(function() {
+            isDragging = false;
+            isInteracting = false;
+          }, 80);
           rack.classList.remove("is-dragging");
         }
       });
 
-      rack.addEventListener("scroll", requestCurveUpdate, { passive: true });
+      // Touch drag
+      rack.addEventListener("touchstart", function(e) {
+        if (!e.touches || !e.touches[0]) return;
+        isInteracting = true;
+        startX = e.touches[0].pageX - rack.offsetLeft;
+        scrollStart = rack.scrollLeft;
+      }, { passive: true });
+
+      rack.addEventListener("touchmove", function(e) {
+        if (!e.touches || !e.touches[0]) return;
+        var x = e.touches[0].pageX - rack.offsetLeft;
+        var walk = (x - startX) * 1.5;
+        rack.scrollLeft = scrollStart - walk;
+        handleInfiniteWrap();
+        requestCurveUpdate();
+      }, { passive: true });
+
+      rack.addEventListener("touchend", function() {
+        setTimeout(function() { isInteracting = false; }, 80);
+      }, { passive: true });
+
+      rack.addEventListener("scroll", function() {
+        handleInfiniteWrap();
+        requestCurveUpdate();
+      }, { passive: true });
+
       window.addEventListener("resize", function() {
         updateRodCurve();
+        updateSetWidth();
         requestCurveUpdate();
       });
 
       // Initialize
       updateRodCurve();
+      updateSetWidth();
+
+      // Position in the middle set for smooth bi-directional infinite scrolling
       setTimeout(function() {
         updateRodCurve();
+        updateSetWidth();
+        if (isInfiniteEnabled && singleSetWidth > 0) {
+          rack.scrollLeft = singleSetWidth;
+        }
         updateItemTrajectory();
         var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
         if (centerDemo) setPeek(centerDemo);
-      }, 60);
+        startDrift();
+      }, 80);
     }
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -1121,48 +1235,28 @@
   "settings": [
     {
       "type": "header",
-      "content": "Background Settings"
+      "content": "Infinite Carousel & Movement"
     },
     {
       "type": "checkbox",
-      "id": "show_background_image",
-      "label": "Enable background image",
-      "default": false,
-      "info": "Leave disabled for 100% transparent background."
-    },
-    {
-      "type": "image_picker",
-      "id": "background_image",
-      "label": "Background image",
-      "info": "Optional wide photo behind rail."
-    },
-    {
-      "type": "select",
-      "id": "image_focus",
-      "label": "Image focus",
-      "options": [
-        { "value": "top", "label": "Top" },
-        { "value": "center", "label": "Center" },
-        { "value": "bottom", "label": "Bottom" }
-      ],
-      "default": "center"
+      "id": "enable_infinite",
+      "label": "Enable infinite continuous slider",
+      "default": true,
+      "info": "Seamlessly wraps around infinitely as you drag or scroll."
     },
     {
       "type": "range",
-      "id": "overlay_opacity",
-      "label": "Dark overlay opacity",
+      "id": "auto_drift_speed",
+      "label": "Continuous infinite drift speed",
       "min": 0,
-      "max": 80,
-      "step": 5,
-      "unit": "%",
-      "default": 0
+      "max": 3,
+      "step": 0.2,
+      "default": 0.8,
+      "info": "Gently glides along the curved rail automatically. Set to 0 to disable."
     },
     {
-      "type": "checkbox",
-      "id": "blend_white_mockups",
-      "label": "Knock out white mockup backgrounds",
-      "default": false,
-      "info": "Blends out white solid backgrounds from product mockups."
+      "type": "header",
+      "content": "Scene Colors"
     },
     {
       "type": "color",
@@ -1370,6 +1464,43 @@
       "type": "url",
       "id": "cta_url",
       "label": "CTA link URL"
+    },
+    {
+      "type": "header",
+      "content": "Optional Background Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_background_image",
+      "label": "Enable background photo",
+      "default": false,
+      "info": "Leave disabled for 100% transparent background."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image photo"
+    },
+    {
+      "type": "select",
+      "id": "image_focus",
+      "label": "Image focus",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Dark overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 0
     },
     {
       "type": "header",

@@ -151,6 +151,76 @@
             "initial_scale": 100,
             "hover_scale": 100
           }
+        },
+        "product_f3mFHJ": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Black_Urban_Culture_Sport_Tee_Mockup.png",
+            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_Tee.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_Cf8DYa": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Red_Urban_Culture_Striped_T-Shirt_Mockup.png",
+            "hover_image": "shopify://shop_images/Deep_Red_Urban_Culture_T-Shirt.png",
+            "product": "mustard-festive-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_KF77gk": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Urban_Culture_Green_Striped_Tee.png",
+            "hover_image": "shopify://shop_images/Olive_Green_Urban_Culture_T-Shirt_Mockup.png",
+            "product": "emerald-green-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_T9m9kf": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Cream_Urban_Culture_Striped_T-Shirt_Mockup.png",
+            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
+            "product": "ivory-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
+        },
+        "product_8gHYBF": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/Navy_Urban_Culture_Striped_T-Shirt.png",
+            "hover_image": "shopify://shop_images/Navy_Urban_Culture_Graphic_T-Shirt.png",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0,
+            "initial_scale": 100,
+            "hover_scale": 100
+          }
         }
       },
       "block_order": [
@@ -163,7 +233,12 @@
         "product_cjPngL",
         "product_LQirRK",
         "product_DiJEAE",
-        "product_UjqQye"
+        "product_UjqQye",
+        "product_f3mFHJ",
+        "product_Cf8DYa",
+        "product_KF77gk",
+        "product_T9m9kf",
+        "product_8gHYBF"
       ],
       "name": "Scene rail",
       "settings": {

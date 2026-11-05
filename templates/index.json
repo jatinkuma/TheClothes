@@ -9,6 +9,147 @@
  */
 {
   "sections": {
+    "hanging_slider_rail_zTKMBj": {
+      "type": "hanging_slider_rail",
+      "blocks": {
+        "product_pUUUtB": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_fMVRaz": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_6U8VmM": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_Jhyr6h": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_HhFgEf": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_P47cxU": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_cb9hdF": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        },
+        "product_kTN6JJ": {
+          "type": "product",
+          "settings": {
+            "initial_image": "shopify://shop_images/left-side-dress.png",
+            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "product": "black-gold-sherwani",
+            "custom_title": "",
+            "custom_price": "",
+            "custom_link": "",
+            "drop_offset": 0
+          }
+        }
+      },
+      "block_order": [
+        "product_pUUUtB",
+        "product_fMVRaz",
+        "product_6U8VmM",
+        "product_Jhyr6h",
+        "product_HhFgEf",
+        "product_P47cxU",
+        "product_cb9hdF",
+        "product_kTN6JJ"
+      ],
+      "name": "Scene rail",
+      "settings": {
+        "background_color": "#FFFFFF",
+        "text_color": "#FFFFFF",
+        "accent_color": "#FFFFFF",
+        "image_focus": "center",
+        "overlay_opacity": 0,
+        "rail_sag": 40,
+        "rail_thickness": 7,
+        "eyebrow": "NEW COLLECTION",
+        "eyebrow_sub": "PREMIUM STREETWEAR",
+        "heading": "Layers that hang right.",
+        "garment_height": 320,
+        "product_gap": 20,
+        "hover_speed": 850,
+        "enable_breeze": true,
+        "enable_tilt": 3,
+        "show_tags": true,
+        "tag_background": "#FAF9F5",
+        "tag_text": "#000000",
+        "default_tag_price": "$199",
+        "show_progress": true,
+        "footer_hint": "Hover a piece · click to look closer",
+        "mobile_hint": "Tap a piece to turn it · tap again to look closer",
+        "footer_text": "Crafted in heavyweight fleece. Cut oversized. Made to last.",
+        "cta_label": "Shop the Collection",
+        "cta_url": "",
+        "padding_top": 60,
+        "padding_bottom": 48
+      }
+    },
     "interactive_royal_mascot": {
       "type": "interactive-royal-mascot",
       "blocks": {
@@ -603,16 +744,16 @@
         "heading": "The Royal Scene Rail",
         "description": "Each bespoke garment hangs along a sculpted metallic architectural rail. Hover to inspect, click to open full tailoring details.",
         "header_alignment": "center",
-        "bg_color": "#F5F2EB",
-        "text_color": "#1A1815",
-        "accent_color": "#93672E",
+        "bg_color": "#f5f2eb",
+        "text_color": "#1a1815",
+        "accent_color": "#93672e",
         "section_height": "viewport",
         "custom_height_desktop": 720,
         "custom_height_mobile": 580,
         "padding_top": 40,
         "padding_bottom": 50,
         "rail_style": "chrome",
-        "custom_rail_color": "#C0C0C0",
+        "custom_rail_color": "#c0c0c0",
         "rail_thickness": 6,
         "rail_sag": 65,
         "rail_top_position": 45,
@@ -630,8 +771,8 @@
         "enable_curve_tilt": true,
         "hover_lift": true,
         "enable_price_tags": true,
-        "tag_bg_color": "#1A1815",
-        "tag_text_color": "#FFFFFF",
+        "tag_bg_color": "#1a1815",
+        "tag_text_color": "#ffffff",
         "tag_size": "medium",
         "show_compare_price": true,
         "show_arrows": true,
@@ -655,6 +796,7 @@
     }
   },
   "order": [
+    "hanging_slider_rail_zTKMBj",
     "interactive_royal_mascot",
     "hero_jVaWmY",
     "product_list_fa6P9H",

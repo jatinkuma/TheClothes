@@ -15,8 +15,8 @@
         "product_pUUUtB": {
           "type": "product",
           "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
+            "initial_image": "shopify://shop_images/Side-Profile_Black_T-Shirt_on_Hanger.png",
+            "hover_image": "shopify://shop_images/Black_Oversized_T-Shirt_on_Wooden_Hanger.png",
             "product": "black-gold-sherwani",
             "custom_title": "",
             "custom_price": "",
@@ -24,84 +24,12 @@
             "drop_offset": 0
           }
         },
-        "product_fMVRaz": {
+        "product_FazLHz": {
           "type": "product",
           "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
-            "custom_title": "",
-            "custom_price": "",
-            "custom_link": "",
-            "drop_offset": 0
-          }
-        },
-        "product_6U8VmM": {
-          "type": "product",
-          "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
-            "custom_title": "",
-            "custom_price": "",
-            "custom_link": "",
-            "drop_offset": 0
-          }
-        },
-        "product_Jhyr6h": {
-          "type": "product",
-          "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
-            "custom_title": "",
-            "custom_price": "",
-            "custom_link": "",
-            "drop_offset": 0
-          }
-        },
-        "product_HhFgEf": {
-          "type": "product",
-          "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
-            "custom_title": "",
-            "custom_price": "",
-            "custom_link": "",
-            "drop_offset": 0
-          }
-        },
-        "product_P47cxU": {
-          "type": "product",
-          "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
-            "custom_title": "",
-            "custom_price": "",
-            "custom_link": "",
-            "drop_offset": 0
-          }
-        },
-        "product_cb9hdF": {
-          "type": "product",
-          "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
-            "custom_title": "",
-            "custom_price": "",
-            "custom_link": "",
-            "drop_offset": 0
-          }
-        },
-        "product_kTN6JJ": {
-          "type": "product",
-          "settings": {
-            "initial_image": "shopify://shop_images/left-side-dress.png",
-            "hover_image": "shopify://shop_images/kids-sherwani-for-festive-occasions.png",
-            "product": "black-gold-sherwani",
+            "initial_image": "shopify://shop_images/Floating_Burgundy_Oversized_T-Shirt.png",
+            "hover_image": "shopify://shop_images/Urban_Culture_Striped_Burgundy_T-Shirt.png",
+            "product": "royal-blue-sherwani",
             "custom_title": "",
             "custom_price": "",
             "custom_link": "",
@@ -111,13 +39,7 @@
       },
       "block_order": [
         "product_pUUUtB",
-        "product_fMVRaz",
-        "product_6U8VmM",
-        "product_Jhyr6h",
-        "product_HhFgEf",
-        "product_P47cxU",
-        "product_cb9hdF",
-        "product_kTN6JJ"
+        "product_FazLHz"
       ],
       "name": "Scene rail",
       "settings": {

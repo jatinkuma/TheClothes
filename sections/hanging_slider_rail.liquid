@@ -158,7 +158,17 @@
             {% for r in (1..repeat_count) %}
               {% for block in section.blocks %}
                 {% assign linked_product = block.settings.product %}
-                {% assign item_url = block.settings.custom_link | default: linked_product.url | default: '#' %}
+                {% assign item_url = block.settings.custom_link %}
+                {% if item_url == blank and linked_product != blank %}
+                  {% if linked_product.url != blank %}
+                    {% assign item_url = linked_product.url %}
+                  {% else %}
+                    {% assign item_url = '/products/' | append: linked_product %}
+                  {% endif %}
+                {% endif %}
+                {% if item_url == blank %}
+                  {% assign item_url = routes.all_products_collection_url | default: '/collections/all' %}
+                {% endif %}
                 {% assign item_title = block.settings.custom_title | default: linked_product.title | default: 'Atelier Piece' %}
                 
                 {% assign item_price = block.settings.custom_price %}
@@ -177,11 +187,10 @@
                 {% assign init_scale = block.settings.initial_scale | default: 100 | divided_by: 100.0 %}
                 {% assign hover_scale = block.settings.hover_scale | default: 100 | divided_by: 100.0 %}
 
-                <div
+                <a
                   class="sr-item"
+                  href="{{ item_url }}"
                   data-sr-item=""
-                  role="button"
-                  tabindex="0"
                   aria-label="{{ item_title | escape }}"
                   data-name="{{ item_title | escape }}"
                   data-price="{{ item_price | escape }}"
@@ -268,7 +277,7 @@
 
                   <!-- Floor Drop Shadow -->
                   <div class="sr-item-shadow" aria-hidden="true"></div>
-                </div>
+                </a>
               {% endfor %}
             {% endfor %}
           </div>
@@ -288,15 +297,14 @@
                 {% assign is_center_demo = false %}
                 {% if r == 1 and forloop.index == 8 %}{% assign is_center_demo = true %}{% endif %}
 
-                <div
+                <a
                   class="sr-item{% if is_center_demo %} is-demo-center{% endif %}"
+                  href="{{ routes.all_products_collection_url | default: '/collections/all' }}"
                   data-sr-item=""
-                  role="button"
-                  tabindex="0"
                   aria-label="{{ d_name }}"
                   data-name="{{ d_name }}"
                   data-price="{{ d_price }}"
-                  data-url="/collections/all"
+                  data-url="{{ routes.all_products_collection_url | default: '/collections/all' }}"
                   data-idx="{{ forloop.index }}"
                   style="
                     --item-w-init: {{ base_init_w }}px;
@@ -352,7 +360,7 @@
 
                   <!-- Shadow -->
                   <div class="sr-item-shadow" aria-hidden="true"></div>
-                </div>
+                </a>
               {% endfor %}
             {% endfor %}
           </div>
@@ -367,8 +375,10 @@
         <span class="sr-peek-hint sr-hint-d">{{ section.settings.footer_hint | escape }}</span>
         <span class="sr-peek-hint sr-hint-m">{{ section.settings.mobile_hint | escape }}</span>
         <div class="sr-peek-info">
-          <span class="sr-peek-name" data-sr-pname="">Blazzer</span>
-          <span class="sr-peek-price" data-sr-pprice="">$199.00</span>
+          <a href="{{ routes.all_products_collection_url | default: '/collections/all' }}" class="sr-peek-link" data-sr-plink="" aria-label="View product details">
+            <span class="sr-peek-name" data-sr-pname="">Blazzer</span>
+            <span class="sr-peek-price" data-sr-pprice="">$199.00</span>
+          </a>
         </div>
       </div>
 
@@ -550,12 +560,27 @@
     align-items: center;
     outline: none;
     cursor: pointer;
+    text-decoration: none !important;
+    color: inherit !important;
+    -webkit-tap-highlight-color: transparent;
     /* Narrow side width */
     width: var(--item-w-init, var(--sr-w-init, 110px));
     transform-origin: 50% 0%;
     transform: translate3d(0, calc(var(--curve-y, 0px) + var(--sr-drop, 0px)), 0) rotate(var(--curve-tilt, 0deg));
     transition: width var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1), transform 0.08s linear;
     will-change: width, transform;
+  }
+  .sr-peek-link {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    text-decoration: none !important;
+    color: inherit !important;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  .sr-peek-link:hover {
+    opacity: 0.8;
   }
 
   /* Hover & Active: Width smoothly expands, parting neighbor clothes */
@@ -1273,9 +1298,21 @@
       function setPeek(item) {
         var name = item.dataset.name;
         var price = item.dataset.price;
+        var url = item.getAttribute("href") || item.dataset.url;
         if (peekName && name) peekName.textContent = name;
         if (peekPrice && price) peekPrice.textContent = price;
+        var peekLink = root.querySelector("[data-sr-plink]");
+        if (peekLink && url && url !== "#") peekLink.href = url;
       }
+
+      // 6. MOUSE & TOUCH DRAGGING (Accurate Drag vs Click Detection)
+      var isPointerDown = false;
+      var hasDragged = false;
+      var touchHasDragged = false;
+      var startX = 0;
+      var startY = 0;
+      var scrollStart = 0;
+      var dragThreshold = 6; // movement threshold in px to distinguish click from drag
 
       items.forEach(function(item) {
         item.addEventListener("mouseenter", function() {
@@ -1287,10 +1324,17 @@
           setTimeout(requestCurveUpdate, 60);
         });
 
+        // Click handler: navigate to product page if it wasn't a drag gesture
         item.addEventListener("click", function(e) {
-          if (isDragging) return;
-          var url = item.dataset.url;
-          if (url && url !== "#") window.location.href = url;
+          if (hasDragged || touchHasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          }
+          var url = item.getAttribute("href") || item.dataset.url;
+          if (url && url !== "#") {
+            window.location.href = url;
+          }
         });
       });
 
@@ -1307,60 +1351,78 @@
         setTimeout(requestCurveUpdate, 60);
       });
 
-      // 6. MOUSE & TOUCH DRAGGING
-      var isDragging = false;
-      var startX = 0;
-      var scrollStart = 0;
-
-      // Mouse drag
+      // Mouse drag on rack
       rack.addEventListener("mousedown", function(e) {
-        isDragging = true;
+        if (e.button !== 0) return; // Only track left mouse button
+        isPointerDown = true;
+        hasDragged = false;
         isInteracting = true;
-        rack.classList.add("is-dragging");
-        startX = e.pageX - rack.offsetLeft;
+        startX = e.pageX;
+        startY = e.pageY;
         scrollStart = rack.scrollLeft;
       });
 
       window.addEventListener("mousemove", function(e) {
-        if (!isDragging) return;
-        e.preventDefault();
-        var x = e.pageX - rack.offsetLeft;
-        var walk = (x - startX) * 1.6;
-        rack.scrollLeft = scrollStart - walk;
-        handleInfiniteWrap();
-        requestCurveUpdate();
-      });
+        if (!isPointerDown) return;
+        var deltaX = e.pageX - startX;
+        
+        if (!hasDragged && Math.abs(deltaX) > dragThreshold) {
+          hasDragged = true;
+          rack.classList.add("is-dragging");
+        }
 
-      window.addEventListener("mouseup", function() {
-        if (isDragging) {
-          setTimeout(function() {
-            isDragging = false;
-            isInteracting = false;
-          }, 80);
-          rack.classList.remove("is-dragging");
+        if (hasDragged) {
+          e.preventDefault();
+          rack.scrollLeft = scrollStart - (deltaX * 1.5);
+          handleInfiniteWrap();
+          requestCurveUpdate();
         }
       });
 
-      // Touch drag
+      window.addEventListener("mouseup", function() {
+        if (isPointerDown) {
+          isPointerDown = false;
+          rack.classList.remove("is-dragging");
+          setTimeout(function() {
+            hasDragged = false;
+            isInteracting = false;
+          }, 100);
+        }
+      });
+
+      // Touch drag on rack
+      var touchStartX = 0;
+      var touchStartY = 0;
+
       rack.addEventListener("touchstart", function(e) {
         if (!e.touches || !e.touches[0]) return;
         isInteracting = true;
-        startX = e.touches[0].pageX - rack.offsetLeft;
+        touchHasDragged = false;
+        touchStartX = e.touches[0].pageX;
+        touchStartY = e.touches[0].pageY;
         scrollStart = rack.scrollLeft;
       }, { passive: true });
 
       rack.addEventListener("touchmove", function(e) {
         if (!e.touches || !e.touches[0]) return;
-        var x = e.touches[0].pageX - rack.offsetLeft;
-        var walk = (x - startX) * 1.5;
-        rack.scrollLeft = scrollStart - walk;
-        handleInfiniteWrap();
-        requestCurveUpdate();
+        var deltaX = e.touches[0].pageX - touchStartX;
+        if (!touchHasDragged && Math.abs(deltaX) > dragThreshold) {
+          touchHasDragged = true;
+        }
+        if (touchHasDragged) {
+          var walk = deltaX * 1.4;
+          rack.scrollLeft = scrollStart - walk;
+          handleInfiniteWrap();
+          requestCurveUpdate();
+        }
       }, { passive: true });
 
       rack.addEventListener("touchend", function() {
-        setTimeout(function() { isInteracting = false; }, 80);
-      }, { passive: true });
+        setTimeout(function() {
+          touchHasDragged = false;
+          isInteracting = false;
+        }, 100);
+      });
 
       rack.addEventListener("scroll", function() {
         handleInfiniteWrap();

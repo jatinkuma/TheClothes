@@ -283,8 +283,8 @@
           </div>
 
         {% else %}
-          <!-- DEFAULT PREVIEW (Nike / Streetwear Reference Pieces) -->
-          {% assign demo_items = "Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Hoodie Black|$199.00|2610071101516777|2610071101472773#Sweatshirt|$199.00|2610071517384792|2610071517318112#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Tshirt|$199.00|2610071516549024|2610071515314737#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Sweatshirt|$199.00|2610071517384792|2610071517318112#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552" | split: "#" %}
+          <!-- DEFAULT PREVIEW (Local Theme Asset Garments) -->
+          {% assign demo_items = "Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Hoodie Black|$199.00|sr-demo-hoodie-black-side.webp|sr-demo-hoodie-black-front.webp#Sweatshirt|$199.00|sr-demo-sweatshirt-side.webp|sr-demo-sweatshirt-front.webp#Sweatshirt Plus|$199.00|sr-demo-sweatshirt-plus-side.webp|sr-demo-sweatshirt-plus-front.webp#Tshirt|$199.00|sr-demo-tshirt-side.webp|sr-demo-tshirt-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Sweatshirt|$199.00|sr-demo-sweatshirt-side.webp|sr-demo-sweatshirt-front.webp#Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Sweatshirt Plus|$199.00|sr-demo-sweatshirt-plus-side.webp|sr-demo-sweatshirt-plus-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Sweatshirt Plus|$199.00|sr-demo-sweatshirt-plus-side.webp|sr-demo-sweatshirt-plus-front.webp" | split: "#" %}
 
           <div class="sr-track-inner" data-sr-track-inner="" data-repeat="3">
             {% for r in (1..3) %}
@@ -292,8 +292,8 @@
                 {% assign d_parts = d_str | split: "|" %}
                 {% assign d_name = d_parts[0] %}
                 {% assign d_price = d_parts[1] %}
-                {% assign d_side_id = d_parts[2] %}
-                {% assign d_front_id = d_parts[3] %}
+                {% assign d_side_file = d_parts[2] %}
+                {% assign d_front_file = d_parts[3] %}
                 {% assign is_center_demo = false %}
                 {% if r == 1 and forloop.index == 8 %}{% assign is_center_demo = true %}{% endif %}
 
@@ -336,7 +336,7 @@
                       <!-- Side View -->
                       <div class="sr-view" data-sr-pos="0">
                         <img
-                          src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_side_id }}.webp?height=640"
+                          src="{{ d_side_file | asset_url }}"
                           alt="{{ d_name }} – side"
                           loading="eager"
                           decoding="async"
@@ -347,7 +347,7 @@
                       <!-- Front View -->
                       <div class="sr-view" data-sr-pos="1">
                         <img
-                          src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_front_id }}.webp?height=640"
+                          src="{{ d_front_file | asset_url }}"
                           alt="{{ d_name }} – front"
                           loading="eager"
                           decoding="async"

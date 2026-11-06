@@ -3,9 +3,11 @@
   SCENE RAIL: INFINITE HANGING PRODUCT SLIDER (CURVED METALLIC RAIL)
   ------------------------------------------------------------------------------
   - 100% Transparent background (no white card containers, no white boxes).
-  - Automatically knocks out white backgrounds from uploaded product mockups (mix-blend-mode: multiply).
+  - Automatically erases white/light mockup backgrounds via BFS edge flood fill
+    and auto-crops canvas so there are zero card offsets, zero borders, zero overlap.
+  - White stripes on clothes and light cream fabrics are 100% preserved.
   - True infinite continuous looping slider (drifts & drags infinitely with zero seam).
-  - Both initial and hover images have the EXACT SAME 100% full height.
+  - Both initial and hover images have the EXACT SAME 100% full vertical height.
   - Left / Side view (Initial) has narrow width (width km).
   - Front view (Hovered) expands to broad width with smooth neighboring garment parting.
   - Realistic left-to-right pendulum sway ("kapde jaise hilte hain").
@@ -141,7 +143,7 @@
 
         {% if block_count > 0 %}
           {% comment %} Repeat blocks 4-10 times for seamless infinite loop {% endcomment %}
-          {% assign repeat_count = 3 %}
+          {% assign repeat_count = 4 %}
           {% if block_count == 1 %}
             {% assign repeat_count = 16 %}
           {% elsif block_count <= 2 %}
@@ -222,8 +224,10 @@
                           <img
                             src="{{ initial_img | image_url: height: 800 }}"
                             alt="{{ item_title | escape }} – side"
-                            loading="lazy"
+                            loading="eager"
                             decoding="async"
+                            crossorigin="anonymous"
+                            data-clean-bg="true"
                             style="{% if init_scale != 1.0 %}transform: scale({{ init_scale }});{% endif %}"
                           >
                         {% else %}
@@ -237,8 +241,10 @@
                           <img
                             src="{{ hover_img | image_url: height: 800 }}"
                             alt="{{ item_title | escape }} – front"
-                            loading="lazy"
+                            loading="eager"
                             decoding="async"
+                            crossorigin="anonymous"
+                            data-clean-bg="true"
                             style="{% if hover_scale != 1.0 %}transform: scale({{ hover_scale }});{% endif %}"
                           >
                         {% endif %}
@@ -250,8 +256,10 @@
                           <img
                             src="{{ back_img | image_url: height: 800 }}"
                             alt="{{ item_title | escape }} – back"
-                            loading="lazy"
+                            loading="eager"
                             decoding="async"
+                            crossorigin="anonymous"
+                            data-clean-bg="true"
                           >
                         </div>
                       {% endif %}
@@ -269,8 +277,8 @@
           <!-- DEFAULT PREVIEW (Nike / Streetwear Reference Pieces) -->
           {% assign demo_items = "Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Hoodie Black|$199.00|2610071101516777|2610071101472773#Sweatshirt|$199.00|2610071517384792|2610071517318112#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Tshirt|$199.00|2610071516549024|2610071515314737#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Hoodie|$199.00|2610071514447647|2610071514403809#Sweatshirt|$199.00|2610071517384792|2610071517318112#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552#Hoodie|$199.00|2610071514447647|2610071514403809#Blazzer|$199.00|2610071515248388|2610071514560224#Sweatshirt Plus|$199.00|2610071517049148|2610071516592552" | split: "#" %}
 
-          <div class="sr-track-inner" data-sr-track-inner="" data-repeat="2">
-            {% for r in (1..2) %}
+          <div class="sr-track-inner" data-sr-track-inner="" data-repeat="3">
+            {% for r in (1..3) %}
               {% for d_str in demo_items %}
                 {% assign d_parts = d_str | split: "|" %}
                 {% assign d_name = d_parts[0] %}
@@ -322,8 +330,10 @@
                         <img
                           src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_side_id }}.webp?height=640"
                           alt="{{ d_name }} – side"
-                          loading="lazy"
+                          loading="eager"
                           decoding="async"
+                          crossorigin="anonymous"
+                          data-clean-bg="true"
                         >
                       </div>
                       <!-- Front View -->
@@ -331,8 +341,10 @@
                         <img
                           src="https://nike-makknzjs.myshopify.com/cdn/shop/files/{{ d_front_id }}.webp?height=640"
                           alt="{{ d_name }} – front"
-                          loading="lazy"
+                          loading="eager"
                           decoding="async"
+                          crossorigin="anonymous"
+                          data-clean-bg="true"
                         >
                       </div>
                     </div>
@@ -389,7 +401,7 @@
 
 <style>
   /* ========================================================================= */
-  /* 100% TRANSPARENT BACKGROUND (No White Box, No Overlays)                   */
+  /* 100% TRANSPARENT BACKGROUND (No White Box, No Overlays, No Borders)       */
   /* ========================================================================= */
   .sr-sec,
   .sr-wrap,
@@ -404,6 +416,7 @@
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    outline: none !important;
   }
 
   .sr-sec {
@@ -712,7 +725,7 @@
     left: 50%;
     transform: translateX(-50%);
     height: var(--sr-h-desk, 320px);
-    width: max-content;
+    width: auto;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -725,10 +738,10 @@
   }
 
   /*
-   * 1. mix-blend-mode: multiply KNOCKS OUT THE WHITE BACKGROUND FROM MOCKUPS!
-   *    Any white pixels become 100% transparent so only the clothing is visible.
-   * 2. filter: none removes rectangular card outlines.
-   * 3. height: var(--sr-h-desk) !important guarantees identical height.
+   * 1. Canvas auto-crops & removes white pixels into 100% transparent PNGs!
+   * 2. height: var(--sr-h-desk) !important guarantees exact same vertical height.
+   * 3. width: auto naturally sizes based on auto-cropped silhouette.
+   * 4. No cards, no borders, no overlapping offsets!
    */
   .sr-view img {
     display: block;
@@ -738,9 +751,10 @@
     max-width: none !important;
     object-fit: contain;
     object-position: top center;
-    mix-blend-mode: multiply !important;
-    filter: none !important;
     background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    filter: none !important;
     user-select: none;
     -webkit-user-drag: none;
   }
@@ -781,7 +795,7 @@
     transform: translateX(-50%) rotateY(0deg);
   }
 
-  /* Center demo item in default state */
+  /* Demo Center unhovered view */
   .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-view[data-sr-pos="0"] {
     opacity: 0;
     transform: translateX(-50%) rotateY(25deg);
@@ -793,70 +807,56 @@
 
   /* Floor Shadow */
   .sr-item-shadow {
-    position: absolute;
-    bottom: -16px;
-    left: 50%;
-    transform: translateX(-50%);
     width: 60px;
     height: 12px;
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0) 70%);
+    margin-top: 10px;
     border-radius: 50%;
     pointer-events: none;
+    opacity: 0.8;
     transition: transform var(--sr-hspd) ease, opacity var(--sr-hspd) ease;
   }
   .sr-item:hover .sr-item-shadow,
-  .sr-item.is-active .sr-item-shadow,
-  .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-item-shadow {
-    transform: translateX(-50%) scale(1.4);
-    opacity: 0.85;
+  .sr-item:focus-visible .sr-item-shadow,
+  .sr-item.is-active .sr-item-shadow {
+    transform: scale(1.35);
+    opacity: 0.45;
   }
 
   /* ========================================================================= */
-  /* FOOTER & PROGRESS BAR                                                     */
+  /* FOOTER BAR (Peek Details, Center Progress, Corner CTA)                    */
   /* ========================================================================= */
   .sr-foot {
     position: relative;
     z-index: 6;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    padding: 16px max(40px, 5vw) 0 max(40px, 5vw);
-    gap: 24px;
+    padding: 10px 32px 0 32px;
+    font-size: 13px;
   }
   @media (max-width: 768px) {
     .sr-foot {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       gap: 16px;
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-    .sr-garment,
-    .sr-view,
-    .sr-view img {
-      height: var(--sr-h-slide, 260px) !important;
-      max-height: var(--sr-h-slide, 260px) !important;
-    }
-    .sr-item {
-      width: var(--item-w-init, 90px);
-    }
-    .sr-item:hover,
-    .sr-item:focus-visible,
-    .sr-item.is-active,
-    .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center {
-      width: var(--item-w-hov, 220px);
+      padding: 10px 20px 0 20px;
+      text-align: center;
     }
   }
 
-  /* Peek Info (Bottom Left) */
+  /* Peek Info (Left) */
   .sr-peek {
-    font-size: 12px;
-    opacity: 0.88;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 180px;
   }
   .sr-peek-hint {
-    display: block;
-    margin-bottom: 4px;
-    letter-spacing: 0.02em;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
   }
   .sr-hint-m { display: none; }
   @media (max-width: 768px) {
@@ -864,79 +864,73 @@
     .sr-hint-m { display: block; }
   }
   .sr-peek-info {
-    display: inline-flex;
+    display: flex;
     align-items: baseline;
     gap: 10px;
   }
   .sr-peek-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
   }
   .sr-peek-price {
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0.85;
+    font-size: 13px;
+    opacity: 0.8;
   }
 
-  /* Progress Rail */
+  /* Progress Track (Center) */
   .sr-prog {
-    flex-grow: 1;
-    max-width: 260px;
-    margin: 0 auto;
+    flex: 1;
+    max-width: 280px;
+    margin: 0 20px;
+    display: flex;
+    align-items: center;
+  }
+  @media (max-width: 768px) {
+    .sr-prog {
+      max-width: 200px;
+      margin: 8px 0;
+    }
   }
   .sr-prog-track {
     position: relative;
     width: 100%;
     height: 2px;
-    background: rgba(0, 0, 0, 0.15);
+    background: currentColor;
+    opacity: 0.2;
     border-radius: 2px;
-  }
-  .sr-prog-track::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: -2px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.2;
-  }
-  .sr-prog-track::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: -2px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.2;
+    overflow: hidden;
   }
   .sr-prog-bar {
     position: absolute;
-    left: 0;
     top: 0;
-    height: 100%;
+    left: 0;
     width: 25%;
+    height: 100%;
     background: currentColor;
+    opacity: 0.9;
     border-radius: 2px;
-    transition: left 0.1s linear, width 0.1s linear;
+    transition: left 0.1s linear;
   }
 
-  /* Corner CTA (Bottom Right) */
+  /* Corner CTA (Right) */
   .sr-corner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
     text-align: right;
   }
   @media (max-width: 768px) {
-    .sr-corner { text-align: left; }
+    .sr-corner {
+      align-items: center;
+      text-align: center;
+    }
   }
   .sr-corner-h {
     font-size: 14px;
-    font-weight: 650;
+    font-weight: 600;
+    max-width: 280px;
     line-height: 1.35;
-    margin-bottom: 10px;
-    max-width: 320px;
   }
   .sr-cta-link {
     display: inline-flex;
@@ -944,22 +938,202 @@
     gap: 8px;
     font-size: 12px;
     font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
     color: inherit;
-    text-decoration: none;
-    border-bottom: 1.5px solid currentColor;
-    padding-bottom: 3px;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, gap 0.2s ease;
   }
-  .sr-cta-link:hover { opacity: 0.75; }
+  .sr-cta-link:hover {
+    opacity: 0.75;
+    gap: 12px;
+  }
   .sr-cta-ar {
     width: 14px;
     height: 10px;
-    display: inline-block;
   }
 </style>
 
 <script>
   (function() {
+    // =========================================================================
+    // CLIENT-SIDE CANVAS BACKGROUND ERASER & AUTO-CROPPER
+    // - Erases white/light mockup backgrounds into 100% transparent PNGs in memory!
+    // - Uses BFS border flood fill so white stripes/text inside clothes stay intact!
+    // - Auto-crops canvas to garment boundaries so cards and overlap offsets vanish!
+    // =========================================================================
+    var cleanImageCache = {};
+
+    function cleanMockupWhiteBackground(img) {
+      if (!img) return;
+      if (img.dataset.bgCleaned === "true") return;
+
+      var originalSrc = img.currentSrc || img.src;
+      if (!originalSrc || originalSrc.indexOf("data:image") === 0) {
+        img.dataset.bgCleaned = "true";
+        return;
+      }
+
+      // If already cleaned and cached, apply instantly to duplicate/cloned items!
+      if (cleanImageCache[originalSrc]) {
+        img.src = cleanImageCache[originalSrc];
+        img.dataset.bgCleaned = "true";
+        return;
+      }
+
+      function executeClean() {
+        if (img.dataset.bgCleaned === "true") return;
+        if (cleanImageCache[originalSrc]) {
+          img.src = cleanImageCache[originalSrc];
+          img.dataset.bgCleaned = "true";
+          return;
+        }
+
+        var w = img.naturalWidth;
+        var h = img.naturalHeight;
+        if (!w || !h || w < 20 || h < 20) return;
+
+        var canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (!ctx) return;
+
+        try {
+          ctx.drawImage(img, 0, 0);
+          var imgData = ctx.getImageData(0, 0, w, h);
+          var d = imgData.data;
+          var totalPixels = w * h;
+
+          // Check if corners have white/light background
+          var cornerIndices = [0, (w - 1) * 4, ((h - 1) * w) * 4, (totalPixels - 1) * 4];
+          var isWhiteBg = false;
+          for (var c = 0; c < cornerIndices.length; c++) {
+            var ci = cornerIndices[c];
+            if (d[ci + 3] > 15 && d[ci] > 215 && d[ci + 1] > 215 && d[ci + 2] > 215) {
+              isWhiteBg = true;
+              break;
+            }
+          }
+
+          if (!isWhiteBg) {
+            img.dataset.bgCleaned = "true";
+            return;
+          }
+
+          // BFS Flood Fill from all 4 image borders (preserves interior white stripes & text)
+          var visited = new Uint8Array(totalPixels);
+          var queue = new Int32Array(totalPixels);
+          var qHead = 0;
+          var qTail = 0;
+
+          function trySeed(x, y) {
+            var idx = y * w + x;
+            if (visited[idx]) return;
+            var pi = idx * 4;
+            var r = d[pi], g = d[pi + 1], b = d[pi + 2], a = d[pi + 3];
+            if (a > 15 && r > 210 && g > 210 && b > 210 &&
+                Math.abs(r - g) < 26 && Math.abs(r - b) < 26 && Math.abs(g - b) < 26) {
+              visited[idx] = 1;
+              queue[qTail++] = idx;
+            }
+          }
+
+          for (var x = 0; x < w; x++) {
+            trySeed(x, 0);
+            trySeed(x, h - 1);
+          }
+          for (var y = 0; y < h; y++) {
+            trySeed(0, y);
+            trySeed(w - 1, y);
+          }
+
+          while (qHead < qTail) {
+            var curr = queue[qHead++];
+            var cx = curr % w;
+            var cy = Math.floor(curr / w);
+
+            var neighbors = [
+              cx > 0 ? curr - 1 : -1,
+              cx < w - 1 ? curr + 1 : -1,
+              cy > 0 ? curr - w : -1,
+              cy < h - 1 ? curr + w : -1
+            ];
+
+            for (var n = 0; n < 4; n++) {
+              var nIdx = neighbors[n];
+              if (nIdx >= 0 && !visited[nIdx]) {
+                visited[nIdx] = 1;
+                var npi = nIdx * 4;
+                var nr = d[npi], ng = d[npi + 1], nb = d[npi + 2], na = d[npi + 3];
+                if (na > 15 && nr > 210 && ng > 210 && nb > 210 &&
+                    Math.abs(nr - ng) < 26 && Math.abs(nr - nb) < 26 && Math.abs(ng - nb) < 26) {
+                  queue[qTail++] = nIdx;
+                }
+              }
+            }
+          }
+
+          // Knock out background pixels to transparent & find garment bounding box
+          var minX = w, maxX = 0, minY = h, maxY = 0;
+          var hasGarment = false;
+
+          for (var p = 0; p < totalPixels; p++) {
+            var p4 = p * 4;
+            if (visited[p]) {
+              d[p4 + 3] = 0; // Alpha = 0 (100% Transparent)
+            } else if (d[p4 + 3] > 20) {
+              hasGarment = true;
+              var px = p % w;
+              var py = Math.floor(p / w);
+              if (px < minX) minX = px;
+              if (px > maxX) maxX = px;
+              if (py < minY) minY = py;
+              if (py > maxY) maxY = py;
+            }
+          }
+
+          if (hasGarment && minX <= maxX && minY <= maxY) {
+            ctx.putImageData(imgData, 0, 0);
+
+            // Auto-crop tightly to the actual garment boundaries (eliminates wide card offsets!)
+            var cropW = Math.max(10, maxX - minX + 1);
+            var cropH = Math.max(10, maxY - minY + 1);
+            var cropCanvas = document.createElement("canvas");
+            cropCanvas.width = cropW;
+            cropCanvas.height = cropH;
+            var cropCtx = cropCanvas.getContext("2d");
+            cropCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+
+            var transparentDataUrl = cropCanvas.toDataURL("image/png");
+            cleanImageCache[originalSrc] = transparentDataUrl;
+
+            img.src = transparentDataUrl;
+            img.dataset.bgCleaned = "true";
+
+            // Update all duplicate cloned images immediately
+            var allSame = document.querySelectorAll('.sr-view img[src="' + originalSrc + '"]');
+            allSame.forEach(function(dup) {
+              dup.src = transparentDataUrl;
+              dup.dataset.bgCleaned = "true";
+            });
+          } else {
+            img.dataset.bgCleaned = "true";
+          }
+        } catch (err) {
+          console.warn("Canvas background removal fallback:", err);
+          img.dataset.bgCleaned = "true";
+        }
+      }
+
+      if (img.complete && img.naturalWidth > 0) {
+        executeClean();
+      } else {
+        img.addEventListener("load", executeClean, { once: true });
+      }
+    }
+
     function initSceneRailSection(sectionId) {
       var root = document.getElementById("sr-" + sectionId);
       if (!root) return;
@@ -977,6 +1151,10 @@
       var progBar = root.querySelector("[data-sr-prog-bar]");
 
       if (!stage || !rack) return;
+
+      // Automatically clean and transparentize all garment images
+      var allGarmentImgs = rack.querySelectorAll(".sr-view img");
+      allGarmentImgs.forEach(cleanMockupWhiteBackground);
 
       var sag = parseFloat(root.dataset.sag) || 40;
       var tiltMult = parseFloat(root.dataset.tilt) || 3;
@@ -1063,11 +1241,11 @@
         if (!isInfiniteEnabled || singleSetWidth <= 10) return;
         
         // Wrap right
-        if (rack.scrollLeft >= singleSetWidth * 2) {
+        if (rack.scrollLeft >= singleSetWidth * 2.5) {
           rack.scrollLeft -= singleSetWidth;
         }
         // Wrap left
-        else if (rack.scrollLeft <= singleSetWidth * 0.2) {
+        else if (rack.scrollLeft <= singleSetWidth * 0.5) {
           rack.scrollLeft += singleSetWidth;
         }
       }
@@ -1199,7 +1377,6 @@
       updateRodCurve();
       updateSetWidth();
 
-      // Position in the middle set for smooth bi-directional infinite scrolling
       setTimeout(function() {
         updateRodCurve();
         updateSetWidth();
@@ -1247,16 +1424,211 @@
     {
       "type": "range",
       "id": "auto_drift_speed",
-      "label": "Continuous infinite drift speed",
       "min": 0,
-      "max": 3,
+      "max": 4,
       "step": 0.2,
+      "unit": "px",
+      "label": "Continuous auto-drift speed",
       "default": 0.8,
-      "info": "Gently glides along the curved rail automatically. Set to 0 to disable."
+      "info": "Gentle automatic motion. Pauses when hovered or dragged."
+    },
+    {
+      "type": "range",
+      "id": "hover_speed",
+      "min": 200,
+      "max": 1200,
+      "step": 50,
+      "unit": "ms",
+      "label": "Hover transition speed",
+      "default": 400
     },
     {
       "type": "header",
-      "content": "Scene Colors"
+      "content": "Garment Dimensions (Equal Height Guaranteed)"
+    },
+    {
+      "type": "range",
+      "id": "garment_height",
+      "min": 200,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "label": "Garment vertical height (both views)",
+      "default": 320,
+      "info": "Both initial and hovered images will match this exact height."
+    },
+    {
+      "type": "range",
+      "id": "initial_width",
+      "min": 60,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Initial view width (side view - narrow)",
+      "default": 110,
+      "info": "Width of side profile when hanging normally."
+    },
+    {
+      "type": "range",
+      "id": "hover_width",
+      "min": 180,
+      "max": 450,
+      "step": 10,
+      "unit": "px",
+      "label": "Hovered view width (front view - broad)",
+      "default": 260,
+      "info": "Width when expanded on hover with adjacent garments parting."
+    },
+    {
+      "type": "range",
+      "id": "product_gap",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between hanging garments",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Curved Rail & Pendulum Motion"
+    },
+    {
+      "type": "range",
+      "id": "rail_sag",
+      "min": 10,
+      "max": 90,
+      "step": 5,
+      "unit": "px",
+      "label": "Rail curve sag (dip depth)",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "rail_thickness",
+      "min": 4,
+      "max": 14,
+      "step": 1,
+      "unit": "px",
+      "label": "Metallic rail thickness",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "enable_tilt",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "label": "Curve tilt angle factor",
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_breeze",
+      "label": "Enable realistic clothing sway",
+      "default": true,
+      "info": "Hanging clothes naturally sway left to right like fabric in a breeze."
+    },
+    {
+      "type": "range",
+      "id": "sway_intensity",
+      "min": 0,
+      "max": 8,
+      "step": 0.5,
+      "unit": "deg",
+      "label": "Sway angle intensity",
+      "default": 2.5
+    },
+    {
+      "type": "header",
+      "content": "Price Tags"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tags",
+      "label": "Show hanging price tags",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "tag_background",
+      "label": "Tag background colour",
+      "default": "#FAF9F5"
+    },
+    {
+      "type": "color",
+      "id": "tag_text",
+      "label": "Tag text colour",
+      "default": "#000000"
+    },
+    {
+      "type": "text",
+      "id": "default_tag_price",
+      "label": "Default fallback tag price",
+      "default": "$199"
+    },
+    {
+      "type": "header",
+      "content": "Header & Caption"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Rail caption eyebrow",
+      "default": "NEW COLLECTION"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_sub",
+      "label": "Rail caption subtitle",
+      "default": "PREMIUM STREETWEAR"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main heading",
+      "default": "Layers that hang right."
+    },
+    {
+      "type": "header",
+      "content": "Section Background & Overlay"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_background_image",
+      "label": "Enable background photo",
+      "default": false,
+      "info": "Optional background image behind the transparent rail."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Background overlay darkness",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "image_focus",
+      "label": "Background image focus",
+      "options": [
+        { "value": "top center", "label": "Top center" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom center", "label": "Bottom center" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Colours & Theme"
     },
     {
       "type": "color",
@@ -1272,186 +1644,30 @@
     },
     {
       "type": "header",
-      "content": "Curved Metallic Rail"
-    },
-    {
-      "type": "range",
-      "id": "rail_sag",
-      "label": "Rail curve sag (depth)",
-      "min": 10,
-      "max": 80,
-      "step": 5,
-      "unit": "px",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "rail_thickness",
-      "label": "Rail metallic thickness",
-      "min": 4,
-      "max": 14,
-      "step": 1,
-      "unit": "px",
-      "default": 7
-    },
-    {
-      "type": "header",
-      "content": "Header Text"
-    },
-    {
-      "type": "text",
-      "id": "eyebrow",
-      "label": "Eyebrow tag",
-      "default": "NEW COLLECTION"
-    },
-    {
-      "type": "text",
-      "id": "eyebrow_sub",
-      "label": "Eyebrow subtitle",
-      "default": "PREMIUM STREETWEAR"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Layers that hang right."
-    },
-    {
-      "type": "header",
-      "content": "Garment Dimensions & Widths"
-    },
-    {
-      "type": "range",
-      "id": "garment_height",
-      "label": "Garment height (same for both views)",
-      "min": 240,
-      "max": 520,
-      "step": 10,
-      "unit": "px",
-      "default": 320,
-      "info": "Both side view and front view maintain this exact same height."
-    },
-    {
-      "type": "range",
-      "id": "initial_width",
-      "label": "Side view width (narrow)",
-      "min": 70,
-      "max": 180,
-      "step": 5,
-      "unit": "px",
-      "default": 110,
-      "info": "Width for unhovered side/left profile garments."
-    },
-    {
-      "type": "range",
-      "id": "hover_width",
-      "label": "Front view width (broad)",
-      "min": 180,
-      "max": 380,
-      "step": 10,
-      "unit": "px",
-      "default": 260,
-      "info": "Width for hovered front-facing garment."
-    },
-    {
-      "type": "range",
-      "id": "product_gap",
-      "label": "Gap between clothes",
-      "min": 10,
-      "max": 50,
-      "step": 2,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "range",
-      "id": "hover_speed",
-      "label": "Hover transition duration",
-      "min": 200,
-      "max": 800,
-      "step": 50,
-      "unit": "ms",
-      "default": 400
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_breeze",
-      "label": "Enable realistic garment sway",
-      "default": true
-    },
-    {
-      "type": "range",
-      "id": "sway_intensity",
-      "label": "Sway angle intensity",
-      "min": 1.0,
-      "max": 6.0,
-      "step": 0.5,
-      "unit": "deg",
-      "default": 2.5
-    },
-    {
-      "type": "range",
-      "id": "enable_tilt",
-      "label": "Rail curve tilt follower",
-      "min": 0,
-      "max": 6,
-      "step": 1,
-      "default": 3
-    },
-    {
-      "type": "header",
-      "content": "Floating Price Tags"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_tags",
-      "label": "Show price tags",
-      "default": true
-    },
-    {
-      "type": "color",
-      "id": "tag_background",
-      "label": "Tag background color",
-      "default": "#FAF9F5"
-    },
-    {
-      "type": "color",
-      "id": "tag_text",
-      "label": "Tag text color",
-      "default": "#000000"
-    },
-    {
-      "type": "text",
-      "id": "default_tag_price",
-      "label": "Default fallback tag price",
-      "default": "$199"
-    },
-    {
-      "type": "header",
-      "content": "Footer & Call to Action"
+      "content": "Footer & Interactive Indicator"
     },
     {
       "type": "checkbox",
       "id": "show_progress",
-      "label": "Show scroll progress rail",
+      "label": "Show center progress track",
       "default": true
     },
     {
       "type": "text",
       "id": "footer_hint",
       "label": "Desktop instruction hint",
-      "default": "Hover a piece · click to look closer"
+      "default": "Hover a piece · drag rail horizontally"
     },
     {
       "type": "text",
       "id": "mobile_hint",
       "label": "Mobile instruction hint",
-      "default": "Tap a piece to turn it · tap again to look closer"
+      "default": "Swipe to explore collection"
     },
     {
       "type": "text",
       "id": "footer_text",
-      "label": "Footer message",
+      "label": "Corner description",
       "default": "Crafted in heavyweight fleece. Cut oversized. Made to last."
     },
     {
@@ -1467,63 +1683,26 @@
     },
     {
       "type": "header",
-      "content": "Optional Background Image"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_background_image",
-      "label": "Enable background photo",
-      "default": false,
-      "info": "Leave disabled for 100% transparent background."
-    },
-    {
-      "type": "image_picker",
-      "id": "background_image",
-      "label": "Background image photo"
-    },
-    {
-      "type": "select",
-      "id": "image_focus",
-      "label": "Image focus",
-      "options": [
-        { "value": "top", "label": "Top" },
-        { "value": "center", "label": "Center" },
-        { "value": "bottom", "label": "Bottom" }
-      ],
-      "default": "center"
-    },
-    {
-      "type": "range",
-      "id": "overlay_opacity",
-      "label": "Dark overlay opacity",
-      "min": 0,
-      "max": 80,
-      "step": 5,
-      "unit": "%",
-      "default": 0
-    },
-    {
-      "type": "header",
       "content": "Section Padding"
     },
     {
       "type": "range",
       "id": "padding_top",
-      "label": "Top padding",
-      "min": 20,
-      "max": 120,
-      "step": 4,
+      "min": 0,
+      "max": 150,
+      "step": 6,
       "unit": "px",
+      "label": "Top padding",
       "default": 60
     },
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "Bottom padding",
-      "min": 20,
-      "max": 100,
-      "step": 4,
+      "min": 0,
+      "max": 150,
+      "step": 6,
       "unit": "px",
+      "label": "Bottom padding",
       "default": 48
     }
   ],
@@ -1533,27 +1712,26 @@
       "name": "Hanging Garment",
       "settings": [
         {
+          "type": "product",
+          "id": "product",
+          "label": "Shopify product"
+        },
+        {
           "type": "image_picker",
           "id": "initial_image",
-          "label": "Initial Image (Left / Side View)",
-          "info": "Upload the side/left view. Displays at full 100% height with narrow width."
+          "label": "Initial image (Side profile - narrow)",
+          "info": "Mockup white background is automatically erased to 100% transparent."
         },
         {
           "type": "image_picker",
           "id": "hover_image",
-          "label": "Hovered Image (Front View)",
-          "info": "Upload the front view. Displays at the exact same 100% height with broad width on hover."
+          "label": "Hovered image (Front profile - broad)",
+          "info": "Shown when garment is hovered. Equal vertical height guaranteed."
         },
         {
           "type": "image_picker",
           "id": "back_image",
-          "label": "Back Image (Optional)",
-          "info": "Optional back view image."
-        },
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Link to Shopify Product"
+          "label": "Back image (optional 3D turn)"
         },
         {
           "type": "text",
@@ -1563,44 +1741,42 @@
         {
           "type": "text",
           "id": "custom_price",
-          "label": "Custom price override (e.g. $199)"
+          "label": "Custom price tag override"
         },
         {
           "type": "url",
           "id": "custom_link",
-          "label": "Custom URL override"
+          "label": "Custom product link URL"
         },
         {
           "type": "range",
           "id": "drop_offset",
-          "label": "Vertical hanging offset",
-          "min": -50,
-          "max": 50,
+          "min": -40,
+          "max": 40,
           "step": 2,
           "unit": "px",
+          "label": "Hanging vertical offset",
           "default": 0
         },
         {
           "type": "range",
           "id": "initial_scale",
-          "label": "Side view scale adjustment",
-          "min": 70,
-          "max": 130,
+          "min": 60,
+          "max": 140,
           "step": 5,
           "unit": "%",
-          "default": 100,
-          "info": "Fine-tune size if mockup has extra transparent padding."
+          "label": "Initial side image scale",
+          "default": 100
         },
         {
           "type": "range",
           "id": "hover_scale",
-          "label": "Front view scale adjustment",
-          "min": 70,
-          "max": 130,
+          "min": 60,
+          "max": 140,
           "step": 5,
           "unit": "%",
-          "default": 100,
-          "info": "Fine-tune size if mockup has extra transparent padding."
+          "label": "Hovered front image scale",
+          "default": 100
         }
       ]
     }
@@ -1609,9 +1785,6 @@
     {
       "name": "Scene rail",
       "blocks": [
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
         { "type": "product" },
         { "type": "product" },
         { "type": "product" },

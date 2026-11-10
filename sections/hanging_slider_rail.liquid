@@ -183,6 +183,39 @@
                   {% assign item_price = section.settings.default_tag_price | default: '$199' %}
                 {% endif %}
 
+                {% assign item_compare = '' %}
+                {% if block.settings.custom_price == blank and linked_product != blank and linked_product.compare_at_price > linked_product.price %}
+                  {% assign item_compare = linked_product.compare_at_price | money %}
+                {% endif %}
+
+                {% assign item_meta = '' %}
+                {% if linked_product != blank %}
+                  {% if linked_product.vendor != blank and linked_product.type != blank %}
+                    {% assign item_meta = linked_product.vendor | append: ' · ' | append: linked_product.type %}
+                  {% else %}
+                    {% assign item_meta = linked_product.type | default: linked_product.vendor %}
+                  {% endif %}
+                {% endif %}
+                {% if item_meta == blank %}
+                  {% assign item_meta = section.settings.eyebrow | default: 'Selected piece' %}
+                {% endif %}
+
+                {% assign item_desc = block.settings.custom_subtitle | strip %}
+                {% if item_desc == blank and linked_product != blank and linked_product.description != blank %}
+                  {% assign item_desc = linked_product.description | strip_html | strip_newlines | truncate: 88 %}
+                {% endif %}
+
+                {% assign item_options = '' %}
+                {% if linked_product != blank and linked_product.has_only_default_variant == false %}
+                  {% for opt in linked_product.options_with_values %}
+                    {% if forloop.first and opt.values.size > 0 and opt.name != 'Title' %}
+                      {% assign opt_vals = opt.values | join: ' · ' %}
+                      {% assign item_options = opt.name | append: ': ' | append: opt_vals %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+
                 {% assign initial_img = block.settings.initial_image | default: linked_product.featured_image %}
                 {% assign hover_img = block.settings.hover_image | default: linked_product.images[1] | default: initial_img %}
                 {% assign back_img = block.settings.back_image | default: linked_product.images[2] %}
@@ -198,6 +231,10 @@
                   aria-label="{{ item_title | escape }}"
                   data-name="{{ item_title | escape }}"
                   data-price="{{ item_price | escape }}"
+                  data-compare="{{ item_compare | escape }}"
+                  data-meta="{{ item_meta | escape }}"
+                  data-desc="{{ item_desc | escape }}"
+                  data-options="{{ item_options | escape }}"
                   data-url="{{ item_url }}"
                   data-idx="{{ forloop.index }}"
                   style="
@@ -301,6 +338,23 @@
                 {% assign is_center_demo = false %}
                 {% if r == 2 and forloop.index == 4 %}{% assign is_center_demo = true %}{% endif %}
 
+                {% assign d_meta = section.settings.eyebrow | default: 'New Collection' %}
+                {% assign d_desc = 'Heavyweight cotton blend · Relaxed oversized fit' %}
+                {% case d_name %}
+                  {% when 'Blazzer' %}
+                    {% assign d_meta = 'Tailored Outerwear' %}
+                    {% assign d_desc = 'Structured wool-blend shoulder with horn button closure' %}
+                  {% when 'Hoodie' or 'Hoodie Black' %}
+                    {% assign d_meta = 'Heavyweight Fleece' %}
+                    {% assign d_desc = '480 GSM brushed cotton fleece · Drop-shoulder cut' %}
+                  {% when 'Sweatshirt' or 'Sweatshirt Plus' %}
+                    {% assign d_meta = 'Signature Knitwear' %}
+                    {% assign d_desc = 'Relaxed boxy silhouette with heavyweight ribbed trim' %}
+                  {% when 'Tshirt' %}
+                    {% assign d_meta = 'Essential Jersey' %}
+                    {% assign d_desc = 'Heavyweight combed cotton with contrast sleeve stripes' %}
+                {% endcase %}
+
                 <a
                   class="sr-item{% if is_center_demo %} is-demo-center{% endif %}"
                   href="{{ routes.all_products_collection_url | default: '/collections/all' }}"
@@ -308,6 +362,10 @@
                   aria-label="{{ d_name }}"
                   data-name="{{ d_name }}"
                   data-price="{{ d_price }}"
+                  data-compare=""
+                  data-meta="{{ d_meta | escape }}"
+                  data-desc="{{ d_desc | escape }}"
+                  data-options="Sizes: S · M · L · XL"
                   data-url="{{ routes.all_products_collection_url | default: '/collections/all' }}"
                   data-idx="{{ forloop.index }}"
                   style="
@@ -372,23 +430,37 @@
       </div>
     </div>
 
-    <!-- Bottom Bar: Hint, Interactive Progress Indicator & Corner CTA -->
+    <!-- Bottom Bar: Hint / Hovered Product Details, Interactive Progress Indicator & Corner CTA -->
+    {% assign cta_href = section.settings.cta_url %}
+    {% if cta_href == blank %}
+      {% assign cta_href = routes.all_products_collection_url | default: '/collections/all' %}
+    {% endif %}
     <div class="sr-foot">
-      <!-- Peek Info (Bottom Left) -->
-      <div class="sr-peek">
-        <span class="sr-peek-hint sr-hint-d">{{ section.settings.footer_hint | escape }}</span>
-        <span class="sr-peek-hint sr-hint-m">{{ section.settings.mobile_hint | escape }}</span>
-        <div class="sr-peek-info">
-          <a href="{{ routes.all_products_collection_url | default: '/collections/all' }}" class="sr-peek-link" data-sr-plink="" aria-label="View product details">
-            <span class="sr-peek-name" data-sr-pname="">Blazzer</span>
-            <span class="sr-peek-price" data-sr-pprice="">$199.00</span>
+      <!-- Peek Info (Bottom Left: Idle hint -> Active hovered garment details) -->
+      <div class="sr-peek" data-sr-peek="">
+        <div class="sr-peek-idle" aria-hidden="false">
+          <span class="sr-peek-dash" aria-hidden="true"></span>
+          <span class="sr-peek-hint sr-hint-d">{{ section.settings.footer_hint | default: 'Hover a piece · click to look closer' | escape }}</span>
+          <span class="sr-peek-hint sr-hint-m">{{ section.settings.mobile_hint | default: 'Tap a piece to look closer' | escape }}</span>
+        </div>
+        <div class="sr-peek-details" aria-live="polite" aria-hidden="true">
+          <div class="sr-peek-meta-row">
+            <span class="sr-peek-dash" aria-hidden="true"></span>
+            <span class="sr-peek-meta" data-sr-pmeta=""></span>
+          </div>
+          <a href="{{ cta_href }}" class="sr-peek-link" data-sr-plink="" aria-label="View product details">
+            <span class="sr-peek-name" data-sr-pname=""></span>
+            <span class="sr-peek-price" data-sr-pprice=""></span>
+            <s class="sr-peek-compare is-hidden" data-sr-pcompare=""></s>
+            <span class="sr-peek-view" aria-hidden="true">→</span>
           </a>
+          <p class="sr-peek-desc is-hidden" data-sr-pdesc=""></p>
         </div>
       </div>
 
       <!-- Center Progress Rail -->
       {% if section.settings.show_progress %}
-        <div class="sr-prog" data-sr-prog="">
+        <div class="sr-prog" data-sr-prog="" aria-hidden="true">
           <div class="sr-prog-track">
             <div class="sr-prog-bar" data-sr-prog-bar=""></div>
           </div>
@@ -401,10 +473,10 @@
           <div class="sr-corner-h">{{ section.settings.footer_text | escape }}</div>
         {% endif %}
         {% if section.settings.cta_label != blank %}
-          <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="sr-cta-link">
+          <a href="{{ cta_href }}" class="sr-cta-link">
             <span>{{ section.settings.cta_label | escape }}</span>
-            <svg class="sr-cta-ar" viewBox="0 0 14 10" fill="none">
-              <path d="M 1 5 L 13 5 M 9 1 L 13 5 L 9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg class="sr-cta-ar" viewBox="0 0 14 10" fill="none" aria-hidden="true">
+              <path d="M 1 5 L 13 5 M 9 1 L 13 5 L 9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </a>
         {% endif %}
@@ -494,10 +566,10 @@
   }
   .sr-railcap-sep {
     display: inline-block;
-    width: 28px;
-    height: 1px;
+    width: 1px;
+    height: 11px;
     background: currentColor;
-    opacity: 0.4;
+    opacity: 0.35;
   }
   .sr-railcap-dim {
     opacity: 0.65;
@@ -611,19 +683,6 @@
     transition: width var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1);
     will-change: width, transform;
   }
-  .sr-peek-link {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    text-decoration: none !important;
-    color: inherit !important;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-  }
-  .sr-peek-link:hover {
-    opacity: 0.8;
-  }
-
   /* Hover & Active: Width smoothly expands, parting neighbor clothes */
   .sr-item:hover,
   .sr-item:focus-visible,
@@ -895,74 +954,204 @@
   .sr-foot {
     position: relative;
     z-index: 6;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 24px;
     padding: 10px 32px 0 32px;
     font-size: 13px;
   }
   @media (max-width: 768px) {
     .sr-foot {
-      flex-direction: column;
+      grid-template-columns: 1fr;
+      justify-items: center;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       padding: 10px 20px 0 20px;
       text-align: center;
     }
   }
 
-  /* Peek Info (Left) */
+  /* Peek Info (Bottom Left: Idle Hairline Hint <-> Active Hovered Product Details) */
   .sr-peek {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 180px;
+    position: relative;
+    display: grid;
+    align-items: end;
+    min-width: 0;
+    min-height: 58px;
+    max-width: 100%;
+    text-align: left;
+  }
+  @media (max-width: 768px) {
+    .sr-peek {
+      justify-items: center;
+      text-align: center;
+      min-height: 48px;
+      width: 100%;
+    }
+  }
+  .sr-peek-idle,
+  .sr-peek-details {
+    grid-area: 1 / 1;
+    align-self: end;
+    min-width: 0;
+    max-width: 100%;
+    transition: opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sr-peek-idle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 4px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .sr-peek.is-peeking .sr-peek-idle {
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+  }
+  .sr-peek-dash {
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.42;
+    flex-shrink: 0;
   }
   .sr-peek-hint {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    opacity: 0.6;
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    text-transform: none;
+    opacity: 0.65;
   }
   .sr-hint-m { display: none; }
   @media (max-width: 768px) {
     .sr-hint-d { display: none; }
-    .sr-hint-m { display: block; }
+    .sr-hint-m { display: inline; }
   }
-  .sr-peek-info {
+
+  .sr-peek-details {
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+  }
+  .sr-peek.is-peeking .sr-peek-details {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .sr-peek-meta-row {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+    min-width: 0;
+  }
+  @media (max-width: 768px) {
+    .sr-peek-meta-row {
+      justify-content: center;
+    }
+  }
+  .sr-peek-meta {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.58;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sr-peek-link {
+    display: inline-flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: 10px;
+    gap: 8px;
+    max-width: 100%;
+    text-decoration: none !important;
+    color: inherit !important;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  @media (max-width: 768px) {
+    .sr-peek-link {
+      justify-content: center;
+    }
+  }
+  .sr-peek-link:hover {
+    opacity: 0.78;
   }
   .sr-peek-name {
     font-size: 15px;
     font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
   }
   .sr-peek-price {
     font-size: 13px;
-    opacity: 0.8;
+    font-weight: 600;
+    opacity: 0.86;
+    white-space: nowrap;
+  }
+  .sr-peek-compare {
+    font-size: 12px;
+    opacity: 0.45;
+    white-space: nowrap;
+  }
+  .sr-peek-view {
+    font-size: 12px;
+    opacity: 0.55;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .sr-peek-link:hover .sr-peek-view {
+    transform: translateX(3px);
+    opacity: 0.9;
+  }
+  .sr-peek-desc {
+    margin: 3px 0 0 0;
+    font-size: 12px;
+    line-height: 1.35;
+    opacity: 0.66;
+    max-width: min(390px, 100%);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 768px) {
+    .sr-peek-desc {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  .sr-peek .is-hidden {
+    display: none !important;
   }
 
   /* Progress Track (Center) */
   .sr-prog {
-    flex: 1;
-    max-width: 280px;
-    margin: 0 20px;
+    width: 140px;
+    margin: 0 auto;
+    padding-bottom: 6px;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
   @media (max-width: 768px) {
     .sr-prog {
-      max-width: 200px;
-      margin: 8px 0;
+      width: 130px;
+      padding-bottom: 0;
+      margin: 2px auto;
     }
   }
   .sr-prog-track {
     position: relative;
     width: 100%;
     height: 2px;
-    background: currentColor;
-    opacity: 0.2;
+    background: rgba(17, 17, 17, 0.16);
+    background: color-mix(in srgb, currentColor 18%, transparent);
     border-radius: 2px;
     overflow: hidden;
   }
@@ -970,10 +1159,10 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 25%;
+    width: 28%;
     height: 100%;
     background: currentColor;
-    opacity: 0.9;
+    opacity: 1;
     border-radius: 2px;
     transition: left 0.1s linear;
   }
@@ -983,36 +1172,38 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
+    gap: 10px;
     text-align: right;
   }
   @media (max-width: 768px) {
     .sr-corner {
       align-items: center;
       text-align: center;
+      gap: 8px;
     }
   }
   .sr-corner-h {
-    font-size: 14px;
-    font-weight: 600;
-    max-width: 280px;
-    line-height: 1.35;
+    font-size: 13.5px;
+    font-weight: 700;
+    max-width: 255px;
+    line-height: 1.32;
   }
   .sr-cta-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 4px;
     color: inherit;
     transition: opacity 0.2s ease, gap 0.2s ease;
   }
   .sr-cta-link:hover {
-    opacity: 0.75;
+    opacity: 0.72;
     gap: 12px;
   }
   .sr-cta-ar {
@@ -1212,8 +1403,15 @@
       var rodShadow = root.querySelector("[data-sr-rod-shadow]");
       var rodHighlight = root.querySelector("[data-sr-rod-highlight]");
 
+      var peekWrap = root.querySelector("[data-sr-peek]");
+      var peekIdle = root.querySelector(".sr-peek-idle");
+      var peekDetails = root.querySelector(".sr-peek-details");
+      var peekMeta = root.querySelector("[data-sr-pmeta]");
       var peekName = root.querySelector("[data-sr-pname]");
       var peekPrice = root.querySelector("[data-sr-pprice]");
+      var peekCompare = root.querySelector("[data-sr-pcompare]");
+      var peekDesc = root.querySelector("[data-sr-pdesc]");
+      var peekLink = root.querySelector("[data-sr-plink]");
       var progBar = root.querySelector("[data-sr-prog-bar]");
 
       if (!stage || !rack) return;
@@ -1331,23 +1529,6 @@
         requestCurveUpdate();
       }
 
-      function findCenterItem() {
-        var stageRect = stage.getBoundingClientRect();
-        var stageCenterX = stageRect.left + ((stageRect.width || 1400) * 0.5);
-        var trackLeft = trackInner ? trackInner.getBoundingClientRect().left : rack.getBoundingClientRect().left;
-        var best = items[0];
-        var bestDist = Infinity;
-        for (var i = 0; i < items.length; i++) {
-          var cx = trackLeft + items[i].offsetLeft + (items[i].offsetWidth * 0.5);
-          var d = Math.abs(cx - stageCenterX);
-          if (d < bestDist) {
-            bestDist = d;
-            best = items[i];
-          }
-        }
-        return best;
-      }
-
       // 3. SEAMLESS INFINITE LOOP WRAPPER
       function handleInfiniteWrap() {
         if (!isInfiniteEnabled || singleSetWidth <= 10) return;
@@ -1381,16 +1562,94 @@
         driftAnimationId = requestAnimationFrame(tickDrift);
       }
 
-      // 5. HOVER & PEEK INFO
+      // 5. HOVER & PEEK INFO (Show hovered garment details below rail, idle hint when unhovered)
+      var peekHideTimer = null;
+
+      function cancelClearPeek() {
+        if (peekHideTimer) {
+          clearTimeout(peekHideTimer);
+          peekHideTimer = null;
+        }
+      }
+
+      function clearPeek() {
+        cancelClearPeek();
+        isHovered = false;
+        rack.classList.remove("has-active-item");
+        items.forEach(function(it) { it.classList.remove("is-active"); });
+        if (peekWrap) peekWrap.classList.remove("is-peeking");
+        if (peekIdle) peekIdle.setAttribute("aria-hidden", "false");
+        if (peekDetails) peekDetails.setAttribute("aria-hidden", "true");
+        syncTrajectoryDuringHover();
+      }
+
+      function scheduleClearPeek() {
+        cancelClearPeek();
+        peekHideTimer = setTimeout(clearPeek, 140);
+      }
+
       function setPeek(item) {
         if (!item) return;
-        var name = item.dataset.name;
-        var price = item.dataset.price;
-        var url = item.getAttribute("href") || item.dataset.url;
-        if (peekName && name) peekName.textContent = name;
-        if (peekPrice && price) peekPrice.textContent = price;
-        var peekLink = root.querySelector("[data-sr-plink]");
-        if (peekLink && url && url !== "#") peekLink.href = url;
+        cancelClearPeek();
+
+        var name = item.dataset.name || "";
+        var price = item.dataset.price || "";
+        var compare = item.dataset.compare || "";
+        var meta = item.dataset.meta || "";
+        var desc = item.dataset.desc || "";
+        var options = item.dataset.options || "";
+        var url = item.getAttribute("href") || item.dataset.url || "";
+
+        var detailLine = desc;
+        if (options) {
+          detailLine = detailLine ? (detailLine + " · " + options) : options;
+        }
+
+        if (peekName) peekName.textContent = name;
+        if (peekPrice) peekPrice.textContent = price;
+
+        if (peekCompare) {
+          if (compare && compare !== price) {
+            peekCompare.textContent = compare;
+            peekCompare.classList.remove("is-hidden");
+          } else {
+            peekCompare.textContent = "";
+            peekCompare.classList.add("is-hidden");
+          }
+        }
+
+        if (peekMeta) {
+          peekMeta.textContent = meta || "Selected piece";
+        }
+
+        if (peekDesc) {
+          if (detailLine) {
+            peekDesc.textContent = detailLine;
+            peekDesc.classList.remove("is-hidden");
+          } else {
+            peekDesc.textContent = "";
+            peekDesc.classList.add("is-hidden");
+          }
+        }
+
+        if (peekLink && url && url !== "#") {
+          peekLink.href = url;
+          if (name) peekLink.setAttribute("aria-label", "View " + name);
+        }
+
+        if (peekWrap) peekWrap.classList.add("is-peeking");
+        if (peekIdle) peekIdle.setAttribute("aria-hidden", "true");
+        if (peekDetails) peekDetails.setAttribute("aria-hidden", "false");
+      }
+
+      function activateItem(item) {
+        isHovered = true;
+        cancelClearPeek();
+        rack.classList.add("has-active-item");
+        items.forEach(function(it) { it.classList.remove("is-active", "is-demo-center"); });
+        item.classList.add("is-active");
+        setPeek(item);
+        syncTrajectoryDuringHover();
       }
 
       // 6. MOUSE & TOUCH DRAGGING (Accurate Drag vs Click Detection)
@@ -1404,12 +1663,11 @@
 
       items.forEach(function(item) {
         item.addEventListener("mouseenter", function() {
-          isHovered = true;
-          rack.classList.add("has-active-item");
-          items.forEach(function(it) { it.classList.remove("is-active", "is-demo-center"); });
-          item.classList.add("is-active");
-          setPeek(item);
-          syncTrajectoryDuringHover();
+          activateItem(item);
+        });
+
+        item.addEventListener("focusin", function() {
+          activateItem(item);
         });
 
         // Click handler: navigate to product page if it wasn't a drag gesture
@@ -1428,15 +1686,33 @@
 
       rack.addEventListener("mouseenter", function() {
         isHovered = true;
+        cancelClearPeek();
       });
 
       rack.addEventListener("mouseleave", function() {
-        isHovered = false;
-        rack.classList.remove("has-active-item");
-        items.forEach(function(it) { it.classList.remove("is-active"); });
-        var centerDemo = findCenterItem();
-        if (centerDemo) setPeek(centerDemo);
-        syncTrajectoryDuringHover();
+        scheduleClearPeek();
+      });
+
+      if (peekWrap) {
+        peekWrap.addEventListener("mouseenter", function() {
+          if (peekWrap.classList.contains("is-peeking")) {
+            isHovered = true;
+            cancelClearPeek();
+          }
+        });
+        peekWrap.addEventListener("mouseleave", function() {
+          scheduleClearPeek();
+        });
+      }
+
+      root.addEventListener("focusout", function() {
+        setTimeout(function() {
+          var activeInside = root.contains(document.activeElement);
+          var hovered = rack.matches(":hover") || (peekWrap && peekWrap.matches(":hover"));
+          if (!activeInside && !hovered) {
+            clearPeek();
+          }
+        }, 0);
       });
 
       // Mouse drag on rack
@@ -1538,8 +1814,6 @@
           rack.scrollLeft = singleSetWidth;
         }
         updateItemTrajectory();
-        var centerDemo = findCenterItem();
-        if (centerDemo) setPeek(centerDemo);
         startDrift();
       }, 80);
     }
@@ -1917,6 +2191,12 @@
           "type": "text",
           "id": "custom_price",
           "label": "Custom price tag override"
+        },
+        {
+          "type": "text",
+          "id": "custom_subtitle",
+          "label": "Custom hover detail / subtitle",
+          "info": "Shown at bottom-left when this garment is hovered. Defaults to product description."
         },
         {
           "type": "url",

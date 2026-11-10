@@ -20,12 +20,15 @@
 {% assign base_init_w = section.settings.initial_width | default: 110 %}
 {% assign base_hov_w = section.settings.hover_width | default: 260 %}
 {% assign auto_drift = section.settings.auto_drift_speed | default: 0.8 %}
+{% assign container_w = section.settings.container_width | default: 1180 %}
+{% assign rail_sag_val = section.settings.rail_sag | default: 40 %}
+{% assign ssr_p1y = 29 | plus: rail_sag_val | plus: rail_sag_val %}
 
 <section
   id="sr-{{ section.id }}"
-  class="sr-sec sr-vh-d sr-vh-m sr-shaped"
+  class="sr-sec sr-vh-d sr-vh-m sr-shaped{% unless section.settings.enable_container == false %} sr-contained{% endunless %}"
   data-sr-section=""
-  data-sag="{{ section.settings.rail_sag | default: 40 }}"
+  data-sag="{{ rail_sag_val }}"
   data-tilt="{{ section.settings.enable_tilt | default: 3 }}"
   data-hover-speed="{{ section.settings.hover_speed | default: 400 }}"
   data-garment-h="{{ garment_h }}"
@@ -38,6 +41,7 @@
     --sr-w-init: {{ base_init_w }}px;
     --sr-w-hov: {{ base_hov_w }}px;
     --sr-gap: {{ section.settings.product_gap | default: 20 }}px;
+    --sr-container-w: {{ container_w }}px;
     --sr-h-desk: {{ garment_h }}px;
     --sr-h-slide: {{ garment_h | times: 0.82 | round }}px;
     --sr-sway: {{ section.settings.sway_intensity | default: 2.5 }}deg;
@@ -108,7 +112,7 @@
         <!-- Soft Rail Drop Shadow -->
         <path
           data-sr-rod-shadow=""
-          d="M -30,22 Q 700,102 1430,22"
+          d="M -30,34 Q 700,{{ ssr_p1y | plus: 5 }} 1430,34"
           fill="none"
           stroke="rgba(0,0,0,0.25)"
           stroke-width="{{ rail_thick | plus: 3 }}"
@@ -117,7 +121,7 @@
         <!-- Metallic Core -->
         <path
           data-sr-rod-core=""
-          d="M -30,17 Q 700,97 1430,17"
+          d="M -30,29 Q 700,{{ ssr_p1y }} 1430,29"
           fill="none"
           stroke="url(#srg-{{ section.id }})"
           stroke-width="{{ rail_thick }}"
@@ -126,7 +130,7 @@
         <!-- Top Highlight -->
         <path
           data-sr-rod-highlight=""
-          d="M -30,16 Q 700,96 1430,16"
+          d="M -30,28 Q 700,{{ ssr_p1y | minus: 1 }} 1430,28"
           fill="none"
           stroke="rgba(255,255,255,0.75)"
           stroke-width="1.5"
@@ -207,10 +211,10 @@
                   <div class="sr-hang-sway">
                     <!-- Metallic Hanger Hook -->
                     <div class="sr-hanger-hook" aria-hidden="true">
-                      <svg viewBox="0 0 24 38" fill="none">
-                        <path d="M 12 16 C 12 7 19 4 19 11 C 19 14 17 16 13 18 C 12 19 12 21 12 26" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
-                        <circle cx="19" cy="11" r="1.6" fill="#9da3a9"/>
-                        <rect x="10" y="26" width="4" height="4" rx="1" fill="#4d3a2c"/>
+                      <svg viewBox="0 0 24 34" fill="none">
+                        <path d="M 12 17 C 11 5 19.5 2.5 19.5 10.5 C 19.5 14.5 17 16.5 13 18.5 C 12 19.5 12 21 12 23" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
+                        <circle cx="19.5" cy="10.5" r="1.5" fill="#9da3a9"/>
+                        <rect x="9.5" y="23" width="5" height="4" rx="1" fill="#4d3a2c"/>
                       </svg>
                     </div>
 
@@ -286,8 +290,8 @@
           <!-- DEFAULT PREVIEW (Local Theme Asset Garments) -->
           {% assign demo_items = "Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Hoodie Black|$199.00|sr-demo-hoodie-black-side.webp|sr-demo-hoodie-black-front.webp#Sweatshirt|$199.00|sr-demo-sweatshirt-side.webp|sr-demo-sweatshirt-front.webp#Sweatshirt Plus|$199.00|sr-demo-sweatshirt-plus-side.webp|sr-demo-sweatshirt-plus-front.webp#Tshirt|$199.00|sr-demo-tshirt-side.webp|sr-demo-tshirt-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Sweatshirt|$199.00|sr-demo-sweatshirt-side.webp|sr-demo-sweatshirt-front.webp#Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Sweatshirt Plus|$199.00|sr-demo-sweatshirt-plus-side.webp|sr-demo-sweatshirt-plus-front.webp#Hoodie|$199.00|sr-demo-hoodie-side.webp|sr-demo-hoodie-front.webp#Blazzer|$199.00|sr-demo-blazzer-side.webp|sr-demo-blazzer-front.webp#Sweatshirt Plus|$199.00|sr-demo-sweatshirt-plus-side.webp|sr-demo-sweatshirt-plus-front.webp" | split: "#" %}
 
-          <div class="sr-track-inner" data-sr-track-inner="" data-repeat="3">
-            {% for r in (1..3) %}
+          <div class="sr-track-inner" data-sr-track-inner="" data-repeat="4">
+            {% for r in (1..4) %}
               {% for d_str in demo_items %}
                 {% assign d_parts = d_str | split: "|" %}
                 {% assign d_name = d_parts[0] %}
@@ -295,7 +299,7 @@
                 {% assign d_side_file = d_parts[2] %}
                 {% assign d_front_file = d_parts[3] %}
                 {% assign is_center_demo = false %}
-                {% if r == 1 and forloop.index == 8 %}{% assign is_center_demo = true %}{% endif %}
+                {% if r == 2 and forloop.index == 4 %}{% assign is_center_demo = true %}{% endif %}
 
                 <a
                   class="sr-item{% if is_center_demo %} is-demo-center{% endif %}"
@@ -315,10 +319,10 @@
                   <div class="sr-hang-sway">
                     <!-- Hook -->
                     <div class="sr-hanger-hook" aria-hidden="true">
-                      <svg viewBox="0 0 24 38" fill="none">
-                        <path d="M 12 16 C 12 7 19 4 19 11 C 19 14 17 16 13 18 C 12 19 12 21 12 26" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
-                        <circle cx="19" cy="11" r="1.6" fill="#9da3a9"/>
-                        <rect x="10" y="26" width="4" height="4" rx="1" fill="#4d3a2c"/>
+                      <svg viewBox="0 0 24 34" fill="none">
+                        <path d="M 12 17 C 11 5 19.5 2.5 19.5 10.5 C 19.5 14.5 17 16.5 13 18.5 C 12 19.5 12 21 12 23" stroke="#9da3a9" stroke-width="2.4" stroke-linecap="round"/>
+                        <circle cx="19.5" cy="10.5" r="1.5" fill="#9da3a9"/>
+                        <rect x="9.5" y="23" width="5" height="4" rx="1" fill="#4d3a2c"/>
                       </svg>
                     </div>
 
@@ -506,7 +510,7 @@
     margin: 0;
   }
 
-  /* Stage & SVG Rod */
+  /* Stage & SVG Rod (Full Viewport Width) */
   .sr-stage {
     position: relative;
     width: 100%;
@@ -534,18 +538,55 @@
     -ms-overflow-style: none;
     cursor: grab;
     touch-action: pan-y;
-    padding: 34px 0 26px 0;
+    padding: 18px 0 26px 0;
     user-select: none;
   }
   .sr-rack::-webkit-scrollbar { display: none; }
   .sr-rack.is-dragging { cursor: grabbing; }
 
+  /* Centered Page Container (Full-Width Rope + Contained Products & Chrome) */
+  .sr-sec.sr-contained .sr-top,
+  .sr-sec.sr-contained .sr-rack,
+  .sr-sec.sr-contained .sr-foot {
+    width: 100%;
+    max-width: min(var(--sr-container-w, 1180px), calc(100% - 140px));
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+  .sr-sec.sr-contained .sr-top {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .sr-sec.sr-contained .sr-foot {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  @media (max-width: 989px) {
+    .sr-sec.sr-contained .sr-top,
+    .sr-sec.sr-contained .sr-rack,
+    .sr-sec.sr-contained .sr-foot {
+      max-width: calc(100% - 64px);
+    }
+  }
+  @media (max-width: 768px) {
+    .sr-sec.sr-contained .sr-top,
+    .sr-sec.sr-contained .sr-rack,
+    .sr-sec.sr-contained .sr-foot {
+      max-width: calc(100% - 32px);
+    }
+  }
+
   /* Inner Flex Track that wraps cloned items */
   .sr-track-inner {
+    position: relative;
     display: flex;
     align-items: flex-start;
     gap: var(--sr-gap, 20px);
     width: max-content;
+    padding: 0;
+  }
+  .sr-sec:not(.sr-contained) .sr-track-inner {
     padding: 0 max(40px, 5vw);
   }
 
@@ -567,7 +608,7 @@
     width: var(--item-w-init, var(--sr-w-init, 110px));
     transform-origin: 50% 0%;
     transform: translate3d(0, calc(var(--curve-y, 0px) + var(--sr-drop, 0px)), 0) rotate(var(--curve-tilt, 0deg));
-    transition: width var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1), transform 0.08s linear;
+    transition: width var(--sr-hspd) cubic-bezier(0.25, 1, 0.5, 1);
     will-change: width, transform;
   }
   .sr-peek-link {
@@ -606,7 +647,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    transform-origin: 50% 6px;
+    transform-origin: 50% 11px;
     will-change: transform;
     transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
   }
@@ -654,17 +695,17 @@
     animation-delay: -3.9s;
   }
 
-  /* On Hover: Garment straightens upright (0deg) and lifts slightly (-8px) */
+  /* On Hover: Garment straightens upright (0deg) while hook stays hooked over the rod */
   .sr-item:hover .sr-hang-sway,
   .sr-item:focus-visible .sr-hang-sway,
   .sr-item.is-active .sr-hang-sway {
     animation: none !important;
-    transform: translateY(-8px) rotate(0deg) !important;
+    transform: rotate(0deg) !important;
   }
 
   .sr-rack:not(:hover):not(.has-active-item) .sr-item.is-demo-center .sr-hang-sway {
     animation: none !important;
-    transform: translateY(-4px) rotate(0deg) !important;
+    transform: rotate(0deg) !important;
   }
 
   /* ========================================================================= */
@@ -673,9 +714,9 @@
   .sr-hanger-hook {
     position: relative;
     width: 24px;
-    height: 38px;
-    margin-top: -3px;
-    margin-bottom: -10px;
+    height: 34px;
+    margin-top: 0;
+    margin-bottom: -8px;
     z-index: 6;
     pointer-events: none;
   }
@@ -689,7 +730,7 @@
   /* Price Tag */
   .sr-tag {
     position: absolute;
-    top: 8px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 7;
@@ -701,7 +742,7 @@
   .sr-tag-cord {
     display: block;
     width: 1px;
-    height: 10px;
+    height: 7px;
     background: rgba(80, 80, 80, 0.55);
   }
   .sr-tag-inner {
@@ -1183,16 +1224,34 @@
 
       var sag = parseFloat(root.dataset.sag) || 40;
       var tiltMult = parseFloat(root.dataset.tilt) || 3;
+      var hoverSpeed = parseFloat(root.dataset.hoverSpeed) || 400;
       var autoDriftSpeed = parseFloat(root.dataset.autoDrift) || 0;
       var isInfiniteEnabled = root.dataset.infinite !== "false";
       var items = Array.prototype.slice.call(rack.querySelectorAll("[data-sr-item]"));
-      var yAnchor = 17;
+      // Aligned so rod centerline (29px + yDip) sits snugly inside the hook crook (18px padding + 11px SVG eye)
+      var yAnchor = 29;
 
       var repeatCount = trackInner ? (parseInt(trackInner.dataset.repeat, 10) || 1) : 1;
       var singleSetWidth = 0;
 
       function updateSetWidth() {
-        if (trackInner && repeatCount > 1) {
+        if (trackInner && repeatCount > 1 && items.length >= repeatCount) {
+          var setLen = Math.floor(items.length / repeatCount);
+          if (setLen > 0) {
+            var best = Infinity;
+            for (var s = 0; s < repeatCount - 1; s++) {
+              var a = items[s * setLen];
+              var b = items[(s + 1) * setLen];
+              if (a && b) {
+                var diff = b.offsetLeft - a.offsetLeft;
+                if (diff > 0 && diff < best) best = diff;
+              }
+            }
+            if (best !== Infinity) {
+              singleSetWidth = best;
+              return;
+            }
+          }
           singleSetWidth = trackInner.scrollWidth / repeatCount;
         } else {
           singleSetWidth = rack.scrollWidth;
@@ -1221,6 +1280,7 @@
 
       // 2. REAL-TIME CURVE TRAJECTORY
       var isTicking = false;
+      var transitionUntil = 0;
 
       function updateItemTrajectory() {
         isTicking = false;
@@ -1228,18 +1288,19 @@
         var stageW = stageRect.width || 1400;
         var stageCenterX = stageRect.left + (stageW * 0.5);
         var halfW = Math.max(1, stageW * 0.5);
+        var bezierHalf = halfW + 30;
+        var trackLeft = trackInner ? trackInner.getBoundingClientRect().left : rack.getBoundingClientRect().left;
 
         for (var i = 0; i < items.length; i++) {
           var item = items[i];
-          var rect = item.getBoundingClientRect();
-          var itemCenterX = rect.left + (rect.width * 0.5);
+          var itemCenterX = trackLeft + item.offsetLeft + (item.offsetWidth * 0.5);
           var relX = itemCenterX - stageCenterX;
 
-          var u = relX / halfW;
+          var u = relX / bezierHalf;
           u = Math.max(-1.3, Math.min(1.3, u));
 
           var yDip = Math.max(0, sag * (1.0 - (u * u)));
-          var slope = - (2.0 * sag * u) / halfW;
+          var slope = - (2.0 * sag * u) / bezierHalf;
           var angleDeg = (Math.atan(slope) * 180) / Math.PI;
           var tilt = Math.max(-tiltMult * 2.5, Math.min(tiltMult * 2.5, angleDeg * (tiltMult / 3)));
 
@@ -1248,9 +1309,13 @@
         }
 
         if (progBar && singleSetWidth > 0) {
-          var normPos = rack.scrollLeft % singleSetWidth;
+          var normPos = ((rack.scrollLeft % singleSetWidth) + singleSetWidth) % singleSetWidth;
           var ratio = normPos / singleSetWidth;
           progBar.style.left = (ratio * 75).toFixed(1) + "%";
+        }
+
+        if (performance.now() < transitionUntil) {
+          requestCurveUpdate();
         }
       }
 
@@ -1261,12 +1326,34 @@
         }
       }
 
+      function syncTrajectoryDuringHover() {
+        transitionUntil = performance.now() + hoverSpeed + 100;
+        requestCurveUpdate();
+      }
+
+      function findCenterItem() {
+        var stageRect = stage.getBoundingClientRect();
+        var stageCenterX = stageRect.left + ((stageRect.width || 1400) * 0.5);
+        var trackLeft = trackInner ? trackInner.getBoundingClientRect().left : rack.getBoundingClientRect().left;
+        var best = items[0];
+        var bestDist = Infinity;
+        for (var i = 0; i < items.length; i++) {
+          var cx = trackLeft + items[i].offsetLeft + (items[i].offsetWidth * 0.5);
+          var d = Math.abs(cx - stageCenterX);
+          if (d < bestDist) {
+            bestDist = d;
+            best = items[i];
+          }
+        }
+        return best;
+      }
+
       // 3. SEAMLESS INFINITE LOOP WRAPPER
       function handleInfiniteWrap() {
         if (!isInfiniteEnabled || singleSetWidth <= 10) return;
-        
+
         // Wrap right
-        if (rack.scrollLeft >= singleSetWidth * 2.5) {
+        if (rack.scrollLeft >= singleSetWidth * 2.0) {
           rack.scrollLeft -= singleSetWidth;
         }
         // Wrap left
@@ -1296,6 +1383,7 @@
 
       // 5. HOVER & PEEK INFO
       function setPeek(item) {
+        if (!item) return;
         var name = item.dataset.name;
         var price = item.dataset.price;
         var url = item.getAttribute("href") || item.dataset.url;
@@ -1321,7 +1409,7 @@
           items.forEach(function(it) { it.classList.remove("is-active", "is-demo-center"); });
           item.classList.add("is-active");
           setPeek(item);
-          setTimeout(requestCurveUpdate, 60);
+          syncTrajectoryDuringHover();
         });
 
         // Click handler: navigate to product page if it wasn't a drag gesture
@@ -1346,9 +1434,9 @@
         isHovered = false;
         rack.classList.remove("has-active-item");
         items.forEach(function(it) { it.classList.remove("is-active"); });
-        var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
+        var centerDemo = findCenterItem();
         if (centerDemo) setPeek(centerDemo);
-        setTimeout(requestCurveUpdate, 60);
+        syncTrajectoryDuringHover();
       });
 
       // Mouse drag on rack
@@ -1435,18 +1523,22 @@
         requestCurveUpdate();
       });
 
-      // Initialize
+      // Initialize immediately to prevent initial frame jump, then re-sync after layout settles
       updateRodCurve();
       updateSetWidth();
+      if (isInfiniteEnabled && singleSetWidth > 0) {
+        rack.scrollLeft = singleSetWidth;
+      }
+      updateItemTrajectory();
 
       setTimeout(function() {
         updateRodCurve();
         updateSetWidth();
-        if (isInfiniteEnabled && singleSetWidth > 0) {
+        if (isInfiniteEnabled && singleSetWidth > 0 && rack.scrollLeft < singleSetWidth * 0.2) {
           rack.scrollLeft = singleSetWidth;
         }
         updateItemTrajectory();
-        var centerDemo = rack.querySelector(".sr-item:nth-child(8)") || items[0];
+        var centerDemo = findCenterItem();
         if (centerDemo) setPeek(centerDemo);
         startDrift();
       }, 80);
@@ -1550,6 +1642,27 @@
       "unit": "px",
       "label": "Gap between hanging garments",
       "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Container & Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_container",
+      "label": "Keep products inside centered container",
+      "default": true,
+      "info": "Metallic rope stays full width while hanging garments stay inside a centered page container."
+    },
+    {
+      "type": "range",
+      "id": "container_width",
+      "min": 900,
+      "max": 1500,
+      "step": 20,
+      "unit": "px",
+      "label": "Product container max width",
+      "default": 1180
     },
     {
       "type": "header",

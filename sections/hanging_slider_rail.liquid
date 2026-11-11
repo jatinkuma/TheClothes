@@ -42,6 +42,7 @@
     --sr-w-hov: {{ base_hov_w }}px;
     --sr-gap: {{ section.settings.product_gap | default: 20 }}px;
     --sr-container-w: {{ container_w }}px;
+    --sr-sag: {{ rail_sag_val }}px;
     --sr-h-desk: {{ garment_h }}px;
     --sr-h-slide: {{ garment_h | times: 0.82 | round }}px;
     --sr-sway: {{ section.settings.sway_intensity | default: 2.5 }}deg;
@@ -586,7 +587,7 @@
   .sr-stage {
     position: relative;
     width: 100%;
-    margin: 20px 0 10px 0;
+    margin: 20px 0 0 0;
     overflow: visible;
   }
   .sr-rodsvg {
@@ -605,12 +606,13 @@
     z-index: 5;
     width: 100%;
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: hidden;
+    overscroll-behavior-y: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
     cursor: grab;
     touch-action: pan-y;
-    padding: 18px 0 26px 0;
+    padding: 18px 0 calc(var(--sr-sag, 40px) + 52px) 0;
     user-select: none;
   }
   .sr-rack::-webkit-scrollbar { display: none; }
@@ -958,7 +960,7 @@
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: end;
     gap: 24px;
-    padding: 10px 32px 0 32px;
+    padding: 4px 32px 0 32px;
     font-size: 13px;
   }
   @media (max-width: 768px) {
@@ -1789,17 +1791,20 @@
       });
 
       rack.addEventListener("scroll", function() {
+        if (rack.scrollTop !== 0) rack.scrollTop = 0;
         handleInfiniteWrap();
         requestCurveUpdate();
       }, { passive: true });
 
       window.addEventListener("resize", function() {
+        if (rack.scrollTop !== 0) rack.scrollTop = 0;
         updateRodCurve();
         updateSetWidth();
         requestCurveUpdate();
       });
 
       // Initialize immediately to prevent initial frame jump, then re-sync after layout settles
+      rack.scrollTop = 0;
       updateRodCurve();
       updateSetWidth();
       if (isInfiniteEnabled && singleSetWidth > 0) {
@@ -1808,6 +1813,7 @@
       updateItemTrajectory();
 
       setTimeout(function() {
+        rack.scrollTop = 0;
         updateRodCurve();
         updateSetWidth();
         if (isInfiniteEnabled && singleSetWidth > 0 && rack.scrollLeft < singleSetWidth * 0.2) {

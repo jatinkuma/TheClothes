@@ -7,7 +7,7 @@
   assign layout_style = section.settings.layout_style | default: 'ring'
   assign mobile_style = section.settings.mobile_style | default: 'ring'
   assign feel = section.settings.feel | default: 'balanced'
-  assign speed = section.settings.speed | default: 5000
+  assign speed = section.settings.speed | default: 5
   assign autoplay = section.settings.autoplay
   if autoplay == nil
     assign autoplay = true
@@ -39,7 +39,7 @@
   data-mheight-vh="{{ section.settings.mheight_vh | default: 109 }}"
   data-reflect="false"
   data-autoplay="{% if autoplay %}true{% else %}false{% endif %}"
-  data-speed="{{ speed }}"
+  data-speed="{{ speed | times: 1000 }}"
   data-after-add="stay"
   data-bundle-code="{{ section.settings.bundle_discount_code | escape }}"
   data-msg-choose="Pick a size for: [items]"
@@ -74,7 +74,7 @@
     --rw-panel-pad-d: 32px;
     --rw-radius: 0px;
     --rw-max: none;
-    --rw-speed: {{ speed | divided_by: 1000.0 | default: 5 }}s;
+    --rw-speed: {{ speed }}s;
     --rw-ax: 40%;
     --rw-btn-radius: 0px; --rw-pill-radius: 30px; --rw-add-radius: 20px;
   "
@@ -1135,12 +1135,12 @@
     {
       "type": "range",
       "id": "speed",
-      "min": 2000,
-      "max": 10000,
-      "step": 500,
-      "unit": "ms",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
       "label": "Autoplay speed",
-      "default": 5000
+      "default": 5
     },
     {
       "type": "checkbox",

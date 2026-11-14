@@ -1017,7 +1017,7 @@
         "mobile_style": "ring",
         "feel": "balanced",
         "autoplay": true,
-        "speed": 5000,
+        "speed": 5,
         "blur": true,
         "height_mode": "original",
         "height_vh": 100,

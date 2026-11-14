@@ -20,6 +20,7 @@
             "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_Tee.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -34,6 +35,7 @@
             "hover_image": "shopify://shop_images/Deep_Red_Urban_Culture_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -48,6 +50,7 @@
             "hover_image": "shopify://shop_images/Olive_Green_Urban_Culture_T-Shirt_Mockup.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -62,6 +65,7 @@
             "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -76,6 +80,7 @@
             "hover_image": "shopify://shop_images/Navy_Urban_Culture_Graphic_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -90,6 +95,7 @@
             "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_Tee.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -104,6 +110,7 @@
             "hover_image": "shopify://shop_images/Deep_Red_Urban_Culture_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -118,6 +125,7 @@
             "hover_image": "shopify://shop_images/Olive_Green_Urban_Culture_T-Shirt_Mockup.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -132,6 +140,7 @@
             "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -146,6 +155,7 @@
             "hover_image": "shopify://shop_images/Navy_Urban_Culture_Graphic_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -160,6 +170,7 @@
             "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_Tee.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -174,6 +185,7 @@
             "hover_image": "shopify://shop_images/Deep_Red_Urban_Culture_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -188,6 +200,7 @@
             "hover_image": "shopify://shop_images/Olive_Green_Urban_Culture_T-Shirt_Mockup.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -202,6 +215,7 @@
             "hover_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -216,6 +230,7 @@
             "hover_image": "shopify://shop_images/Navy_Urban_Culture_Graphic_T-Shirt.png",
             "custom_title": "",
             "custom_price": "",
+            "custom_subtitle": "",
             "custom_link": "",
             "drop_offset": 0,
             "initial_scale": 100,
@@ -249,6 +264,8 @@
         "initial_width": 110,
         "hover_width": 260,
         "product_gap": 40,
+        "enable_container": true,
+        "container_width": 1180,
         "rail_sag": 40,
         "rail_thickness": 7,
         "enable_tilt": 3,
@@ -274,6 +291,137 @@
         "cta_url": "",
         "padding_top": 60,
         "padding_bottom": 48
+      }
+    },
+    "the_runway_lookbook": {
+      "type": "the-runway",
+      "blocks": {
+        "the_runway_look_1": {
+          "type": "look",
+          "settings": {
+            "title": "The City Edit",
+            "model_image": "shopify://shop_images/Urban_Culture_Striped_Oversized_T-Shirt.png",
+            "bundle_note": "",
+            "product_1": "cream-floral-sherwani",
+            "pin_1_x": 48,
+            "pin_1_y": 38,
+            "product_2": "ivory-gold-sherwani",
+            "pin_2_x": 48,
+            "pin_2_y": 72,
+            "product_3": "",
+            "pin_3_x": 50,
+            "pin_3_y": 50
+          }
+        },
+        "the_runway_look_2": {
+          "type": "look",
+          "settings": {
+            "title": "Gallery Opening",
+            "bundle_note": "Bundle tee & joggers and save 10%",
+            "product_1": "",
+            "pin_1_x": 50,
+            "pin_1_y": 36,
+            "product_2": "",
+            "pin_2_x": 48,
+            "pin_2_y": 70,
+            "product_3": "",
+            "pin_3_x": 50,
+            "pin_3_y": 50
+          }
+        },
+        "the_runway_look_3": {
+          "type": "look",
+          "settings": {
+            "title": "Street Edition",
+            "bundle_note": "Bundle tee & joggers and save 10%",
+            "product_1": "",
+            "pin_1_x": 50,
+            "pin_1_y": 36,
+            "product_2": "",
+            "pin_2_x": 48,
+            "pin_2_y": 70,
+            "product_3": "",
+            "pin_3_x": 50,
+            "pin_3_y": 50
+          }
+        },
+        "the_runway_look_4": {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "bundle_note": "Bundle tee & joggers and save 10%",
+            "product_1": "",
+            "pin_1_x": 50,
+            "pin_1_y": 36,
+            "product_2": "",
+            "pin_2_x": 48,
+            "pin_2_y": 70,
+            "product_3": "",
+            "pin_3_x": 50,
+            "pin_3_y": 50
+          }
+        },
+        "the_runway_look_5": {
+          "type": "look",
+          "settings": {
+            "title": "Night Runner",
+            "bundle_note": "Bundle tee & joggers and save 10%",
+            "product_1": "",
+            "pin_1_x": 50,
+            "pin_1_y": 36,
+            "product_2": "",
+            "pin_2_x": 48,
+            "pin_2_y": 70,
+            "product_3": "",
+            "pin_3_x": 50,
+            "pin_3_y": 50
+          }
+        },
+        "the_runway_look_6": {
+          "type": "look",
+          "settings": {
+            "title": "Atelier Edit",
+            "bundle_note": "Bundle tee & joggers and save 10%",
+            "product_1": "",
+            "pin_1_x": 50,
+            "pin_1_y": 36,
+            "product_2": "",
+            "pin_2_x": 48,
+            "pin_2_y": 70,
+            "product_3": "",
+            "pin_3_x": 50,
+            "pin_3_y": 50
+          }
+        }
+      },
+      "block_order": [
+        "the_runway_look_1",
+        "the_runway_look_2",
+        "the_runway_look_3",
+        "the_runway_look_4",
+        "the_runway_look_5",
+        "the_runway_look_6"
+      ],
+      "settings": {
+        "heading": "Try the Look.",
+        "subheading": "Curated tee & jogger sets. Tap a pin to see the piece.",
+        "layout_style": "ring",
+        "mobile_style": "ring",
+        "feel": "balanced",
+        "autoplay": true,
+        "speed": 5,
+        "blur": true,
+        "height_mode": "original",
+        "height_vh": 100,
+        "bundle_discount_code": "",
+        "color_stage": "#ffffff",
+        "color_panel": "#ffffff",
+        "color_text": "#151413",
+        "color_muted": "#66625c",
+        "color_accent": "#0e0e0e",
+        "color_on_accent": "#ffffff",
+        "color_card": "#dfdfdf",
+        "color_line": "#c8c8c8"
       }
     },
     "interactive_royal_mascot": {
@@ -918,105 +1066,6 @@
         "cta_label": "Explore Full Collection",
         "cta_url": "",
         "show_cta_arrow": true
-      }
-    },
-    "the_runway_lookbook": {
-      "type": "the-runway",
-      "blocks": {
-        "the_runway_look_1": {
-          "type": "look",
-          "settings": {
-            "title": "The City Edit",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 48,
-            "pin_1_y": 38,
-            "pin_2_x": 48,
-            "pin_2_y": 72
-          }
-        },
-        "the_runway_look_2": {
-          "type": "look",
-          "settings": {
-            "title": "Gallery Opening",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
-            "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
-          }
-        },
-        "the_runway_look_3": {
-          "type": "look",
-          "settings": {
-            "title": "Street Edition",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
-            "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
-          }
-        },
-        "the_runway_look_4": {
-          "type": "look",
-          "settings": {
-            "title": "Studio Day",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
-            "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
-          }
-        },
-        "the_runway_look_5": {
-          "type": "look",
-          "settings": {
-            "title": "Night Runner",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
-            "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
-          }
-        },
-        "the_runway_look_6": {
-          "type": "look",
-          "settings": {
-            "title": "Atelier Edit",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
-            "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
-          }
-        }
-      },
-      "block_order": [
-        "the_runway_look_1",
-        "the_runway_look_2",
-        "the_runway_look_3",
-        "the_runway_look_4",
-        "the_runway_look_5",
-        "the_runway_look_6"
-      ],
-      "settings": {
-        "heading": "Try the Look.",
-        "subheading": "Curated tee & jogger sets. Tap a pin to see the piece.",
-        "layout_style": "ring",
-        "mobile_style": "ring",
-        "feel": "balanced",
-        "autoplay": true,
-        "speed": 5,
-        "blur": true,
-        "height_mode": "original",
-        "height_vh": 100,
-        "color_stage": "#ffffff",
-        "color_panel": "#ffffff",
-        "color_text": "#151413",
-        "color_muted": "#66625c",
-        "color_accent": "#0e0e0e",
-        "color_on_accent": "#ffffff",
-        "color_card": "#DFDFDF",
-        "color_line": "#c8c8c8"
       }
     }
   },

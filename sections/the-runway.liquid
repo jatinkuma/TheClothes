@@ -1,0 +1,1451 @@
+{{ 'the-runway.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'the-runway.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign sec_heading = section.settings.heading | default: 'Try the Look.'
+  assign sec_subheading = section.settings.subheading | default: 'Six looks, styled head to toe. Tap a pin to see the piece.'
+  assign layout_style = section.settings.layout_style | default: 'ring'
+  assign mobile_style = section.settings.mobile_style | default: 'ring'
+  assign feel = section.settings.feel | default: 'balanced'
+  assign speed = section.settings.speed | default: 5000
+  assign autoplay = section.settings.autoplay
+  if autoplay == nil
+    assign autoplay = true
+  endif
+  assign blur = section.settings.blur
+  if blur == nil
+    assign blur = true
+  endif
+
+  assign look_count = section.blocks.size
+  if look_count == 0
+    assign look_count = 6
+  endif
+-%}
+
+<section id="shopify-section-{{ section.id }}" class="shopify-section section-the-runway">
+<runway-section
+  id="Runway-{{ section.id }}"
+  class="rw rw--add-icon rw--popup rw--list has-dividers has-border"
+  data-feel="{{ feel }}"
+  data-blur="{% if blur %}true{% else %}false{% endif %}"
+  data-mblur="{% if blur %}true{% else %}false{% endif %}"
+  data-style="{{ layout_style }}"
+  data-mstyle="{{ mobile_style }}"
+  data-fit="true"
+  data-height-mode="{{ section.settings.height_mode | default: 'original' }}"
+  data-height-vh="{{ section.settings.height_vh | default: 100 }}"
+  data-mheight-mode="{{ section.settings.mheight_mode | default: 'custom' }}"
+  data-mheight-vh="{{ section.settings.mheight_vh | default: 109 }}"
+  data-reflect="false"
+  data-autoplay="{% if autoplay %}true{% else %}false{% endif %}"
+  data-speed="{{ speed }}"
+  data-after-add="stay"
+  data-bundle-code="{{ section.settings.bundle_discount_code | escape }}"
+  data-msg-choose="Pick a size for: [items]"
+  data-msg-error="Couldn’t add to bag. Please try again."
+  data-msg-soldout="Sold out"
+  style="
+    --rw-c-stage: {{ section.settings.color_stage | default: '#ffffff' }};
+    --rw-c-panel: {{ section.settings.color_panel | default: '#ffffff' }};
+    --rw-c-text: {{ section.settings.color_text | default: '#151413' }};
+    --rw-c-muted: {{ section.settings.color_muted | default: '#66625c' }};
+    --rw-c-accent: {{ section.settings.color_accent | default: '#0e0e0e' }};
+    --rw-c-on-accent: {{ section.settings.color_on_accent | default: '#ffffff' }};
+    --rw-c-line: {{ section.settings.color_line | default: '#c8c8c8' }};
+    --rw-card: {{ section.settings.color_card | default: '#DFDFDF' }};
+    --rw-hf: var(--font-heading--family, inherit);
+    --rw-hw: var(--font-heading--weight, 400);
+    --rw-h-d: 46px; --rw-h-m: 24px;
+    --rw-sub-d: 12px; --rw-sub-m: 12px;
+    --rw-eyebrow-d: 11px; --rw-eyebrow-m: 10px;
+    --rw-label-d: 10px; --rw-label-m: 9px;
+    --rw-chip-d: 17px; --rw-chip-m: 18px;
+    --rw-ph-d: 18px; --rw-ph-m: 16px;
+    --rw-pt-size-d: 13px; --rw-pt-size-m: 12px;
+    --rw-price-d: 12px; --rw-price-m: 12px;
+    --rw-opt-d: 11px; --rw-opt-m: 11px;
+    --rw-total-d: 16px; --rw-total-m: 16px;
+    --rw-thumb-d: 92px; --rw-thumb-m: 62px;
+    --rw-tag-top: 18px; --rw-tag-left: 0px;
+    --rw-thumb-radius: 0px;
+    --rw-morph: 900ms; --rw-bar-r: 20px;
+    --rw-panel-w: 380px;
+    --rw-panel-pad-d: 32px;
+    --rw-radius: 0px;
+    --rw-max: none;
+    --rw-speed: {{ speed | divided_by: 1000.0 | default: 5 }}s;
+    --rw-ax: 40%;
+    --rw-btn-radius: 0px; --rw-pill-radius: 30px; --rw-add-radius: 20px;
+  "
+>
+  <div class="rw__sticky">
+    <div class="rw__grid">
+      <div class="rw__left">
+        <div class="rw__head">
+          <div class="rw__intro">
+            <h2 class="rw__title">{{ sec_heading | escape }}</h2>
+            <p class="rw__sub">{{ sec_subheading | escape }}</p>
+          </div>
+          <span class="rw__sr" aria-live="polite" aria-atomic="true" data-rw-live></span>
+        </div>
+
+        <div class="rw__stage" data-rw-stage tabindex="0" role="region" aria-roledescription="carousel" aria-label="Looks carousel">
+          <span class="rw__walk" aria-hidden="true"><span class="rw__walk-line"></span></span>
+
+          <!-- STAGE ACTORS (3D CAROUSEL) -->
+          <div class="rw__actors" data-rw-actors>
+            {%- for i in (0..5) -%}
+              {%- if i < look_count -%}
+                {%- assign blk = section.blocks[i] -%}
+                {%- assign l_idx = i -%}
+                {%- assign l_num = i | plus: 1 -%}
+                {%- assign default_title = 'The City Edit' -%}
+                {%- case i -%}
+                  {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}{%- assign fb_img = 'rw-model-1.webp' -%}
+                  {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}{%- assign fb_img = 'rw-model-5.webp' -%}
+                  {%- when 2 -%}{%- assign default_title = 'Gallery Opening' -%}{%- assign fb_img = 'rw-model-4.webp' -%}
+                  {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-6.webp' -%}
+                  {%- when 4 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-3.webp' -%}
+                  {%- when 5 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-2.webp' -%}
+                {%- endcase -%}
+                {%- assign l_title = blk.settings.title | default: default_title -%}
+                {%- assign m_img = blk.settings.model_image -%}
+
+                <div class="rw__model" data-rw-model data-index="{{ l_idx }}" aria-hidden="true" {% if blk %}{{ blk.shopify_attributes }}{% endif %}>
+                  <span class="rw__shadow" aria-hidden="true"></span>
+                  <div class="rw__figure" style="--rw-ar: 0.5625;">
+                    <div class="rw__art">
+                      {%- if m_img != blank -%}
+                        <img src="{{ m_img | image_url: width: 1100 }}" alt="{{ l_title | escape }}" srcset="{{ m_img | image_url: width: 360 }} 360w, {{ m_img | image_url: width: 540 }} 540w, {{ m_img | image_url: width: 720 }} 720w, {{ m_img | image_url: width: 900 }} 900w, {{ m_img | image_url: width: 1100 }} 1100w" width="1100" height="1956" loading="lazy" sizes="(min-width: 750px) 320px, 220px" draggable="false">
+                      {%- else -%}
+                        <img src="{{ fb_img | asset_url }}" alt="{{ l_title | escape }}" srcset="{{ fb_img | asset_url }} 1100w" width="1100" height="1956" loading="lazy" sizes="(min-width: 750px) 320px, 220px" draggable="false">
+                      {%- endif -%}
+                      <button type="button" class="rw__hit" data-rw-go="{{ l_idx }}" aria-label="Look {{ l_num }}: {{ l_title | escape }}" tabindex="-1"></button>
+                    </div>
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          <!-- FOREGROUND HEROES (ACTIVE LOOK WITH HOTSPOT PINS) -->
+          <div class="rw__heroes" data-rw-heroes>
+            {%- for i in (0..5) -%}
+              {%- if i < look_count -%}
+                {%- assign blk = section.blocks[i] -%}
+                {%- assign l_idx = i -%}
+                {%- assign l_num = i | plus: 1 -%}
+                {%- assign default_title = 'The City Edit' -%}
+                {%- case i -%}
+                  {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}{%- assign fb_img = 'rw-model-1.webp' -%}
+                  {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}{%- assign fb_img = 'rw-model-5.webp' -%}
+                  {%- when 2 -%}{%- assign default_title = 'Gallery Opening' -%}{%- assign fb_img = 'rw-model-4.webp' -%}
+                  {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-6.webp' -%}
+                  {%- when 4 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-3.webp' -%}
+                  {%- when 5 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-2.webp' -%}
+                {%- endcase -%}
+                {%- assign l_title = blk.settings.title | default: default_title -%}
+                {%- assign m_img = blk.settings.model_image -%}
+
+                {%- if m_img != blank -%}
+                  {%- assign probe_url = m_img | image_url: width: 96 -%}
+                  {%- assign hero_img_url = m_img | image_url: width: 1100 -%}
+                {%- else -%}
+                  {%- assign probe_url = fb_img | asset_url -%}
+                  {%- assign hero_img_url = fb_img | asset_url -%}
+                {%- endif -%}
+
+                <div class="rw__hero{% if l_idx == 0 %} is-on{% endif %}" data-rw-hero data-index="{{ l_idx }}" data-name="{{ l_title | escape }}" data-label="Look {{ l_num }}: {{ l_title | escape }}" data-probe="{{ probe_url }}" {% if blk %}{{ blk.shopify_attributes }}{% endif %}>
+                  <div class="rw__morph">
+                    <span class="rw__shadow" aria-hidden="true"></span>
+                    <div class="rw__figure" style="--rw-ar: 0.5625;">
+                      <div class="rw__art">
+                        <img src="{{ hero_img_url }}" alt="{{ l_title | escape }}" width="1100" height="1956" loading="{% if l_idx == 0 %}eager{% else %}lazy{% endif %}" sizes="(min-width: 750px) 320px, 220px" draggable="false">
+                        <button type="button" class="rw__zoom" data-rw-zoom aria-label="View look: {{ l_title | escape }}" tabindex="-1"></button>
+                        <div class="rw__pins">
+                          {%- if blk.settings.product_1 != blank -%}
+                            <button type="button" class="rw__pin" data-rw-pin="1" data-tip="{{ blk.settings.product_1.title | escape }}" style="left: {{ blk.settings.pin_1_x | default: 47 }}%; top: {{ blk.settings.pin_1_y | default: 27 }}%; --pi: 1;" aria-label="1: {{ blk.settings.product_1.title | escape }}" tabindex="-1">
+                              <span class="rw__pin-dot" aria-hidden="true">1</span>
+                            </button>
+                            {%- if blk.settings.product_2 != blank -%}
+                              <button type="button" class="rw__pin" data-rw-pin="2" data-tip="{{ blk.settings.product_2.title | escape }}" style="left: {{ blk.settings.pin_2_x | default: 48 }}%; top: {{ blk.settings.pin_2_y | default: 58 }}%; --pi: 2;" aria-label="2: {{ blk.settings.product_2.title | escape }}" tabindex="-1">
+                                <span class="rw__pin-dot" aria-hidden="true">2</span>
+                              </button>
+                            {%- endif -%}
+                            {%- if blk.settings.product_3 != blank -%}
+                              <button type="button" class="rw__pin" data-rw-pin="3" data-tip="{{ blk.settings.product_3.title | escape }}" style="left: {{ blk.settings.pin_3_x | default: 45 }}%; top: {{ blk.settings.pin_3_y | default: 88 }}%; --pi: 3;" aria-label="3: {{ blk.settings.product_3.title | escape }}" tabindex="-1">
+                                <span class="rw__pin-dot" aria-hidden="true">3</span>
+                              </button>
+                            {%- endif -%}
+                            {%- if blk.settings.product_4 != blank -%}
+                              <button type="button" class="rw__pin" data-rw-pin="4" data-tip="{{ blk.settings.product_4.title | escape }}" style="left: {{ blk.settings.pin_4_x | default: 50 }}%; top: {{ blk.settings.pin_4_y | default: 50 }}%; --pi: 4;" aria-label="4: {{ blk.settings.product_4.title | escape }}" tabindex="-1">
+                                <span class="rw__pin-dot" aria-hidden="true">4</span>
+                              </button>
+                            {%- endif -%}
+                          {%- else -%}
+                            {%- case l_idx -%}
+                              {%- when 0 -%}
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Air Jordan 12 Retro" style="left: 47%; top: 27%; --pi: 1;" aria-label="1: Air Jordan 12 Retro" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Tshirt" style="left: 48%; top: 58%; --pi: 2;" aria-label="2: Tshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="3" data-tip="Sweatshirt" style="left: 45%; top: 96%; --pi: 3;" aria-label="3: Sweatshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">3</span></button>
+                              {%- when 1 -%}
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Tatum 5 Orbit" style="left: 50%; top: 28%; --pi: 1;" aria-label="1: Tatum 5 Orbit" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Hoodie Black" style="left: 48%; top: 58%; --pi: 2;" aria-label="2: Hoodie Black" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="3" data-tip="Tshirt" style="left: 45%; top: 88%; --pi: 3;" aria-label="3: Tshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">3</span></button>
+                              {%- when 2 -%}
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Sweatshirt Plus" style="left: 50%; top: 28%; --pi: 1;" aria-label="1: Sweatshirt Plus" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Tatum 5 Orbit" style="left: 48%; top: 58%; --pi: 2;" aria-label="2: Tatum 5 Orbit" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="3" data-tip="Tshirt" style="left: 45%; top: 88%; --pi: 3;" aria-label="3: Tshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">3</span></button>
+                              {%- when 3 -%}
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Hoodie Black" style="left: 50%; top: 28%; --pi: 1;" aria-label="1: Hoodie Black" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Air Jordan 12 Retro" style="left: 48%; top: 58%; --pi: 2;" aria-label="2: Air Jordan 12 Retro" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="3" data-tip="Tshirt" style="left: 45%; top: 88%; --pi: 3;" aria-label="3: Tshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">3</span></button>
+                              {%- when 4 -%}
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Sweatshirt" style="left: 50%; top: 28%; --pi: 1;" aria-label="1: Sweatshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Tatum 5 Orbit" style="left: 48%; top: 58%; --pi: 2;" aria-label="2: Tatum 5 Orbit" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="3" data-tip="Tshirt" style="left: 45%; top: 88%; --pi: 3;" aria-label="3: Tshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">3</span></button>
+                              {%- when 5 -%}
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Hoodie" style="left: 50%; top: 28%; --pi: 1;" aria-label="1: Hoodie" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Luka 5" style="left: 48%; top: 58%; --pi: 2;" aria-label="2: Luka 5" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="3" data-tip="Tshirt" style="left: 45%; top: 88%; --pi: 3;" aria-label="3: Tshirt" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">3</span></button>
+                            {%- endcase -%}
+                          {%- endif -%}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          <!-- CONTROLS & TICKS -->
+          <div class="rw__controls">
+            <button type="button" class="rw__icon" data-rw-prev aria-label="Previous look">
+              <svg width="26" height="14" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M25 7H1M7 1L1 7l6 6"/></svg>
+            </button>
+            <div class="rw__ticks">
+              {%- for i in (0..5) -%}
+                {%- if i < look_count -%}
+                  {%- assign blk = section.blocks[i] -%}
+                  {%- assign l_idx = i -%}
+                  {%- assign l_num = i | plus: 1 -%}
+                  {%- assign default_title = 'The City Edit' -%}
+                  {%- case i -%}
+                    {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}
+                    {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}
+                    {%- when 2 -%}{%- assign default_title = 'Gallery Opening' -%}
+                    {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}
+                    {%- when 4 -%}{%- assign default_title = 'Studio Day' -%}
+                    {%- when 5 -%}{%- assign default_title = 'Studio Day' -%}
+                  {%- endcase -%}
+                  {%- assign l_title = blk.settings.title | default: default_title -%}
+
+                  <button type="button" class="rw__tick" data-rw-tick="{{ l_idx }}" aria-current="{% if l_idx == 0 %}true{% else %}false{% endif %}" aria-label="Look {{ l_num }}: {{ l_title | escape }}">
+                    <span class="rw__tick-bar" aria-hidden="true"></span>
+                    <span class="rw__tick-label" aria-hidden="true">0{{ l_num }}<span class="rw__tick-name">&nbsp;&nbsp;{{ l_title | escape }}</span></span>
+                  </button>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+            <button type="button" class="rw__icon" data-rw-next aria-label="Next look">
+              <svg width="26" height="14" viewBox="0 0 26 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M1 7h24M19 1l6 6-6 6"/></svg>
+            </button>
+            <button type="button" class="rw__icon rw__auto" data-rw-auto-toggle aria-label="Pause autoplay">
+              <svg class="rw__i-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 3v18M18 3v18"/></svg>
+              <svg class="rw__i-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M6 3l13 9-13 9V3z"/></svg>
+            </button>
+          </div>
+
+          <!-- LIGHTBOX MODAL -->
+          <div class="rw__lb" data-rw-lb data-word="Look" role="region" aria-label="View look" aria-hidden="true">
+            <div class="rw__lb-stage" data-rw-lb-stage></div>
+            <div class="rw__lb-top">
+              <p class="rw__lb-cap"><span class="rw__lb-kicker" data-rw-lb-kicker></span><span class="rw__lb-name" data-rw-lb-name></span></p>
+              <button type="button" class="rw__lb-close" data-rw-zoom-close aria-label="Close">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+              </button>
+            </div>
+            <p class="rw__lb-hint">Tap a dot to shop the piece</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR LOOKBOOK PANEL -->
+      <aside class="rw__panel has-rule" aria-label="In this look">
+        <div class="rw__panel-inner">
+          <div class="rw__panel-head">
+            <h3 class="rw__panel-title">In this look</h3>
+            <span class="rw__label" data-rw-pieces>3 pieces</span>
+          </div>
+
+          {%- for i in (0..5) -%}
+            {%- if i < look_count -%}
+              {%- assign blk = section.blocks[i] -%}
+              {%- assign l_idx = i -%}
+              {%- assign l_num = i | plus: 1 -%}
+              {%- assign default_title = 'The City Edit' -%}
+              {%- case i -%}
+                {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}
+                {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}
+                {%- when 2 -%}{%- assign default_title = 'Gallery Opening' -%}
+                {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}
+                {%- when 4 -%}{%- assign default_title = 'Studio Day' -%}
+                {%- when 5 -%}{%- assign default_title = 'Studio Day' -%}
+              {%- endcase -%}
+              {%- assign l_title = blk.settings.title | default: default_title -%}
+
+              <div class="rw__look-panel{% if l_idx == 0 %} is-in{% endif %}" data-rw-panel="{{ l_idx }}"{% unless l_idx == 0 %} hidden{% endunless %} {% if blk %}{{ blk.shopify_attributes }}{% endif %}>
+                <div class="rw__mhead">
+                  <span class="rw__mhead-title">{{ l_title | escape }}</span>
+                  <span class="rw__label">3 pieces</span>
+                </div>
+
+                <ul class="rw__items" role="list">
+                  {%- if blk.settings.product_1 != blank -%}
+                    {%- for p_i in (1..4) -%}
+                      {%- capture p_key -%}product_{{ p_i }}{%- endcapture -%}
+                      {%- assign prod = blk.settings[p_key] -%}
+                      {%- if prod != blank -%}
+                        <li class="rw__item" data-rw-card="{{ p_i }}" style="--i: {{ p_i }};" data-title="{{ prod.title | escape }}">
+                          <a class="rw__media" href="{{ prod.url }}" tabindex="-1" aria-hidden="true">
+                            <img src="{{ prod.featured_image | image_url: width: 400 }}" alt="{{ prod.title | escape }}" width="400" height="400" loading="lazy" sizes="110px">
+                            <span class="rw__num">{{ p_i }}</span>
+                          </a>
+                          <div class="rw__info">
+                            <span class="rw__type">{{ prod.vendor | default: 'Shop' }}</span>
+                            <a class="rw__name" href="{{ prod.url }}">{{ prod.title | escape }}</a>
+                            <span class="rw__price"><span>{{ prod.price | money }}</span></span>
+                          </div>
+                          <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look_{{ blk.id }}-{{ p_i }}" aria-label="Add to bag: {{ prod.title | escape }}" data-added-label="Added to bag: {{ prod.title | escape }}">
+                            <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                            <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                            <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                          </button>
+                          <div class="rw__picker" id="Picker-{{ section.id }}-look_{{ blk.id }}-{{ p_i }}" data-rw-picker hidden>
+                            <div class="rw__picker-head">
+                              <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ prod.featured_image | image_url: width: 160 }}" alt="" width="160" height="160" loading="lazy"></span>
+                              <span class="rw__picker-meta">
+                                <span class="rw__picker-title">{{ prod.title | escape }}</span>
+                                <span class="rw__picker-price">{{ prod.price | money }}</span>
+                              </span>
+                              <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                              </button>
+                            </div>
+                            {%- for option in prod.options_with_values -%}
+                              <fieldset class="rw__opt">
+                                <legend class="rw__opt-name">{{ option.name }}</legend>
+                                <div class="rw__opt-values">
+                                  {%- for val in option.values -%}
+                                    <label class="rw__pill">
+                                      <input type="radio" name="Opt-{{ section.id }}-look_{{ blk.id }}-{{ p_i }}-{{ forloop.parentloop.index0 }}" value="{{ val | escape }}" data-rw-option="{{ forloop.parentloop.index0 }}"{% if forloop.first %} checked{% endif %}>
+                                      <span class="rw__pill-label">{{ val | escape }}</span>
+                                    </label>
+                                  {%- endfor -%}
+                                </div>
+                              </fieldset>
+                            {%- endfor -%}
+                            <button type="button" class="rw__confirm" data-rw-confirm>
+                              <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                              <span class="rw__sr"> — {{ prod.title | escape }}</span>
+                            </button>
+                            <script type="application/json" data-rw-variants>
+                              [
+                                {%- for v in prod.variants -%}
+                                  {"id":{{ v.id }},"a":{{ v.available | json }},"o":{{ v.options | json }}}{%- unless forloop.last -%},{%- endunless -%}
+                                {%- endfor -%}
+                              ]
+                            </script>
+                          </div>
+                        </li>
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- else -%}
+                    <!-- DEMO PRODUCTS FOR LOOK {{ l_idx }} -->
+                    {%- case l_idx -%}
+                      {%- when 0 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Air Jordan 12 Retro">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-2.png' | asset_url }}" alt="Air Jordan 12 Retro" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Air Jordan 12 Retro</a>
+                        <span class="rw__price"><span>$149.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-0-1" aria-label="Add to bag: Air Jordan 12 Retro" data-added-label="Added to bag: Air Jordan 12 Retro">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-0-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-2.png' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Air Jordan 12 Retro</span>
+                            <span class="rw__picker-price">$149.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Shoe size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="40" data-rw-option="0" checked><span class="rw__pill-label">40</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="41" data-rw-option="0"><span class="rw__pill-label">41</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="42" data-rw-option="0"><span class="rw__pill-label">42</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="43" data-rw-option="0"><span class="rw__pill-label">43</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="44" data-rw-option="0"><span class="rw__pill-label">44</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="45" data-rw-option="0"><span class="rw__pill-label">45</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-1" value="46" data-rw-option="0"><span class="rw__pill-label">46</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Air Jordan 12 Retro</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015167025457,"a":true,"o":["40"]},{"id":57015167058225,"a":true,"o":["41"]},{"id":57015167090993,"a":true,"o":["42"]},{"id":57015167123761,"a":true,"o":["43"]},{"id":57015167156529,"a":true,"o":["44"]},{"id":57015167189297,"a":true,"o":["45"]},{"id":57015167222065,"a":true,"o":["46"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Tshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Tshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-0-2" aria-label="Add to bag: Tshirt" data-added-label="Added to bag: Tshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-0-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-2" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-2" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-2" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-2" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-2" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["L"]},{"id":56835911647537,"a":true,"o":["XL"]},{"id":56835911680305,"a":true,"o":["XXL"]},{"id":56835911713073,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="3" style="--i: 3;" data-title="Sweatshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="Sweatshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">3</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Sweatshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-0-3" aria-label="Add to bag: Sweatshirt" data-added-label="Added to bag: Sweatshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-0-3" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Sweatshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-3" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-3" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-3" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-3" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-0-3" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Sweatshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835806396721,"a":true,"o":["S"]},{"id":56835806429489,"a":true,"o":["L"]},{"id":56835806462257,"a":true,"o":["XL"]},{"id":56835806495025,"a":true,"o":["XXL"]},{"id":56835806527793,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                      {%- when 1 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Tatum 5 Orbit">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-1.png' | asset_url }}" alt="Tatum 5 Orbit" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tatum 5 Orbit</a>
+                        <span class="rw__price"><span>$149.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-1-1" aria-label="Add to bag: Tatum 5 Orbit" data-added-label="Added to bag: Tatum 5 Orbit">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-1-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-1.png' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tatum 5 Orbit</span>
+                            <span class="rw__picker-price">$149.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Shoe size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="40" data-rw-option="0" checked><span class="rw__pill-label">40</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="41" data-rw-option="0"><span class="rw__pill-label">41</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="42" data-rw-option="0"><span class="rw__pill-label">42</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="43" data-rw-option="0"><span class="rw__pill-label">43</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="44" data-rw-option="0"><span class="rw__pill-label">44</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="45" data-rw-option="0"><span class="rw__pill-label">45</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-1" value="46" data-rw-option="0"><span class="rw__pill-label">46</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tatum 5 Orbit</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015166730545,"a":true,"o":["40"]},{"id":57015166763313,"a":true,"o":["41"]},{"id":57015166796081,"a":true,"o":["42"]},{"id":57015166828849,"a":true,"o":["43"]},{"id":57015166861617,"a":true,"o":["44"]},{"id":57015166894385,"a":true,"o":["45"]},{"id":57015166927153,"a":true,"o":["46"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Hoodie Black">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-110147.webp' | asset_url }}" alt="Hoodie Black" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Hoodie Black</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-1-2" aria-label="Add to bag: Hoodie Black" data-added-label="Added to bag: Hoodie Black">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-1-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-110147.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Hoodie Black</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-2" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-2" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-2" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-2" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-2" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Hoodie Black</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56836251681073,"a":true,"o":["S"]},{"id":56836251713841,"a":true,"o":["L"]},{"id":56836251746609,"a":true,"o":["XL"]},{"id":56836251779377,"a":true,"o":["XXL"]},{"id":56836251812145,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="3" style="--i: 3;" data-title="Tshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Tshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">3</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-1-3" aria-label="Add to bag: Tshirt" data-added-label="Added to bag: Tshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-1-3" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-3" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-3" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-3" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-3" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-1-3" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["L"]},{"id":56835911647537,"a":true,"o":["XL"]},{"id":56835911680305,"a":true,"o":["XXL"]},{"id":56835911713073,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                      {%- when 2 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Sweatshirt Plus">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151659.webp' | asset_url }}" alt="Sweatshirt Plus" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Sweatshirt Plus</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-2-1" aria-label="Add to bag: Sweatshirt Plus" data-added-label="Added to bag: Sweatshirt Plus">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-2-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151659.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Sweatshirt Plus</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-1" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Sweatshirt Plus</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56836143743281,"a":true,"o":["S"]},{"id":56836143776049,"a":true,"o":["L"]},{"id":56836143808817,"a":true,"o":["XL"]},{"id":56836143841585,"a":true,"o":["XXL"]},{"id":56836143874353,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Tatum 5 Orbit">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-1.png' | asset_url }}" alt="Tatum 5 Orbit" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tatum 5 Orbit</a>
+                        <span class="rw__price"><span>$149.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-2-2" aria-label="Add to bag: Tatum 5 Orbit" data-added-label="Added to bag: Tatum 5 Orbit">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-2-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-1.png' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tatum 5 Orbit</span>
+                            <span class="rw__picker-price">$149.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Shoe size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="40" data-rw-option="0" checked><span class="rw__pill-label">40</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="41" data-rw-option="0"><span class="rw__pill-label">41</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="42" data-rw-option="0"><span class="rw__pill-label">42</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="43" data-rw-option="0"><span class="rw__pill-label">43</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="44" data-rw-option="0"><span class="rw__pill-label">44</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="45" data-rw-option="0"><span class="rw__pill-label">45</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-2" value="46" data-rw-option="0"><span class="rw__pill-label">46</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tatum 5 Orbit</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015166730545,"a":true,"o":["40"]},{"id":57015166763313,"a":true,"o":["41"]},{"id":57015166796081,"a":true,"o":["42"]},{"id":57015166828849,"a":true,"o":["43"]},{"id":57015166861617,"a":true,"o":["44"]},{"id":57015166894385,"a":true,"o":["45"]},{"id":57015166927153,"a":true,"o":["46"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="3" style="--i: 3;" data-title="Tshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Tshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">3</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-2-3" aria-label="Add to bag: Tshirt" data-added-label="Added to bag: Tshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-2-3" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-3" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-3" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-3" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-3" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-2-3" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["L"]},{"id":56835911647537,"a":true,"o":["XL"]},{"id":56835911680305,"a":true,"o":["XXL"]},{"id":56835911713073,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                      {%- when 3 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Hoodie Black">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-110147.webp' | asset_url }}" alt="Hoodie Black" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Hoodie Black</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-3-1" aria-label="Add to bag: Hoodie Black" data-added-label="Added to bag: Hoodie Black">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-3-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-110147.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Hoodie Black</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-1" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Hoodie Black</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56836251681073,"a":true,"o":["S"]},{"id":56836251713841,"a":true,"o":["L"]},{"id":56836251746609,"a":true,"o":["XL"]},{"id":56836251779377,"a":true,"o":["XXL"]},{"id":56836251812145,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Air Jordan 12 Retro">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-2.png' | asset_url }}" alt="Air Jordan 12 Retro" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Air Jordan 12 Retro</a>
+                        <span class="rw__price"><span>$149.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-3-2" aria-label="Add to bag: Air Jordan 12 Retro" data-added-label="Added to bag: Air Jordan 12 Retro">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-3-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-2.png' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Air Jordan 12 Retro</span>
+                            <span class="rw__picker-price">$149.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Shoe size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="40" data-rw-option="0" checked><span class="rw__pill-label">40</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="41" data-rw-option="0"><span class="rw__pill-label">41</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="42" data-rw-option="0"><span class="rw__pill-label">42</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="43" data-rw-option="0"><span class="rw__pill-label">43</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="44" data-rw-option="0"><span class="rw__pill-label">44</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="45" data-rw-option="0"><span class="rw__pill-label">45</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-2" value="46" data-rw-option="0"><span class="rw__pill-label">46</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Air Jordan 12 Retro</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015167025457,"a":true,"o":["40"]},{"id":57015167058225,"a":true,"o":["41"]},{"id":57015167090993,"a":true,"o":["42"]},{"id":57015167123761,"a":true,"o":["43"]},{"id":57015167156529,"a":true,"o":["44"]},{"id":57015167189297,"a":true,"o":["45"]},{"id":57015167222065,"a":true,"o":["46"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="3" style="--i: 3;" data-title="Tshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Tshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">3</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-3-3" aria-label="Add to bag: Tshirt" data-added-label="Added to bag: Tshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-3-3" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-3" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-3" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-3" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-3" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-3-3" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["L"]},{"id":56835911647537,"a":true,"o":["XL"]},{"id":56835911680305,"a":true,"o":["XXL"]},{"id":56835911713073,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                      {%- when 4 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Sweatshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="Sweatshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Sweatshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-4-1" aria-label="Add to bag: Sweatshirt" data-added-label="Added to bag: Sweatshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-4-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Sweatshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-1" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Sweatshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835806396721,"a":true,"o":["S"]},{"id":56835806429489,"a":true,"o":["L"]},{"id":56835806462257,"a":true,"o":["XL"]},{"id":56835806495025,"a":true,"o":["XXL"]},{"id":56835806527793,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Tatum 5 Orbit">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-1.png' | asset_url }}" alt="Tatum 5 Orbit" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tatum 5 Orbit</a>
+                        <span class="rw__price"><span>$149.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-4-2" aria-label="Add to bag: Tatum 5 Orbit" data-added-label="Added to bag: Tatum 5 Orbit">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-4-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-1.png' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tatum 5 Orbit</span>
+                            <span class="rw__picker-price">$149.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Shoe size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="40" data-rw-option="0" checked><span class="rw__pill-label">40</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="41" data-rw-option="0"><span class="rw__pill-label">41</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="42" data-rw-option="0"><span class="rw__pill-label">42</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="43" data-rw-option="0"><span class="rw__pill-label">43</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="44" data-rw-option="0"><span class="rw__pill-label">44</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="45" data-rw-option="0"><span class="rw__pill-label">45</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-2" value="46" data-rw-option="0"><span class="rw__pill-label">46</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tatum 5 Orbit</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015166730545,"a":true,"o":["40"]},{"id":57015166763313,"a":true,"o":["41"]},{"id":57015166796081,"a":true,"o":["42"]},{"id":57015166828849,"a":true,"o":["43"]},{"id":57015166861617,"a":true,"o":["44"]},{"id":57015166894385,"a":true,"o":["45"]},{"id":57015166927153,"a":true,"o":["46"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="3" style="--i: 3;" data-title="Tshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Tshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">3</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-4-3" aria-label="Add to bag: Tshirt" data-added-label="Added to bag: Tshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-4-3" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-3" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-3" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-3" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-3" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-4-3" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["L"]},{"id":56835911647537,"a":true,"o":["XL"]},{"id":56835911680305,"a":true,"o":["XXL"]},{"id":56835911713073,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                      {%- when 5 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Hoodie">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151440.webp' | asset_url }}" alt="Hoodie" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Hoodie</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-5-1" aria-label="Add to bag: Hoodie" data-added-label="Added to bag: Hoodie">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-5-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151440.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Hoodie</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-1" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Hoodie</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56836002185521,"a":true,"o":["S"]},{"id":56836002218289,"a":true,"o":["L"]},{"id":56836002251057,"a":true,"o":["XL"]},{"id":56836002283825,"a":true,"o":["XXL"]},{"id":56836002316593,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Luka 5">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-4.png' | asset_url }}" alt="Luka 5" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Luka 5</a>
+                        <span class="rw__price"><span>$149.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-5-2" aria-label="Add to bag: Luka 5" data-added-label="Added to bag: Luka 5">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-5-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-4.png' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Luka 5</span>
+                            <span class="rw__picker-price">$149.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Shoe size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="40" data-rw-option="0" checked><span class="rw__pill-label">40</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="41" data-rw-option="0"><span class="rw__pill-label">41</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="42" data-rw-option="0"><span class="rw__pill-label">42</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="43" data-rw-option="0"><span class="rw__pill-label">43</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="44" data-rw-option="0"><span class="rw__pill-label">44</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="45" data-rw-option="0"><span class="rw__pill-label">45</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-2" value="46" data-rw-option="0"><span class="rw__pill-label">46</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Luka 5</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015176364337,"a":true,"o":["40"]},{"id":57015176397105,"a":true,"o":["41"]},{"id":57015176429873,"a":true,"o":["42"]},{"id":57015176462641,"a":true,"o":["43"]},{"id":57015176495409,"a":true,"o":["44"]},{"id":57015176528177,"a":true,"o":["45"]},{"id":57015176560945,"a":true,"o":["46"]}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="3" style="--i: 3;" data-title="Tshirt">
+                      <a class="rw__media" href="/products/tatum-5-orbit-copy" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Tshirt" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">3</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Nikey</span>
+                        <a class="rw__name" href="/products/tatum-5-orbit-copy">Tshirt</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-demo-5-3" aria-label="Add to bag: Tshirt" data-added-label="Added to bag: Tshirt">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-demo-5-3" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Tshirt</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-3" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-3" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-3" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-3" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-demo-5-3" value="3XL" data-rw-option="0"><span class="rw__pill-label">3XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Tshirt</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["L"]},{"id":56835911647537,"a":true,"o":["XL"]},{"id":56835911680305,"a":true,"o":["XXL"]},{"id":56835911713073,"a":true,"o":["3XL"]}]</script>
+                      </div>
+                    </li>
+                    {%- endcase -%}
+                  {%- endif -%}
+                </ul>
+
+                <div class="rw__bundle has-rule">
+                  <p class="rw__msg" data-rw-msg role="status" aria-live="polite"></p>
+                  <div class="rw__bundle-row">
+                    <div class="rw__bundle-copy">
+                      <span class="rw__bundle-title">Complete the look</span>
+                      <span class="rw__bundle-note">{{ blk.settings.bundle_note | default: 'Bundle all 3 and save 10%' }}</span>
+                    </div>
+                    <div class="rw__bundle-price">
+                      <s>$547.00</s>
+                      <strong>$492.30</strong>
+                    </div>
+                  </div>
+                  <button type="button" class="rw__cta" data-rw-all>
+                    <span class="rw__cta-add">Add full look to bag &rarr;</span>
+                    <span class="rw__cta-m">Add look &rarr;</span>
+                    <span class="rw__cta-done">Added to bag</span>
+                    <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                  </button>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <span class="rw__cursor" data-rw-cursor aria-hidden="true">
+    <span class="rw__cursor-in">
+      <span class="rw__cursor-label rw__cursor-drag">Drag</span>
+      <span class="rw__cursor-label rw__cursor-view">View</span>
+    </span>
+  </span>
+</runway-section>
+</section>
+
+{% schema %}
+{
+  "name": "Runway lookbook",
+  "tag": "section",
+  "class": "section-the-runway",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Try the Look."
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Six looks, styled head to toe. Tap a pin to see the piece."
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Layout style (Desktop)",
+      "options": [
+        { "value": "ring", "label": "3D Ring (Circular carousel)" },
+        { "value": "line", "label": "Linear runway" }
+      ],
+      "default": "ring"
+    },
+    {
+      "type": "select",
+      "id": "mobile_style",
+      "label": "Layout style (Mobile)",
+      "options": [
+        { "value": "ring", "label": "3D Ring" },
+        { "value": "line", "label": "Linear runway" }
+      ],
+      "default": "ring"
+    },
+    {
+      "type": "select",
+      "id": "feel",
+      "label": "Animation feel / physics",
+      "options": [
+        { "value": "soft", "label": "Soft & silky" },
+        { "value": "balanced", "label": "Balanced (Natural)" },
+        { "value": "snappy", "label": "Snappy & fast" }
+      ],
+      "default": "balanced"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Enable autoplay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 2000,
+      "max": 10000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Autoplay speed",
+      "default": 5000
+    },
+    {
+      "type": "checkbox",
+      "id": "blur",
+      "label": "Depth blur on distant models",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "height_mode",
+      "label": "Section height mode",
+      "options": [
+        { "value": "original", "label": "Original aspect ratio" },
+        { "value": "custom", "label": "Custom viewport height" }
+      ],
+      "default": "original"
+    },
+    {
+      "type": "range",
+      "id": "height_vh",
+      "min": 60,
+      "max": 120,
+      "step": 5,
+      "unit": "vh",
+      "label": "Custom viewport height",
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "bundle_discount_code",
+      "label": "Optional discount code",
+      "info": "Applied automatically at checkout when bundle CTA is clicked."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "color_stage",
+      "label": "Stage background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_panel",
+      "label": "Panel background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text color",
+      "default": "#151413"
+    },
+    {
+      "type": "color",
+      "id": "color_muted",
+      "label": "Muted text",
+      "default": "#66625c"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent / Button color",
+      "default": "#0e0e0e"
+    },
+    {
+      "type": "color",
+      "id": "color_on_accent",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_card",
+      "label": "Card background",
+      "default": "#DFDFDF"
+    },
+    {
+      "type": "color",
+      "id": "color_line",
+      "label": "Border lines",
+      "default": "#c8c8c8"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "look",
+      "name": "Look",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Look title",
+          "default": "The City Edit"
+        },
+        {
+          "type": "image_picker",
+          "id": "model_image",
+          "label": "Model image"
+        },
+        {
+          "type": "text",
+          "id": "bundle_note",
+          "label": "Bundle note",
+          "default": "Bundle all 3 and save 10%"
+        },
+        {
+          "type": "header",
+          "content": "Piece 1"
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "Product 1"
+        },
+        {
+          "type": "range",
+          "id": "pin_1_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 1 X (left)",
+          "default": 47
+        },
+        {
+          "type": "range",
+          "id": "pin_1_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 1 Y (top)",
+          "default": 27
+        },
+        {
+          "type": "header",
+          "content": "Piece 2"
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "Product 2"
+        },
+        {
+          "type": "range",
+          "id": "pin_2_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 2 X (left)",
+          "default": 48
+        },
+        {
+          "type": "range",
+          "id": "pin_2_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 2 Y (top)",
+          "default": 58
+        },
+        {
+          "type": "header",
+          "content": "Piece 3"
+        },
+        {
+          "type": "product",
+          "id": "product_3",
+          "label": "Product 3"
+        },
+        {
+          "type": "range",
+          "id": "pin_3_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 3 X (left)",
+          "default": 45
+        },
+        {
+          "type": "range",
+          "id": "pin_3_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 3 Y (top)",
+          "default": 88
+        },
+        {
+          "type": "header",
+          "content": "Piece 4 (Optional)"
+        },
+        {
+          "type": "product",
+          "id": "product_4",
+          "label": "Product 4"
+        },
+        {
+          "type": "range",
+          "id": "pin_4_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 4 X (left)",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "pin_4_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 4 Y (top)",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Runway lookbook",
+      "blocks": [
+        {
+          "type": "look",
+          "settings": {
+            "title": "The City Edit",
+            "pin_1_x": 47,
+            "pin_1_y": 27,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 96
+          }
+        },
+        {
+          "type": "look",
+          "settings": {
+            "title": "Gallery Opening",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        {
+          "type": "look",
+          "settings": {
+            "title": "Gallery Opening",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

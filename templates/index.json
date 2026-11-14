@@ -919,10 +919,122 @@
         "cta_url": "",
         "show_cta_arrow": true
       }
+    },
+    "the_runway_lookbook": {
+      "type": "the-runway",
+      "blocks": {
+        "the_runway_look_1": {
+          "type": "look",
+          "settings": {
+            "title": "The City Edit",
+            "bundle_note": "Bundle all 3 and save 10%",
+            "pin_1_x": 47,
+            "pin_1_y": 27,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 96
+          }
+        },
+        "the_runway_look_2": {
+          "type": "look",
+          "settings": {
+            "title": "Gallery Opening",
+            "bundle_note": "Bundle all 3 and save 10%",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        "the_runway_look_3": {
+          "type": "look",
+          "settings": {
+            "title": "Gallery Opening",
+            "bundle_note": "Bundle all 3 and save 10%",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        "the_runway_look_4": {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "bundle_note": "Bundle all 3 and save 10%",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        "the_runway_look_5": {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "bundle_note": "Bundle all 3 and save 10%",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        },
+        "the_runway_look_6": {
+          "type": "look",
+          "settings": {
+            "title": "Studio Day",
+            "bundle_note": "Bundle all 3 and save 10%",
+            "pin_1_x": 50,
+            "pin_1_y": 28,
+            "pin_2_x": 48,
+            "pin_2_y": 58,
+            "pin_3_x": 45,
+            "pin_3_y": 88
+          }
+        }
+      },
+      "block_order": [
+        "the_runway_look_1",
+        "the_runway_look_2",
+        "the_runway_look_3",
+        "the_runway_look_4",
+        "the_runway_look_5",
+        "the_runway_look_6"
+      ],
+      "settings": {
+        "heading": "Try the Look.",
+        "subheading": "Six looks, styled head to toe. Tap a pin to see the piece.",
+        "layout_style": "ring",
+        "mobile_style": "ring",
+        "feel": "balanced",
+        "autoplay": true,
+        "speed": 5000,
+        "blur": true,
+        "height_mode": "original",
+        "height_vh": 100,
+        "color_stage": "#ffffff",
+        "color_panel": "#ffffff",
+        "color_text": "#151413",
+        "color_muted": "#66625c",
+        "color_accent": "#0e0e0e",
+        "color_on_accent": "#ffffff",
+        "color_card": "#DFDFDF",
+        "color_line": "#c8c8c8"
+      }
     }
   },
   "order": [
     "hanging_slider_rail_zTKMBj",
+    "the_runway_lookbook",
     "interactive_royal_mascot",
     "hero_jVaWmY",
     "product_list_fa6P9H",

@@ -927,78 +927,66 @@
           "type": "look",
           "settings": {
             "title": "The City Edit",
-            "bundle_note": "Bundle all 3 and save 10%",
-            "pin_1_x": 47,
-            "pin_1_y": 27,
+            "bundle_note": "Bundle tee & joggers and save 10%",
+            "pin_1_x": 48,
+            "pin_1_y": 38,
             "pin_2_x": 48,
-            "pin_2_y": 58,
-            "pin_3_x": 45,
-            "pin_3_y": 96
+            "pin_2_y": 72
           }
         },
         "the_runway_look_2": {
           "type": "look",
           "settings": {
             "title": "Gallery Opening",
-            "bundle_note": "Bundle all 3 and save 10%",
+            "bundle_note": "Bundle tee & joggers and save 10%",
             "pin_1_x": 50,
-            "pin_1_y": 28,
+            "pin_1_y": 36,
             "pin_2_x": 48,
-            "pin_2_y": 58,
-            "pin_3_x": 45,
-            "pin_3_y": 88
+            "pin_2_y": 70
           }
         },
         "the_runway_look_3": {
           "type": "look",
           "settings": {
-            "title": "Gallery Opening",
-            "bundle_note": "Bundle all 3 and save 10%",
+            "title": "Street Edition",
+            "bundle_note": "Bundle tee & joggers and save 10%",
             "pin_1_x": 50,
-            "pin_1_y": 28,
+            "pin_1_y": 36,
             "pin_2_x": 48,
-            "pin_2_y": 58,
-            "pin_3_x": 45,
-            "pin_3_y": 88
+            "pin_2_y": 70
           }
         },
         "the_runway_look_4": {
           "type": "look",
           "settings": {
             "title": "Studio Day",
-            "bundle_note": "Bundle all 3 and save 10%",
+            "bundle_note": "Bundle tee & joggers and save 10%",
             "pin_1_x": 50,
-            "pin_1_y": 28,
+            "pin_1_y": 36,
             "pin_2_x": 48,
-            "pin_2_y": 58,
-            "pin_3_x": 45,
-            "pin_3_y": 88
+            "pin_2_y": 70
           }
         },
         "the_runway_look_5": {
           "type": "look",
           "settings": {
-            "title": "Studio Day",
-            "bundle_note": "Bundle all 3 and save 10%",
+            "title": "Night Runner",
+            "bundle_note": "Bundle tee & joggers and save 10%",
             "pin_1_x": 50,
-            "pin_1_y": 28,
+            "pin_1_y": 36,
             "pin_2_x": 48,
-            "pin_2_y": 58,
-            "pin_3_x": 45,
-            "pin_3_y": 88
+            "pin_2_y": 70
           }
         },
         "the_runway_look_6": {
           "type": "look",
           "settings": {
-            "title": "Studio Day",
-            "bundle_note": "Bundle all 3 and save 10%",
+            "title": "Atelier Edit",
+            "bundle_note": "Bundle tee & joggers and save 10%",
             "pin_1_x": 50,
-            "pin_1_y": 28,
+            "pin_1_y": 36,
             "pin_2_x": 48,
-            "pin_2_y": 58,
-            "pin_3_x": 45,
-            "pin_3_y": 88
+            "pin_2_y": 70
           }
         }
       },
@@ -1012,7 +1000,7 @@
       ],
       "settings": {
         "heading": "Try the Look.",
-        "subheading": "Six looks, styled head to toe. Tap a pin to see the piece.",
+        "subheading": "Curated tee & jogger sets. Tap a pin to see the piece.",
         "layout_style": "ring",
         "mobile_style": "ring",
         "feel": "balanced",

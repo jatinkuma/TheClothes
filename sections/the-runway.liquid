@@ -1,9 +1,30 @@
 {{ 'the-runway.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'the-runway.js' | asset_url }}" defer="defer"></script>
 
+<style>
+.rw__cat-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--rw-accent) 10%, transparent);
+  color: var(--rw-accent);
+  border: 1px solid color-mix(in srgb, var(--rw-accent) 22%, transparent);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.rw__tick-cat {
+  font-weight: 700;
+  opacity: 0.65;
+}
+</style>
+
 {%- liquid
   assign sec_heading = section.settings.heading | default: 'Try the Look.'
-  assign sec_subheading = section.settings.subheading | default: 'Curated tee & jogger sets. Tap a pin to see the piece.'
+  assign sec_subheading = section.settings.subheading | default: 'Curated Men, Women & Couple Sets. Tap a pin to see the piece.'
   assign layout_style = section.settings.layout_style | default: 'ring'
   assign mobile_style = section.settings.mobile_style | default: 'ring'
   assign feel = section.settings.feel | default: 'balanced'
@@ -41,7 +62,7 @@
   data-autoplay="{% if autoplay %}true{% else %}false{% endif %}"
   data-speed="{{ speed | times: 1000 }}"
   data-after-add="stay"
-  data-bundle-code="{{ section.settings.bundle_discount_code | escape }}"
+  data-money-format="{{ shop.money_format | escape }}"
   data-msg-choose="Pick a size for: [items]"
   data-msg-error="Couldn’t add to bag. Please try again."
   data-msg-soldout="Sold out"
@@ -102,12 +123,12 @@
                 {%- assign l_num = i | plus: 1 -%}
                 {%- assign default_title = 'The City Edit' -%}
                 {%- case i -%}
-                  {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}{%- assign fb_img = 'rw-model-1.webp' -%}
-                  {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}{%- assign fb_img = 'rw-model-5.webp' -%}
-                  {%- when 2 -%}{%- assign default_title = 'Street Edition' -%}{%- assign fb_img = 'rw-model-4.webp' -%}
-                  {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-6.webp' -%}
-                  {%- when 4 -%}{%- assign default_title = 'Night Runner' -%}{%- assign fb_img = 'rw-model-3.webp' -%}
-                  {%- when 5 -%}{%- assign default_title = 'Atelier Edit' -%}{%- assign fb_img = 'rw-model-2.webp' -%}
+                  {%- when 0 -%}{%- assign default_title = "Men's Street Set" -%}{%- assign fb_img = 'rw-model-1.webp' -%}
+                  {%- when 1 -%}{%- assign default_title = "Women's Atelier Fit" -%}{%- assign fb_img = 'rw-model-2.webp' -%}
+                  {%- when 2 -%}{%- assign default_title = 'Couple Tee Pair' -%}{%- assign fb_img = 'rw-model-3.webp' -%}
+                  {%- when 3 -%}{%- assign default_title = "Men's Utility Look" -%}{%- assign fb_img = 'rw-model-4.webp' -%}
+                  {%- when 4 -%}{%- assign default_title = "Women's Relaxed Fit" -%}{%- assign fb_img = 'rw-model-5.webp' -%}
+                  {%- when 5 -%}{%- assign default_title = 'His & Hers Matching Set' -%}{%- assign fb_img = 'rw-model-6.webp' -%}
                 {%- endcase -%}
                 {%- assign l_title = blk.settings.title | default: default_title -%}
                 {%- assign m_img = blk.settings.model_image -%}
@@ -138,12 +159,12 @@
                 {%- assign l_num = i | plus: 1 -%}
                 {%- assign default_title = 'The City Edit' -%}
                 {%- case i -%}
-                  {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}{%- assign fb_img = 'rw-model-1.webp' -%}
-                  {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}{%- assign fb_img = 'rw-model-5.webp' -%}
-                  {%- when 2 -%}{%- assign default_title = 'Street Edition' -%}{%- assign fb_img = 'rw-model-4.webp' -%}
-                  {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}{%- assign fb_img = 'rw-model-6.webp' -%}
-                  {%- when 4 -%}{%- assign default_title = 'Night Runner' -%}{%- assign fb_img = 'rw-model-3.webp' -%}
-                  {%- when 5 -%}{%- assign default_title = 'Atelier Edit' -%}{%- assign fb_img = 'rw-model-2.webp' -%}
+                  {%- when 0 -%}{%- assign default_title = "Men's Street Set" -%}{%- assign fb_img = 'rw-model-1.webp' -%}
+                  {%- when 1 -%}{%- assign default_title = "Women's Atelier Fit" -%}{%- assign fb_img = 'rw-model-2.webp' -%}
+                  {%- when 2 -%}{%- assign default_title = 'Couple Tee Pair' -%}{%- assign fb_img = 'rw-model-3.webp' -%}
+                  {%- when 3 -%}{%- assign default_title = "Men's Utility Look" -%}{%- assign fb_img = 'rw-model-4.webp' -%}
+                  {%- when 4 -%}{%- assign default_title = "Women's Relaxed Fit" -%}{%- assign fb_img = 'rw-model-5.webp' -%}
+                  {%- when 5 -%}{%- assign default_title = 'His & Hers Matching Set' -%}{%- assign fb_img = 'rw-model-6.webp' -%}
                 {%- endcase -%}
                 {%- assign l_title = blk.settings.title | default: default_title -%}
                 {%- assign m_img = blk.settings.model_image -%}
@@ -165,42 +186,49 @@
                         <button type="button" class="rw__zoom" data-rw-zoom aria-label="View look: {{ l_title | escape }}" tabindex="-1"></button>
                         <div class="rw__pins">
                           {%- if blk.settings.product_1 != blank -%}
-                            <!-- Custom Piece 1: Tee -->
-                            <button type="button" class="rw__pin" data-rw-pin="1" data-tip="{{ blk.settings.product_1.title | escape }}" style="left: {{ blk.settings.pin_1_x | default: 48 }}%; top: {{ blk.settings.pin_1_y | default: 38 }}%; --pi: 1;" aria-label="1: {{ blk.settings.product_1.title | escape }}" tabindex="-1">
+                            <!-- Custom Piece 1 -->
+                            <button type="button" class="rw__pin" data-rw-pin="1" data-tip="{{ blk.settings.piece_1_label | default: blk.settings.product_1.title | escape }}" style="left: {{ blk.settings.pin_1_x | default: 48 }}%; top: {{ blk.settings.pin_1_y | default: 38 }}%; --pi: 1;" aria-label="1: {{ blk.settings.product_1.title | escape }}" tabindex="-1">
                               <span class="rw__pin-dot" aria-hidden="true">1</span>
                             </button>
                             {%- if blk.settings.product_2 != blank -%}
-                              <!-- Custom Piece 2: Joggers -->
-                              <button type="button" class="rw__pin" data-rw-pin="2" data-tip="{{ blk.settings.product_2.title | escape }}" style="left: {{ blk.settings.pin_2_x | default: 48 }}%; top: {{ blk.settings.pin_2_y | default: 72 }}%; --pi: 2;" aria-label="2: {{ blk.settings.product_2.title | escape }}" tabindex="-1">
+                              <!-- Custom Piece 2 -->
+                              <button type="button" class="rw__pin" data-rw-pin="2" data-tip="{{ blk.settings.piece_2_label | default: blk.settings.product_2.title | escape }}" style="left: {{ blk.settings.pin_2_x | default: 48 }}%; top: {{ blk.settings.pin_2_y | default: 72 }}%; --pi: 2;" aria-label="2: {{ blk.settings.product_2.title | escape }}" tabindex="-1">
                                 <span class="rw__pin-dot" aria-hidden="true">2</span>
                               </button>
                             {%- endif -%}
                             {%- if blk.settings.product_3 != blank -%}
-                              <button type="button" class="rw__pin" data-rw-pin="3" data-tip="{{ blk.settings.product_3.title | escape }}" style="left: {{ blk.settings.pin_3_x | default: 50 }}%; top: {{ blk.settings.pin_3_y | default: 50 }}%; --pi: 3;" aria-label="3: {{ blk.settings.product_3.title | escape }}" tabindex="-1">
+                              <!-- Custom Piece 3 -->
+                              <button type="button" class="rw__pin" data-rw-pin="3" data-tip="{{ blk.settings.piece_3_label | default: blk.settings.product_3.title | escape }}" style="left: {{ blk.settings.pin_3_x | default: 50 }}%; top: {{ blk.settings.pin_3_y | default: 50 }}%; --pi: 3;" aria-label="3: {{ blk.settings.product_3.title | escape }}" tabindex="-1">
                                 <span class="rw__pin-dot" aria-hidden="true">3</span>
                               </button>
                             {%- endif -%}
+                            {%- if blk.settings.product_4 != blank -%}
+                              <!-- Custom Piece 4 -->
+                              <button type="button" class="rw__pin" data-rw-pin="4" data-tip="{{ blk.settings.piece_4_label | default: blk.settings.product_4.title | escape }}" style="left: {{ blk.settings.pin_4_x | default: 50 }}%; top: {{ blk.settings.pin_4_y | default: 50 }}%; --pi: 4;" aria-label="4: {{ blk.settings.product_4.title | escape }}" tabindex="-1">
+                                <span class="rw__pin-dot" aria-hidden="true">4</span>
+                              </button>
+                            {%- endif -%}
                           {%- else -%}
-                            <!-- Default Tee & Joggers Hotspot Pins -->
+                            <!-- Default Men, Women & Couple Pair Hotspot Pins -->
                             {%- case l_idx -%}
                               {%- when 0 -%}
-                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Urban Culture Oversized Tee" style="left: 48%; top: 38%; --pi: 1;" aria-label="1: Urban Culture Oversized Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Men's Urban Culture Tee" style="left: 48%; top: 38%; --pi: 1;" aria-label="1: Men's Urban Culture Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
                                 <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Cargo Streetwear Joggers" style="left: 48%; top: 72%; --pi: 2;" aria-label="2: Cargo Streetwear Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
                               {%- when 1 -%}
-                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Heavyweight Acid Wash Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Heavyweight Acid Wash Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
-                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Fleece Relaxed Joggers" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Fleece Relaxed Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Women's Cropped Boxy Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Women's Cropped Boxy Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Women's Fleece Joggers" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Women's Fleece Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
                               {%- when 2 -%}
-                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Urban Culture Oversized Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Urban Culture Oversized Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
-                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Olive Utility Cargo Pants" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Olive Utility Cargo Pants" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="His Oversized Tee" style="left: 42%; top: 38%; --pi: 1;" aria-label="1: His Oversized Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Her Boxy Street Tee" style="left: 58%; top: 42%; --pi: 2;" aria-label="2: Her Boxy Street Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
                               {%- when 3 -%}
-                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Heavyweight Acid Wash Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Heavyweight Acid Wash Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
-                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Cargo Streetwear Joggers" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Cargo Streetwear Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Men's Acid Wash Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Men's Acid Wash Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Men's Olive Cargo Pants" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Men's Olive Cargo Pants" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
                               {%- when 4 -%}
-                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Urban Culture Oversized Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Urban Culture Oversized Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
-                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Beige Street Utility Joggers" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Beige Street Utility Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Women's Boxy Street Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Women's Boxy Street Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Women's Utility Joggers" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Women's Utility Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
                               {%- when 5 -%}
-                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="Heavyweight Acid Wash Tee" style="left: 50%; top: 36%; --pi: 1;" aria-label="1: Heavyweight Acid Wash Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
-                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Fleece Relaxed Joggers" style="left: 48%; top: 70%; --pi: 2;" aria-label="2: Fleece Relaxed Joggers" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="1" data-tip="His Matching Tee" style="left: 45%; top: 36%; --pi: 1;" aria-label="1: His Matching Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">1</span></button>
+                                <button type="button" class="rw__pin" data-rw-pin="2" data-tip="Her Matching Tee" style="left: 55%; top: 38%; --pi: 2;" aria-label="2: Her Matching Tee" tabindex="-1"><span class="rw__pin-dot" aria-hidden="true">2</span></button>
                             {%- endcase -%}
                           {%- endif -%}
                         </div>
@@ -224,19 +252,21 @@
                   {%- assign l_idx = i -%}
                   {%- assign l_num = i | plus: 1 -%}
                   {%- assign default_title = 'The City Edit' -%}
+                  {%- assign default_cat = 'Men' -%}
                   {%- case i -%}
-                    {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}
-                    {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}
-                    {%- when 2 -%}{%- assign default_title = 'Street Edition' -%}
-                    {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}
-                    {%- when 4 -%}{%- assign default_title = 'Night Runner' -%}
-                    {%- when 5 -%}{%- assign default_title = 'Atelier Edit' -%}
+                    {%- when 0 -%}{%- assign default_title = "Men's Street Set" -%}{%- assign default_cat = 'Men' -%}
+                    {%- when 1 -%}{%- assign default_title = "Women's Atelier Fit" -%}{%- assign default_cat = 'Women' -%}
+                    {%- when 2 -%}{%- assign default_title = 'Couple Tee Pair' -%}{%- assign default_cat = 'Couple Pair' -%}
+                    {%- when 3 -%}{%- assign default_title = "Men's Utility Look" -%}{%- assign default_cat = 'Men' -%}
+                    {%- when 4 -%}{%- assign default_title = "Women's Relaxed Fit" -%}{%- assign default_cat = 'Women' -%}
+                    {%- when 5 -%}{%- assign default_title = 'His & Hers Matching Set' -%}{%- assign default_cat = 'Matching Set' -%}
                   {%- endcase -%}
                   {%- assign l_title = blk.settings.title | default: default_title -%}
+                  {%- assign l_category = blk.settings.category | default: default_cat -%}
 
                   <button type="button" class="rw__tick" data-rw-tick="{{ l_idx }}" aria-current="{% if l_idx == 0 %}true{% else %}false{% endif %}" aria-label="Look {{ l_num }}: {{ l_title | escape }}">
                     <span class="rw__tick-bar" aria-hidden="true"></span>
-                    <span class="rw__tick-label" aria-hidden="true">0{{ l_num }}<span class="rw__tick-name">&nbsp;&nbsp;{{ l_title | escape }}</span></span>
+                    <span class="rw__tick-label" aria-hidden="true">0{{ l_num }}<span class="rw__tick-name">&nbsp;&nbsp;<span class="rw__tick-cat">[{{ l_category | escape }}]</span> {{ l_title | escape }}</span></span>
                   </button>
                 {%- endif -%}
               {%- endfor -%}
@@ -264,7 +294,7 @@
         </div>
       </div>
 
-      <!-- SIDEBAR LOOKBOOK PANEL (TEE & JOGGERS ONLY) -->
+      <!-- SIDEBAR LOOKBOOK PANEL (MEN, WOMEN & COUPLE PAIRS) -->
       <aside class="rw__panel has-rule" aria-label="In this look">
         <div class="rw__panel-inner">
           <div class="rw__panel-head">
@@ -278,35 +308,51 @@
               {%- assign l_idx = i -%}
               {%- assign l_num = i | plus: 1 -%}
               {%- assign default_title = 'The City Edit' -%}
+              {%- assign default_cat = 'Men' -%}
               {%- case i -%}
-                {%- when 0 -%}{%- assign default_title = 'The City Edit' -%}
-                {%- when 1 -%}{%- assign default_title = 'Gallery Opening' -%}
-                {%- when 2 -%}{%- assign default_title = 'Street Edition' -%}
-                {%- when 3 -%}{%- assign default_title = 'Studio Day' -%}
-                {%- when 4 -%}{%- assign default_title = 'Night Runner' -%}
-                {%- when 5 -%}{%- assign default_title = 'Atelier Edit' -%}
+                {%- when 0 -%}{%- assign default_title = "Men's Street Set" -%}{%- assign default_cat = 'Men' -%}
+                {%- when 1 -%}{%- assign default_title = "Women's Atelier Fit" -%}{%- assign default_cat = 'Women' -%}
+                {%- when 2 -%}{%- assign default_title = 'Couple Tee Pair' -%}{%- assign default_cat = 'Couple Pair' -%}
+                {%- when 3 -%}{%- assign default_title = "Men's Utility Look" -%}{%- assign default_cat = 'Men' -%}
+                {%- when 4 -%}{%- assign default_title = "Women's Relaxed Fit" -%}{%- assign default_cat = 'Women' -%}
+                {%- when 5 -%}{%- assign default_title = 'His & Hers Matching Set' -%}{%- assign default_cat = 'Matching Set' -%}
               {%- endcase -%}
               {%- assign l_title = blk.settings.title | default: default_title -%}
+              {%- assign l_category = blk.settings.category | default: default_cat -%}
+
+              {%- comment -%} Determine pieces count {%- endcomment -%}
+              {%- assign display_pieces = 2 -%}
+              {%- if blk.settings.product_1 != blank -%}
+                {%- assign display_pieces = 1 -%}
+                {%- if blk.settings.product_2 != blank -%}{%- assign display_pieces = 2 -%}{%- endif -%}
+                {%- if blk.settings.product_3 != blank -%}{%- assign display_pieces = 3 -%}{%- endif -%}
+                {%- if blk.settings.product_4 != blank -%}{%- assign display_pieces = 4 -%}{%- endif -%}
+              {%- endif -%}
 
               <div class="rw__look-panel{% if l_idx == 0 %} is-in{% endif %}" data-rw-panel="{{ l_idx }}"{% unless l_idx == 0 %} hidden{% endunless %} {% if blk %}{{ blk.shopify_attributes }}{% endif %}>
                 <div class="rw__mhead">
-                  <span class="rw__mhead-title">{{ l_title | escape }}</span>
-                  <span class="rw__label" data-rw-pieces-text>2 pieces</span>
+                  <div class="rw__mhead-meta">
+                    <span class="rw__cat-badge">{{ l_category | escape }}</span>
+                    <span class="rw__mhead-title">{{ l_title | escape }}</span>
+                  </div>
+                  <span class="rw__label" data-rw-pieces-text>{{ display_pieces }} pieces</span>
                 </div>
 
                 <ul class="rw__items" role="list">
                   {%- if blk.settings.product_1 != blank -%}
                     {%- for p_i in (1..4) -%}
                       {%- capture p_key -%}product_{{ p_i }}{%- endcapture -%}
+                      {%- capture label_key -%}piece_{{ p_i }}_label{%- endcapture -%}
                       {%- assign prod = blk.settings[p_key] -%}
+                      {%- assign p_role = blk.settings[label_key] -%}
                       {%- if prod != blank -%}
-                        <li class="rw__item" data-rw-card="{{ p_i }}" style="--i: {{ p_i }};" data-title="{{ prod.title | escape }}">
+                        <li class="rw__item" data-rw-card="{{ p_i }}" style="--i: {{ p_i }};" data-title="{{ prod.title | escape }}" data-price="{{ prod.price }}" data-selected="{{ prod.first_available_variant.id }}" data-variant-id="{% if prod.has_only_default_variant %}{{ prod.first_available_variant.id }}{% endif %}">
                           <a class="rw__media" href="{{ prod.url }}" tabindex="-1" aria-hidden="true">
                             <img src="{{ prod.featured_image | image_url: width: 400 }}" alt="{{ prod.title | escape }}" width="400" height="400" loading="lazy" sizes="110px">
                             <span class="rw__num">{{ p_i }}</span>
                           </a>
                           <div class="rw__info">
-                            <span class="rw__type">{{ prod.vendor | default: 'The Cloths' }}</span>
+                            <span class="rw__type">{{ p_role | default: prod.type | default: prod.vendor | default: 'The Cloths' }}</span>
                             <a class="rw__name" href="{{ prod.url }}">{{ prod.title | escape }}</a>
                             <span class="rw__price"><span>{{ prod.price | money }}</span></span>
                           </div>
@@ -346,7 +392,7 @@
                             <script type="application/json" data-rw-variants>
                               [
                                 {%- for v in prod.variants -%}
-                                  {"id":{{ v.id }},"a":{{ v.available | json }},"o":{{ v.options | json }}}{%- unless forloop.last -%},{%- endunless -%}
+                                  {"id":{{ v.id }},"a":{{ v.available | json }},"o":{{ v.options | json }},"p":{{ v.price }}}{%- unless forloop.last -%},{%- endunless -%}
                                 {%- endfor -%}
                               ]
                             </script>
@@ -355,16 +401,16 @@
                       {%- endif -%}
                     {%- endfor -%}
                   {%- else -%}
-                    <!-- DEFAULT TEE & JOGGERS CARDS -->
+                    <!-- DEFAULT MEN, WOMEN & COUPLE PAIR STARTER ITEMS -->
                     {%- case l_idx -%}
                       {%- when 0 -%}
-                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Urban Culture Oversized Tee">
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Urban Culture Oversized Tee" data-price="19900" data-selected="56835911582001">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
                         <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Urban Culture Oversized Tee" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">1</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
+                        <span class="rw__type">Men's Tee</span>
                         <a class="rw__name" href="/collections/all">Urban Culture Oversized Tee</a>
                         <span class="rw__price"><span>$199.00</span></span>
                       </div>
@@ -392,20 +438,20 @@
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
                           <span class="rw__sr"> — Urban Culture Oversized Tee</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["M"]},{"id":56835911647537,"a":true,"o":["L"]},{"id":56835911680305,"a":true,"o":["XL"]},{"id":56835911713073,"a":true,"o":["XXL"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"],"p":19900},{"id":56835911614769,"a":true,"o":["M"],"p":19900},{"id":56835911647537,"a":true,"o":["L"],"p":19900},{"id":56835911680305,"a":true,"o":["XL"],"p":19900},{"id":56835911713073,"a":true,"o":["XXL"],"p":19900}]</script>
                       </div>
                     </li>
-                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Cargo Streetwear Joggers">
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Men's Cargo Streetwear Joggers" data-price="19900" data-selected="57015167025457">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-jogger-black.webp' | asset_url }}" alt="Cargo Streetwear Joggers" width="400" height="400" loading="lazy" sizes="110px">
+                        <img src="{{ 'rw-prod-jogger-black.webp' | asset_url }}" alt="Men's Cargo Streetwear Joggers" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">2</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Cargo Streetwear Joggers</a>
+                        <span class="rw__type">Cargo Joggers</span>
+                        <a class="rw__name" href="/collections/all">Men's Cargo Streetwear Joggers</a>
                         <span class="rw__price"><span>$199.00</span></span>
                       </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Cargo Streetwear Joggers" data-added-label="Added to bag: Cargo Streetwear Joggers">
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Men's Cargo Streetwear Joggers" data-added-label="Added to bag: Men's Cargo Streetwear Joggers">
                         <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
                         <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
                         <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
@@ -414,7 +460,7 @@
                         <div class="rw__picker-head">
                           <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-black.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
                           <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Cargo Streetwear Joggers</span>
+                            <span class="rw__picker-title">Men's Cargo Streetwear Joggers</span>
                             <span class="rw__picker-price">$199.00</span>
                           </span>
                           <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
@@ -427,19 +473,169 @@
                         </fieldset>
                         <button type="button" class="rw__confirm" data-rw-confirm>
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Cargo Streetwear Joggers</span>
+                          <span class="rw__sr"> — Men's Cargo Streetwear Joggers</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":57015167025457,"a":true,"o":["30"]},{"id":57015167058225,"a":true,"o":["32"]},{"id":57015167090993,"a":true,"o":["34"]},{"id":57015167123761,"a":true,"o":["36"]},{"id":57015167156529,"a":true,"o":["38"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":57015167025457,"a":true,"o":["30"],"p":19900},{"id":57015167058225,"a":true,"o":["32"],"p":19900},{"id":57015167090993,"a":true,"o":["34"],"p":19900},{"id":57015167123761,"a":true,"o":["36"],"p":19900},{"id":57015167156529,"a":true,"o":["38"],"p":19900}]</script>
                       </div>
                     </li>
                       {%- when 1 -%}
-                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Heavyweight Acid Wash Tee">
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Women's Cropped Boxy Tee" data-price="18900" data-selected="56835911582001">
+                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="Women's Cropped Boxy Tee" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Women's Cropped Tee</span>
+                        <a class="rw__name" href="/collections/all">Women's Cropped Boxy Tee</a>
+                        <span class="rw__price"><span>$189.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-1" aria-label="Add to bag: Women's Cropped Boxy Tee" data-added-label="Added to bag: Women's Cropped Boxy Tee">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Women's Cropped Boxy Tee</span>
+                            <span class="rw__picker-price">$189.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XS" data-rw-option="0" checked><span class="rw__pill-label">XS</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="S" data-rw-option="0"><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Women's Cropped Boxy Tee</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["XS"],"p":18900},{"id":56835911614769,"a":true,"o":["S"],"p":18900},{"id":56835911647537,"a":true,"o":["M"],"p":18900},{"id":56835911680305,"a":true,"o":["L"],"p":18900},{"id":56835911713073,"a":true,"o":["XL"],"p":18900}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Women's Relaxed Fleece Joggers" data-price="19900" data-selected="57015166730545">
+                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-jogger-grey.webp' | asset_url }}" alt="Women's Relaxed Fleece Joggers" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Fleece Joggers</span>
+                        <a class="rw__name" href="/collections/all">Women's Relaxed Fleece Joggers</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Women's Relaxed Fleece Joggers" data-added-label="Added to bag: Women's Relaxed Fleece Joggers">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-grey.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Women's Relaxed Fleece Joggers</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Waist size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="26" data-rw-option="0" checked><span class="rw__pill-label">26</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="28" data-rw-option="0"><span class="rw__pill-label">28</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="30" data-rw-option="0"><span class="rw__pill-label">30</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="32" data-rw-option="0"><span class="rw__pill-label">32</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="34" data-rw-option="0"><span class="rw__pill-label">34</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Women's Relaxed Fleece Joggers</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":57015166730545,"a":true,"o":["26"],"p":19900},{"id":57015166763313,"a":true,"o":["28"],"p":19900},{"id":57015166796081,"a":true,"o":["30"],"p":19900},{"id":57015166828849,"a":true,"o":["32"],"p":19900},{"id":57015166861617,"a":true,"o":["34"],"p":19900}]</script>
+                      </div>
+                    </li>
+                      {%- when 2 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Urban Culture Oversized Tee" data-price="19900" data-selected="56835911582001">
+                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Urban Culture Oversized Tee" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">1</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">His Oversized Tee</span>
+                        <a class="rw__name" href="/collections/all">Urban Culture Oversized Tee</a>
+                        <span class="rw__price"><span>$199.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-1" aria-label="Add to bag: Urban Culture Oversized Tee" data-added-label="Added to bag: Urban Culture Oversized Tee">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-1" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Urban Culture Oversized Tee</span>
+                            <span class="rw__picker-price">$199.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Urban Culture Oversized Tee</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"],"p":19900},{"id":56835911614769,"a":true,"o":["M"],"p":19900},{"id":56835911647537,"a":true,"o":["L"],"p":19900},{"id":56835911680305,"a":true,"o":["XL"],"p":19900},{"id":56835911713073,"a":true,"o":["XXL"],"p":19900}]</script>
+                      </div>
+                    </li>
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Women's Boxy Street Tee" data-price="18900" data-selected="56835911582001">
+                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
+                        <img src="{{ 'rw-prod-151659.webp' | asset_url }}" alt="Women's Boxy Street Tee" width="400" height="400" loading="lazy" sizes="110px">
+                        <span class="rw__num">2</span>
+                      </a>
+                      <div class="rw__info">
+                        <span class="rw__type">Her Boxy Street Tee</span>
+                        <a class="rw__name" href="/collections/all">Women's Boxy Street Tee</a>
+                        <span class="rw__price"><span>$189.00</span></span>
+                      </div>
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Women's Boxy Street Tee" data-added-label="Added to bag: Women's Boxy Street Tee">
+                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
+                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
+                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
+                      </button>
+                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-2" data-rw-picker hidden>
+                        <div class="rw__picker-head">
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151659.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-meta">
+                            <span class="rw__picker-title">Women's Boxy Street Tee</span>
+                            <span class="rw__picker-price">$189.00</span>
+                          </span>
+                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
+                          </button>
+                        </div>
+                        <fieldset class="rw__opt">
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="XS" data-rw-option="0" checked><span class="rw__pill-label">XS</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="S" data-rw-option="0"><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label></div>
+                        </fieldset>
+                        <button type="button" class="rw__confirm" data-rw-confirm>
+                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
+                          <span class="rw__sr"> — Women's Boxy Street Tee</span>
+                        </button>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["XS"],"p":18900},{"id":56835911614769,"a":true,"o":["S"],"p":18900},{"id":56835911647537,"a":true,"o":["M"],"p":18900},{"id":56835911680305,"a":true,"o":["L"],"p":18900},{"id":56835911713073,"a":true,"o":["XL"],"p":18900}]</script>
+                      </div>
+                    </li>
+                      {%- when 3 -%}
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Heavyweight Acid Wash Tee" data-price="19900" data-selected="56835911582001">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
                         <img src="{{ 'sr-demo-tshirt-front.webp' | asset_url }}" alt="Heavyweight Acid Wash Tee" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">1</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
+                        <span class="rw__type">Men's Acid Wash Tee</span>
                         <a class="rw__name" href="/collections/all">Heavyweight Acid Wash Tee</a>
                         <span class="rw__price"><span>$199.00</span></span>
                       </div>
@@ -467,95 +663,20 @@
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
                           <span class="rw__sr"> — Heavyweight Acid Wash Tee</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["M"]},{"id":56835911647537,"a":true,"o":["L"]},{"id":56835911680305,"a":true,"o":["XL"]},{"id":56835911713073,"a":true,"o":["XXL"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"],"p":19900},{"id":56835911614769,"a":true,"o":["M"],"p":19900},{"id":56835911647537,"a":true,"o":["L"],"p":19900},{"id":56835911680305,"a":true,"o":["XL"],"p":19900},{"id":56835911713073,"a":true,"o":["XXL"],"p":19900}]</script>
                       </div>
                     </li>
-                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Fleece Relaxed Joggers">
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Men's Olive Utility Cargo Pants" data-price="19900" data-selected="57015176364337">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-jogger-grey.webp' | asset_url }}" alt="Fleece Relaxed Joggers" width="400" height="400" loading="lazy" sizes="110px">
+                        <img src="{{ 'rw-prod-jogger-olive.webp' | asset_url }}" alt="Men's Olive Utility Cargo Pants" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">2</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Fleece Relaxed Joggers</a>
+                        <span class="rw__type">Utility Cargo Pants</span>
+                        <a class="rw__name" href="/collections/all">Men's Olive Utility Cargo Pants</a>
                         <span class="rw__price"><span>$199.00</span></span>
                       </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Fleece Relaxed Joggers" data-added-label="Added to bag: Fleece Relaxed Joggers">
-                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
-                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
-                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
-                      </button>
-                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-2" data-rw-picker hidden>
-                        <div class="rw__picker-head">
-                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-grey.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
-                          <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Fleece Relaxed Joggers</span>
-                            <span class="rw__picker-price">$199.00</span>
-                          </span>
-                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
-                          </button>
-                        </div>
-                        <fieldset class="rw__opt">
-                          <legend class="rw__opt-name">Waist size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="30" data-rw-option="0" checked><span class="rw__pill-label">30</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="32" data-rw-option="0"><span class="rw__pill-label">32</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="34" data-rw-option="0"><span class="rw__pill-label">34</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="36" data-rw-option="0"><span class="rw__pill-label">36</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="38" data-rw-option="0"><span class="rw__pill-label">38</span></label></div>
-                        </fieldset>
-                        <button type="button" class="rw__confirm" data-rw-confirm>
-                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Fleece Relaxed Joggers</span>
-                        </button>
-                        <script type="application/json" data-rw-variants>[{"id":57015166730545,"a":true,"o":["30"]},{"id":57015166763313,"a":true,"o":["32"]},{"id":57015166796081,"a":true,"o":["34"]},{"id":57015166828849,"a":true,"o":["36"]},{"id":57015166861617,"a":true,"o":["38"]}]</script>
-                      </div>
-                    </li>
-                      {%- when 2 -%}
-                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Urban Culture Oversized Tee">
-                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Urban Culture Oversized Tee" width="400" height="400" loading="lazy" sizes="110px">
-                        <span class="rw__num">1</span>
-                      </a>
-                      <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Urban Culture Oversized Tee</a>
-                        <span class="rw__price"><span>$199.00</span></span>
-                      </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-1" aria-label="Add to bag: Urban Culture Oversized Tee" data-added-label="Added to bag: Urban Culture Oversized Tee">
-                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
-                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
-                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
-                      </button>
-                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-1" data-rw-picker hidden>
-                        <div class="rw__picker-head">
-                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
-                          <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Urban Culture Oversized Tee</span>
-                            <span class="rw__picker-price">$199.00</span>
-                          </span>
-                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
-                          </button>
-                        </div>
-                        <fieldset class="rw__opt">
-                          <legend class="rw__opt-name">Size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label></div>
-                        </fieldset>
-                        <button type="button" class="rw__confirm" data-rw-confirm>
-                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Urban Culture Oversized Tee</span>
-                        </button>
-                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["M"]},{"id":56835911647537,"a":true,"o":["L"]},{"id":56835911680305,"a":true,"o":["XL"]},{"id":56835911713073,"a":true,"o":["XXL"]}]</script>
-                      </div>
-                    </li>
-                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Olive Utility Cargo Pants">
-                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-jogger-olive.webp' | asset_url }}" alt="Olive Utility Cargo Pants" width="400" height="400" loading="lazy" sizes="110px">
-                        <span class="rw__num">2</span>
-                      </a>
-                      <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Olive Utility Cargo Pants</a>
-                        <span class="rw__price"><span>$199.00</span></span>
-                      </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Olive Utility Cargo Pants" data-added-label="Added to bag: Olive Utility Cargo Pants">
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Men's Olive Utility Cargo Pants" data-added-label="Added to bag: Men's Olive Utility Cargo Pants">
                         <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
                         <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
                         <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
@@ -564,7 +685,7 @@
                         <div class="rw__picker-head">
                           <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-olive.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
                           <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Olive Utility Cargo Pants</span>
+                            <span class="rw__picker-title">Men's Olive Utility Cargo Pants</span>
                             <span class="rw__picker-price">$199.00</span>
                           </span>
                           <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
@@ -577,108 +698,33 @@
                         </fieldset>
                         <button type="button" class="rw__confirm" data-rw-confirm>
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Olive Utility Cargo Pants</span>
+                          <span class="rw__sr"> — Men's Olive Utility Cargo Pants</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":57015176364337,"a":true,"o":["30"]},{"id":57015176397105,"a":true,"o":["32"]},{"id":57015176429873,"a":true,"o":["34"]},{"id":57015176462641,"a":true,"o":["36"]},{"id":57015176495409,"a":true,"o":["38"]}]</script>
-                      </div>
-                    </li>
-                      {%- when 3 -%}
-                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Heavyweight Acid Wash Tee">
-                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'sr-demo-tshirt-front.webp' | asset_url }}" alt="Heavyweight Acid Wash Tee" width="400" height="400" loading="lazy" sizes="110px">
-                        <span class="rw__num">1</span>
-                      </a>
-                      <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Heavyweight Acid Wash Tee</a>
-                        <span class="rw__price"><span>$199.00</span></span>
-                      </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-1" aria-label="Add to bag: Heavyweight Acid Wash Tee" data-added-label="Added to bag: Heavyweight Acid Wash Tee">
-                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
-                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
-                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
-                      </button>
-                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-1" data-rw-picker hidden>
-                        <div class="rw__picker-head">
-                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'sr-demo-tshirt-front.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
-                          <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Heavyweight Acid Wash Tee</span>
-                            <span class="rw__picker-price">$199.00</span>
-                          </span>
-                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
-                          </button>
-                        </div>
-                        <fieldset class="rw__opt">
-                          <legend class="rw__opt-name">Size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label></div>
-                        </fieldset>
-                        <button type="button" class="rw__confirm" data-rw-confirm>
-                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Heavyweight Acid Wash Tee</span>
-                        </button>
-                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["M"]},{"id":56835911647537,"a":true,"o":["L"]},{"id":56835911680305,"a":true,"o":["XL"]},{"id":56835911713073,"a":true,"o":["XXL"]}]</script>
-                      </div>
-                    </li>
-                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Cargo Streetwear Joggers">
-                      <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-jogger-black.webp' | asset_url }}" alt="Cargo Streetwear Joggers" width="400" height="400" loading="lazy" sizes="110px">
-                        <span class="rw__num">2</span>
-                      </a>
-                      <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Cargo Streetwear Joggers</a>
-                        <span class="rw__price"><span>$199.00</span></span>
-                      </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Cargo Streetwear Joggers" data-added-label="Added to bag: Cargo Streetwear Joggers">
-                        <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
-                        <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
-                        <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
-                      </button>
-                      <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-2" data-rw-picker hidden>
-                        <div class="rw__picker-head">
-                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-black.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
-                          <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Cargo Streetwear Joggers</span>
-                            <span class="rw__picker-price">$199.00</span>
-                          </span>
-                          <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
-                          </button>
-                        </div>
-                        <fieldset class="rw__opt">
-                          <legend class="rw__opt-name">Waist size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="30" data-rw-option="0" checked><span class="rw__pill-label">30</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="32" data-rw-option="0"><span class="rw__pill-label">32</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="34" data-rw-option="0"><span class="rw__pill-label">34</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="36" data-rw-option="0"><span class="rw__pill-label">36</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="38" data-rw-option="0"><span class="rw__pill-label">38</span></label></div>
-                        </fieldset>
-                        <button type="button" class="rw__confirm" data-rw-confirm>
-                          <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Cargo Streetwear Joggers</span>
-                        </button>
-                        <script type="application/json" data-rw-variants>[{"id":57015167025457,"a":true,"o":["30"]},{"id":57015167058225,"a":true,"o":["32"]},{"id":57015167090993,"a":true,"o":["34"]},{"id":57015167123761,"a":true,"o":["36"]},{"id":57015167156529,"a":true,"o":["38"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":57015176364337,"a":true,"o":["30"],"p":19900},{"id":57015176397105,"a":true,"o":["32"],"p":19900},{"id":57015176429873,"a":true,"o":["34"],"p":19900},{"id":57015176462641,"a":true,"o":["36"],"p":19900},{"id":57015176495409,"a":true,"o":["38"],"p":19900}]</script>
                       </div>
                     </li>
                       {%- when 4 -%}
-                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Urban Culture Oversized Tee">
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Women's Boxy Street Tee" data-price="18900" data-selected="56835911582001">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="Urban Culture Oversized Tee" width="400" height="400" loading="lazy" sizes="110px">
+                        <img src="{{ 'rw-prod-151659.webp' | asset_url }}" alt="Women's Boxy Street Tee" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">1</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Urban Culture Oversized Tee</a>
-                        <span class="rw__price"><span>$199.00</span></span>
+                        <span class="rw__type">Women's Boxy Tee</span>
+                        <a class="rw__name" href="/collections/all">Women's Boxy Street Tee</a>
+                        <span class="rw__price"><span>$189.00</span></span>
                       </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-1" aria-label="Add to bag: Urban Culture Oversized Tee" data-added-label="Added to bag: Urban Culture Oversized Tee">
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-1" aria-label="Add to bag: Women's Boxy Street Tee" data-added-label="Added to bag: Women's Boxy Street Tee">
                         <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
                         <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
                         <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
                       </button>
                       <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-1" data-rw-picker hidden>
                         <div class="rw__picker-head">
-                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151531.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151659.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
                           <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Urban Culture Oversized Tee</span>
-                            <span class="rw__picker-price">$199.00</span>
+                            <span class="rw__picker-title">Women's Boxy Street Tee</span>
+                            <span class="rw__picker-price">$189.00</span>
                           </span>
                           <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
@@ -686,26 +732,26 @@
                         </div>
                         <fieldset class="rw__opt">
                           <legend class="rw__opt-name">Size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="S" data-rw-option="0" checked><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XXL" data-rw-option="0"><span class="rw__pill-label">XXL</span></label></div>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XS" data-rw-option="0" checked><span class="rw__pill-label">XS</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="S" data-rw-option="0"><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-1" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label></div>
                         </fieldset>
                         <button type="button" class="rw__confirm" data-rw-confirm>
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Urban Culture Oversized Tee</span>
+                          <span class="rw__sr"> — Women's Boxy Street Tee</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["M"]},{"id":56835911647537,"a":true,"o":["L"]},{"id":56835911680305,"a":true,"o":["XL"]},{"id":56835911713073,"a":true,"o":["XXL"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["XS"],"p":18900},{"id":56835911614769,"a":true,"o":["S"],"p":18900},{"id":56835911647537,"a":true,"o":["M"],"p":18900},{"id":56835911680305,"a":true,"o":["L"],"p":18900},{"id":56835911713073,"a":true,"o":["XL"],"p":18900}]</script>
                       </div>
                     </li>
-                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Beige Street Utility Joggers">
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Women's Beige Street Utility Joggers" data-price="19900" data-selected="57015167189297">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-jogger-beige.webp' | asset_url }}" alt="Beige Street Utility Joggers" width="400" height="400" loading="lazy" sizes="110px">
+                        <img src="{{ 'rw-prod-jogger-beige.webp' | asset_url }}" alt="Women's Beige Street Utility Joggers" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">2</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Beige Street Utility Joggers</a>
+                        <span class="rw__type">Utility Joggers</span>
+                        <a class="rw__name" href="/collections/all">Women's Beige Street Utility Joggers</a>
                         <span class="rw__price"><span>$199.00</span></span>
                       </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Beige Street Utility Joggers" data-added-label="Added to bag: Beige Street Utility Joggers">
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Women's Beige Street Utility Joggers" data-added-label="Added to bag: Women's Beige Street Utility Joggers">
                         <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
                         <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
                         <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
@@ -714,7 +760,7 @@
                         <div class="rw__picker-head">
                           <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-beige.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
                           <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Beige Street Utility Joggers</span>
+                            <span class="rw__picker-title">Women's Beige Street Utility Joggers</span>
                             <span class="rw__picker-price">$199.00</span>
                           </span>
                           <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
@@ -723,23 +769,23 @@
                         </div>
                         <fieldset class="rw__opt">
                           <legend class="rw__opt-name">Waist size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="30" data-rw-option="0" checked><span class="rw__pill-label">30</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="32" data-rw-option="0"><span class="rw__pill-label">32</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="34" data-rw-option="0"><span class="rw__pill-label">34</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="36" data-rw-option="0"><span class="rw__pill-label">36</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="38" data-rw-option="0"><span class="rw__pill-label">38</span></label></div>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="26" data-rw-option="0" checked><span class="rw__pill-label">26</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="28" data-rw-option="0"><span class="rw__pill-label">28</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="30" data-rw-option="0"><span class="rw__pill-label">30</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="32" data-rw-option="0"><span class="rw__pill-label">32</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="34" data-rw-option="0"><span class="rw__pill-label">34</span></label></div>
                         </fieldset>
                         <button type="button" class="rw__confirm" data-rw-confirm>
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Beige Street Utility Joggers</span>
+                          <span class="rw__sr"> — Women's Beige Street Utility Joggers</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":57015167189297,"a":true,"o":["30"]},{"id":57015167222065,"a":true,"o":["32"]},{"id":57015166894385,"a":true,"o":["34"]},{"id":57015166927153,"a":true,"o":["36"]},{"id":57015176528177,"a":true,"o":["38"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":57015167189297,"a":true,"o":["26"],"p":19900},{"id":57015167222065,"a":true,"o":["28"],"p":19900},{"id":57015166894385,"a":true,"o":["30"],"p":19900},{"id":57015166927153,"a":true,"o":["32"],"p":19900},{"id":57015176528177,"a":true,"o":["34"],"p":19900}]</script>
                       </div>
                     </li>
                       {%- when 5 -%}
-                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Heavyweight Acid Wash Tee">
+                    <li class="rw__item" data-rw-card="1" style="--i: 1;" data-title="Heavyweight Acid Wash Tee" data-price="19900" data-selected="56835911582001">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
                         <img src="{{ 'sr-demo-tshirt-front.webp' | asset_url }}" alt="Heavyweight Acid Wash Tee" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">1</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
+                        <span class="rw__type">His Matching Tee</span>
                         <a class="rw__name" href="/collections/all">Heavyweight Acid Wash Tee</a>
                         <span class="rw__price"><span>$199.00</span></span>
                       </div>
@@ -767,66 +813,88 @@
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
                           <span class="rw__sr"> — Heavyweight Acid Wash Tee</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"]},{"id":56835911614769,"a":true,"o":["M"]},{"id":56835911647537,"a":true,"o":["L"]},{"id":56835911680305,"a":true,"o":["XL"]},{"id":56835911713073,"a":true,"o":["XXL"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["S"],"p":19900},{"id":56835911614769,"a":true,"o":["M"],"p":19900},{"id":56835911647537,"a":true,"o":["L"],"p":19900},{"id":56835911680305,"a":true,"o":["XL"],"p":19900},{"id":56835911713073,"a":true,"o":["XXL"],"p":19900}]</script>
                       </div>
                     </li>
-                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Fleece Relaxed Joggers">
+                    <li class="rw__item" data-rw-card="2" style="--i: 2;" data-title="Women's Cropped Boxy Tee" data-price="18900" data-selected="56835911582001">
                       <a class="rw__media" href="/collections/all" tabindex="-1" aria-hidden="true">
-                        <img src="{{ 'rw-prod-jogger-grey.webp' | asset_url }}" alt="Fleece Relaxed Joggers" width="400" height="400" loading="lazy" sizes="110px">
+                        <img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="Women's Cropped Boxy Tee" width="400" height="400" loading="lazy" sizes="110px">
                         <span class="rw__num">2</span>
                       </a>
                       <div class="rw__info">
-                        <span class="rw__type">The Cloths</span>
-                        <a class="rw__name" href="/collections/all">Fleece Relaxed Joggers</a>
-                        <span class="rw__price"><span>$199.00</span></span>
+                        <span class="rw__type">Her Matching Tee</span>
+                        <a class="rw__name" href="/collections/all">Women's Cropped Boxy Tee</a>
+                        <span class="rw__price"><span>$189.00</span></span>
                       </div>
-                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Fleece Relaxed Joggers" data-added-label="Added to bag: Fleece Relaxed Joggers">
+                      <button type="button" class="rw__add" data-rw-add aria-expanded="false" aria-controls="Picker-{{ section.id }}-look-{{ l_idx }}-2" aria-label="Add to bag: Women's Cropped Boxy Tee" data-added-label="Added to bag: Women's Cropped Boxy Tee">
                         <svg class="rw__i-plus" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 4v16M4 12h16"/></svg>
                         <svg class="rw__i-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.5 12.5l5 5L19.5 7"/></svg>
                         <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
                       </button>
                       <div class="rw__picker" id="Picker-{{ section.id }}-look-{{ l_idx }}-2" data-rw-picker hidden>
                         <div class="rw__picker-head">
-                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-jogger-grey.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
+                          <span class="rw__picker-thumb" aria-hidden="true"><img src="{{ 'rw-prod-151731.webp' | asset_url }}" alt="" width="160" height="160" loading="lazy"></span>
                           <span class="rw__picker-meta">
-                            <span class="rw__picker-title">Fleece Relaxed Joggers</span>
-                            <span class="rw__picker-price">$199.00</span>
+                            <span class="rw__picker-title">Women's Cropped Boxy Tee</span>
+                            <span class="rw__picker-price">$189.00</span>
                           </span>
                           <button type="button" class="rw__picker-close" data-rw-pick-close aria-label="Close">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5 5l14 14M19 5L5 19"/></svg>
                           </button>
                         </div>
                         <fieldset class="rw__opt">
-                          <legend class="rw__opt-name">Waist size</legend>
-                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="30" data-rw-option="0" checked><span class="rw__pill-label">30</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="32" data-rw-option="0"><span class="rw__pill-label">32</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="34" data-rw-option="0"><span class="rw__pill-label">34</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="36" data-rw-option="0"><span class="rw__pill-label">36</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="38" data-rw-option="0"><span class="rw__pill-label">38</span></label></div>
+                          <legend class="rw__opt-name">Size</legend>
+                          <div class="rw__opt-values"><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="XS" data-rw-option="0" checked><span class="rw__pill-label">XS</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="S" data-rw-option="0"><span class="rw__pill-label">S</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="M" data-rw-option="0"><span class="rw__pill-label">M</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="L" data-rw-option="0"><span class="rw__pill-label">L</span></label><label class="rw__pill"><input type="radio" name="Opt-{{ section.id }}-look-{{ l_idx }}-2" value="XL" data-rw-option="0"><span class="rw__pill-label">XL</span></label></div>
                         </fieldset>
                         <button type="button" class="rw__confirm" data-rw-confirm>
                           <span data-rw-confirm-label data-add="Add to bag">Add to bag</span>
-                          <span class="rw__sr"> — Fleece Relaxed Joggers</span>
+                          <span class="rw__sr"> — Women's Cropped Boxy Tee</span>
                         </button>
-                        <script type="application/json" data-rw-variants>[{"id":57015166730545,"a":true,"o":["30"]},{"id":57015166763313,"a":true,"o":["32"]},{"id":57015166796081,"a":true,"o":["34"]},{"id":57015166828849,"a":true,"o":["36"]},{"id":57015166861617,"a":true,"o":["38"]}]</script>
+                        <script type="application/json" data-rw-variants>[{"id":56835911582001,"a":true,"o":["XS"],"p":18900},{"id":56835911614769,"a":true,"o":["S"],"p":18900},{"id":56835911647537,"a":true,"o":["M"],"p":18900},{"id":56835911680305,"a":true,"o":["L"],"p":18900},{"id":56835911713073,"a":true,"o":["XL"],"p":18900}]</script>
                       </div>
                     </li>
                     {%- endcase -%}
                   {%- endif -%}
                 </ul>
 
+                <!-- DYNAMIC 1-CLICK BUNDLE (NO DISCOUNT, ACCURATE SUM) -->
+                {%- assign dynamic_look_total = 0 -%}
+                {%- if blk.settings.product_1 != blank -%}
+                  {%- for p_i in (1..4) -%}
+                    {%- capture p_key -%}product_{{ p_i }}{%- endcapture -%}
+                    {%- assign p_prod = blk.settings[p_key] -%}
+                    {%- if p_prod != blank -%}
+                      {%- assign dynamic_look_total = dynamic_look_total | plus: p_prod.price -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- case l_idx -%}
+                    {%- when 0 -%}{%- assign dynamic_look_total = 39800 -%}
+                    {%- when 1 -%}{%- assign dynamic_look_total = 38800 -%}
+                    {%- when 2 -%}{%- assign dynamic_look_total = 38800 -%}
+                    {%- when 3 -%}{%- assign dynamic_look_total = 39800 -%}
+                    {%- when 4 -%}{%- assign dynamic_look_total = 38800 -%}
+                    {%- when 5 -%}{%- assign dynamic_look_total = 38800 -%}
+                  {%- endcase -%}
+                {%- endif -%}
+
                 <div class="rw__bundle has-rule">
                   <p class="rw__msg" data-rw-msg role="status" aria-live="polite"></p>
                   <div class="rw__bundle-row">
                     <div class="rw__bundle-copy">
-                      <span class="rw__bundle-title">Complete the look</span>
-                      <span class="rw__bundle-note">{{ blk.settings.bundle_note | default: 'Bundle tee & joggers and save 10%' }}</span>
+                      <span class="rw__bundle-title">{{ blk.settings.bundle_title | default: 'Complete the look' }}</span>
+                      {%- if blk.settings.bundle_note != blank -%}
+                        <span class="rw__bundle-note">{{ blk.settings.bundle_note | escape }}</span>
+                      {%- endif -%}
                     </div>
                     <div class="rw__bundle-price">
-                      <s>$398.00</s>
-                      <strong>$358.20</strong>
+                      <strong data-rw-bundle-total>{{ dynamic_look_total | money }}</strong>
                     </div>
                   </div>
-                  <button type="button" class="rw__cta" data-rw-all>
-                    <span class="rw__cta-add">Add full look to bag &rarr;</span>
-                    <span class="rw__cta-m">Add look &rarr;</span>
-                    <span class="rw__cta-done">Added to bag</span>
+                  <button type="button" class="rw__cta" data-rw-all data-rw-add-look aria-label="{{ blk.settings.bundle_title | default: 'Complete the look' }}: {{ l_title | escape }}">
+                    <span class="rw__cta-add" data-rw-bundle-btn-label>{{ blk.settings.bundle_title | default: 'Add full look to bag' }} &rarr;</span>
+                    <span class="rw__cta-m">Add look (<span data-rw-bundle-total-mobile>{{ dynamic_look_total | money }}</span>) &rarr;</span>
+                    <span class="rw__cta-done">Added to bag &#10003;</span>
                     <svg class="rw__i-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 1-9 9"/></svg>
                   </button>
                 </div>
@@ -837,13 +905,6 @@
       </aside>
     </div>
   </div>
-
-  <span class="rw__cursor" data-rw-cursor aria-hidden="true">
-    <span class="rw__cursor-in">
-      <span class="rw__cursor-label rw__cursor-drag">Drag</span>
-      <span class="rw__cursor-label rw__cursor-view">View</span>
-    </span>
-  </span>
 </runway-section>
 </section>
 
@@ -851,7 +912,7 @@
 {
   "name": "Runway lookbook",
   "tag": "section",
-  "class": "section-the-runway",
+  "class": "section section-the-runway",
   "settings": [
     {
       "type": "text",
@@ -863,36 +924,20 @@
       "type": "text",
       "id": "subheading",
       "label": "Subheading",
-      "default": "Curated tee & jogger sets. Tap a pin to see the piece."
+      "default": "Curated Men, Women & Couple Sets. Tap a pin to see the piece."
     },
     {
-      "type": "select",
-      "id": "layout_style",
-      "label": "Layout style (Desktop)",
-      "options": [
-        { "value": "ring", "label": "3D Ring (Circular carousel)" },
-        { "value": "line", "label": "Linear runway" }
-      ],
-      "default": "ring"
-    },
-    {
-      "type": "select",
-      "id": "mobile_style",
-      "label": "Layout style (Mobile)",
-      "options": [
-        { "value": "ring", "label": "3D Ring" },
-        { "value": "line", "label": "Linear runway" }
-      ],
-      "default": "ring"
+      "type": "header",
+      "content": "Stage & Motion"
     },
     {
       "type": "select",
       "id": "feel",
-      "label": "Animation feel / physics",
+      "label": "Interaction Feel",
       "options": [
-        { "value": "soft", "label": "Soft & silky" },
-        { "value": "balanced", "label": "Balanced (Natural)" },
-        { "value": "snappy", "label": "Snappy & fast" }
+        { "value": "snappy", "label": "Snappy" },
+        { "value": "balanced", "label": "Balanced" },
+        { "value": "luxurious", "label": "Luxurious" }
       ],
       "default": "balanced"
     },
@@ -909,40 +954,14 @@
       "max": 10,
       "step": 1,
       "unit": "s",
-      "label": "Autoplay speed",
+      "label": "Autoplay cycle speed",
       "default": 5
     },
     {
       "type": "checkbox",
       "id": "blur",
-      "label": "Depth blur on distant models",
+      "label": "Depth of field background blur",
       "default": true
-    },
-    {
-      "type": "select",
-      "id": "height_mode",
-      "label": "Section height mode",
-      "options": [
-        { "value": "original", "label": "Original aspect ratio" },
-        { "value": "custom", "label": "Custom viewport height" }
-      ],
-      "default": "original"
-    },
-    {
-      "type": "range",
-      "id": "height_vh",
-      "min": 60,
-      "max": 120,
-      "step": 5,
-      "unit": "vh",
-      "label": "Custom viewport height",
-      "default": 100
-    },
-    {
-      "type": "text",
-      "id": "bundle_discount_code",
-      "label": "Optional discount code",
-      "info": "Applied automatically at checkout when bundle CTA is clicked."
     },
     {
       "type": "header",
@@ -975,7 +994,7 @@
     {
       "type": "color",
       "id": "color_accent",
-      "label": "Accent / Button color",
+      "label": "Accent / Button background",
       "default": "#0e0e0e"
     },
     {
@@ -987,7 +1006,7 @@
     {
       "type": "color",
       "id": "color_card",
-      "label": "Card background",
+      "label": "Product card background",
       "default": "#DFDFDF"
     },
     {
@@ -1006,27 +1025,53 @@
           "type": "text",
           "id": "title",
           "label": "Look title",
-          "default": "The City Edit"
+          "default": "Men's Street Set"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Gender / Category",
+          "options": [
+            { "value": "Couple Pair", "label": "Couple Pair" },
+            { "value": "Men", "label": "Men" },
+            { "value": "Women", "label": "Women" },
+            { "value": "Matching Set", "label": "Matching Set" },
+            { "value": "Unisex", "label": "Unisex" }
+          ],
+          "default": "Men"
         },
         {
           "type": "image_picker",
           "id": "model_image",
-          "label": "Model image"
+          "label": "Model / Photoshoot image",
+          "info": "Upload custom photoshoot image. If empty, editorial starter image is used."
+        },
+        {
+          "type": "text",
+          "id": "bundle_title",
+          "label": "Bundle button text",
+          "default": "Complete the look"
         },
         {
           "type": "text",
           "id": "bundle_note",
-          "label": "Bundle note",
-          "default": "Bundle tee & joggers and save 10%"
+          "label": "Bundle note / subtitle",
+          "default": "Curated set ready to wear"
         },
         {
           "type": "header",
-          "content": "Piece 1: Tee / Top"
+          "content": "Piece 1: Top / Tee"
         },
         {
           "type": "product",
           "id": "product_1",
-          "label": "Tee / Top"
+          "label": "Piece 1 Product"
+        },
+        {
+          "type": "text",
+          "id": "piece_1_label",
+          "label": "Piece 1 Role / Badge",
+          "info": "e.g. His Tee, Men's Tee, Crop Top"
         },
         {
           "type": "range",
@@ -1050,12 +1095,18 @@
         },
         {
           "type": "header",
-          "content": "Piece 2: Joggers / Pants"
+          "content": "Piece 2: Pants / Matching Tee"
         },
         {
           "type": "product",
           "id": "product_2",
-          "label": "Joggers / Pants"
+          "label": "Piece 2 Product"
+        },
+        {
+          "type": "text",
+          "id": "piece_2_label",
+          "label": "Piece 2 Role / Badge",
+          "info": "e.g. Her Tee, Cargo Joggers"
         },
         {
           "type": "range",
@@ -1084,7 +1135,12 @@
         {
           "type": "product",
           "id": "product_3",
-          "label": "Product 3"
+          "label": "Piece 3 Product"
+        },
+        {
+          "type": "text",
+          "id": "piece_3_label",
+          "label": "Piece 3 Role / Badge"
         },
         {
           "type": "range",
@@ -1105,6 +1161,40 @@
           "unit": "%",
           "label": "Pin 3 Y (top)",
           "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Piece 4 (Optional)"
+        },
+        {
+          "type": "product",
+          "id": "product_4",
+          "label": "Piece 4 Product"
+        },
+        {
+          "type": "text",
+          "id": "piece_4_label",
+          "label": "Piece 4 Role / Badge"
+        },
+        {
+          "type": "range",
+          "id": "pin_4_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 4 X (left)",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "pin_4_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Pin 4 Y (top)",
+          "default": 50
         }
       ]
     }
@@ -1116,8 +1206,10 @@
         {
           "type": "look",
           "settings": {
-            "title": "The City Edit",
-            "bundle_note": "Bundle tee & joggers and save 10%",
+            "title": "Men's Street Set",
+            "category": "Men",
+            "bundle_title": "Complete Men's Look",
+            "bundle_note": "Men's Tee & Cargo Joggers set",
             "pin_1_x": 48,
             "pin_1_y": 38,
             "pin_2_x": 48,
@@ -1127,8 +1219,10 @@
         {
           "type": "look",
           "settings": {
-            "title": "Gallery Opening",
-            "bundle_note": "Bundle tee & joggers and save 10%",
+            "title": "Women's Atelier Fit",
+            "category": "Women",
+            "bundle_title": "Complete Women's Fit",
+            "bundle_note": "Women's Tee & Fleece Joggers fit",
             "pin_1_x": 50,
             "pin_1_y": 36,
             "pin_2_x": 48,
@@ -1138,8 +1232,23 @@
         {
           "type": "look",
           "settings": {
-            "title": "Street Edition",
-            "bundle_note": "Bundle tee & joggers and save 10%",
+            "title": "Couple Tee Pair",
+            "category": "Couple Pair",
+            "bundle_title": "Bundle the Couple Pair",
+            "bundle_note": "His & Her matching tees pair",
+            "pin_1_x": 42,
+            "pin_1_y": 38,
+            "pin_2_x": 58,
+            "pin_2_y": 42
+          }
+        },
+        {
+          "type": "look",
+          "settings": {
+            "title": "Men's Utility Look",
+            "category": "Men",
+            "bundle_title": "Complete Men's Look",
+            "bundle_note": "Men's Utility Tee & Cargo set",
             "pin_1_x": 50,
             "pin_1_y": 36,
             "pin_2_x": 48,
@@ -1149,8 +1258,10 @@
         {
           "type": "look",
           "settings": {
-            "title": "Studio Day",
-            "bundle_note": "Bundle tee & joggers and save 10%",
+            "title": "Women's Relaxed Fit",
+            "category": "Women",
+            "bundle_title": "Complete Women's Fit",
+            "bundle_note": "Women's Street Tee & Joggers set",
             "pin_1_x": 50,
             "pin_1_y": 36,
             "pin_2_x": 48,
@@ -1160,23 +1271,14 @@
         {
           "type": "look",
           "settings": {
-            "title": "Night Runner",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
+            "title": "His & Hers Matching Set",
+            "category": "Matching Set",
+            "bundle_title": "Bundle the Pair",
+            "bundle_note": "Couple matching outfit set",
+            "pin_1_x": 45,
             "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
-          }
-        },
-        {
-          "type": "look",
-          "settings": {
-            "title": "Atelier Edit",
-            "bundle_note": "Bundle tee & joggers and save 10%",
-            "pin_1_x": 50,
-            "pin_1_y": 36,
-            "pin_2_x": 48,
-            "pin_2_y": 70
+            "pin_2_x": 55,
+            "pin_2_y": 38
           }
         }
       ]

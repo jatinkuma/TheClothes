@@ -949,7 +949,70 @@
         }
         if ((el = t.closest('[data-rw-confirm]'))) { const pk = el.closest('[data-rw-picker]'); return this.onConfirm((pk && pk._card) || el.closest('[data-rw-card]')); }
         if ((el = t.closest('[data-rw-add]'))) return this.onAdd(el.closest('[data-rw-card]'));
-        if ((el = t.closest('[data-rw-all]'))) return this.addFullLook(el.closest('[data-rw-panel]'), el);
+        if ((el = t.closest('[data-rw-all], [data-rw-add-look]'))) return this.addFullLook(el.closest('[data-rw-panel]'), el);
+      }
+
+      /* ---------------- money formatting & dynamic bundle total ---------------- */
+      formatMoney(cents) {
+        const formatString = this.dataset.moneyFormat || window.theme?.moneyFormat || '{{amount}}';
+        if (typeof cents === 'string') cents = cents.replace('.', '');
+        const placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+        function defaultOption(opt, def) { return typeof opt === 'undefined' ? def : opt; }
+        function formatWithDelimiters(number, precision, thousands, decimal) {
+          precision = defaultOption(precision, 2);
+          thousands = defaultOption(thousands, ',');
+          decimal = defaultOption(decimal, '.');
+          if (isNaN(number) || number == null) return '0';
+          number = (number / 100.0).toFixed(precision);
+          const parts = number.split('.');
+          const dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+          const centsStr = parts[1] ? decimal + parts[1] : '';
+          return dollars + centsStr;
+        }
+        let value = '';
+        const match = formatString.match(placeholderRegex);
+        const matchType = match ? match[1] : 'amount';
+        switch (matchType) {
+          case 'amount':
+            value = formatWithDelimiters(cents, 2);
+            break;
+          case 'amount_no_decimals':
+            value = formatWithDelimiters(cents, 0);
+            break;
+          case 'amount_with_comma_separator':
+            value = formatWithDelimiters(cents, 2, '.', ',');
+            break;
+          case 'amount_no_decimals_with_comma_separator':
+            value = formatWithDelimiters(cents, 0, '.', ',');
+            break;
+          default:
+            value = formatWithDelimiters(cents, 2);
+        }
+        return formatString.replace(placeholderRegex, value);
+      }
+
+      updateBundlePrice(panel) {
+        if (!panel) return;
+        const cards = Array.from(panel.querySelectorAll('[data-rw-card]:not([data-placeholder])'));
+        if (!cards.length) return;
+        let totalCents = 0;
+        let hasPrice = false;
+        cards.forEach((c) => {
+          const p = parseInt(c.dataset.price, 10);
+          if (!isNaN(p) && p > 0) {
+            totalCents += p;
+            hasPrice = true;
+          }
+        });
+        if (hasPrice) {
+          const formatted = this.formatMoney(totalCents);
+          panel.querySelectorAll('[data-rw-bundle-total]').forEach((el) => {
+            el.textContent = formatted;
+          });
+          panel.querySelectorAll('[data-rw-bundle-total-mobile]').forEach((el) => {
+            el.textContent = formatted;
+          });
+        }
       }
 
       /* ---------------- variant pickers ---------------- */
@@ -960,6 +1023,7 @@
           if (pk._card) pk._card._pk = pk;
           this.onOptionChange(pk, true);
         });
+        this.panels.forEach((p) => this.updateBundlePrice(p));
       }
       selected(pk) {
         const groups = {};
@@ -1000,6 +1064,14 @@
         if (btn) btn.disabled = !ok;
         if (label) label.textContent = ok ? label.dataset.add : (this.dataset.msgSoldout || 'Sold out');
         card.dataset.selected = ok ? match.id : '';
+        if (match && match.p) {
+          card.dataset.price = match.p;
+          const pDisplay = card.querySelector('.rw__price');
+          if (pDisplay) pDisplay.innerHTML = `<span>${this.formatMoney(match.p)}</span>`;
+          const pkPrice = pk.querySelector('.rw__picker-price');
+          if (pkPrice) pkPrice.textContent = this.formatMoney(match.p);
+        }
+        this.updateBundlePrice(card.closest('[data-rw-panel]'));
         if (!initial) card.dataset.touched = '1';
       }
 
@@ -1152,29 +1224,59 @@
 
       async addFullLook(panel, btn) {
         if (!panel) return;
-        const cta = btn || panel.querySelector('[data-rw-all]');
+        const cta = btn || panel.querySelector('[data-rw-all], [data-rw-add-look]');
         if (panel.classList.contains('is-complete') || (cta && cta.classList.contains('is-loading'))) return;
         const cards = Array.from(panel.querySelectorAll('[data-rw-card]:not([data-placeholder])'))
-          .filter((c) => !c.classList.contains('is-added') && !c.classList.contains('is-soldout'));
+          .filter((c) => !c.classList.contains('is-soldout'));
+        if (!cards.length) return;
+
         const items = [], ready = [], pending = [];
         cards.forEach((c) => {
-          // never guess a size: multi-option pieces need the shopper's own choice
-          const id = c.dataset.variantId || (c.dataset.touched ? c.dataset.selected : '');
-          if (id) { items.push({ id: Number(id), quantity: 1 }); ready.push(c); } else pending.push(c);
+          let id = c.dataset.variantId || c.dataset.selected;
+          if (!id) {
+            const pk = c._pk || c.querySelector('[data-rw-picker]');
+            if (pk && pk._variants && pk._variants.length) {
+              const firstAvail = pk._variants.find((v) => v.a) || pk._variants[0];
+              if (firstAvail) id = firstAvail.id;
+            }
+          }
+          if (id) {
+            items.push({ id: Number(id), quantity: 1 });
+            ready.push(c);
+          } else {
+            pending.push(c);
+          }
         });
         this.msg(panel, '');
+        if (pending.length && !items.length) {
+          (this.mobile ? pending.slice(0, 1) : pending).forEach((c) => this.openPicker(c, true));
+          this.msg(panel, (this.dataset.msgChoose || 'Pick a size for: [items]').replace('[items]', pending.map((c) => c.dataset.title).join(', ')));
+          this.reveal(pending[0]);
+          return;
+        }
         if (items.length) {
           cta && cta.classList.add('is-loading');
           ready.forEach((c) => c.classList.add('is-loading'));
-          try { await this.cartAdd(items); ready.forEach((c) => this.markAdded(c)); this.buzz(); }
-          catch (err) { ready.forEach((c) => c.classList.remove('is-loading')); this.msg(panel, err.message); }
-          cta && cta.classList.remove('is-loading');
-        }
-        if (pending.length) {
-          // phones show one size sheet at a time; the message lists every piece still to choose
-          (this.mobile ? pending.slice(0, 1) : pending).forEach((c) => this.openPicker(c, true));
-          this.msg(panel, (this.dataset.msgChoose || 'Choose your options for: [items]').replace('[items]', pending.map((c) => c.dataset.title).join(', ')));
-          this.reveal(pending[0]);
+          try {
+            await this.cartAdd(items);
+            ready.forEach((c) => this.markAdded(c));
+            this.buzz();
+            panel.classList.add('is-complete');
+            if (cta) {
+              cta.classList.add('is-added');
+              const lbl = cta.querySelector('[data-rw-bundle-btn-label]');
+              if (lbl) lbl.textContent = 'Added to bag ✓';
+            }
+            const themeDrawer = document.querySelector('theme-drawer[id*="cart"], cart-drawer-component')?.closest('theme-drawer');
+            if (themeDrawer && typeof themeDrawer.open === 'function' && !themeDrawer.hasAttribute('open')) {
+              themeDrawer.open();
+            }
+          } catch (err) {
+            ready.forEach((c) => c.classList.remove('is-loading'));
+            this.msg(panel, err.message);
+          } finally {
+            cta && cta.classList.remove('is-loading');
+          }
         }
         this.checkComplete(panel);
       }
@@ -1185,11 +1287,6 @@
         if (cards.length < 2 || !cards.every((c) => c.classList.contains('is-added'))) return;
         panel.classList.add('is-complete');
         this.msg(panel, '');
-        const code = this.dataset.bundleCode;
-        if (code && !this._codeApplied) {
-          this._codeApplied = true;
-          fetch(root() + 'discount/' + encodeURIComponent(code) + '?redirect=' + encodeURIComponent(root() + 'cart.js'), { credentials: 'same-origin' }).catch(() => {});
-        }
       }
     }
 
